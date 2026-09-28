@@ -1,0 +1,8 @@
+target/
+Cargo.lock
+vgen_local.db
+vgen_local.db-shm
+vgen_local.db-wal
+*.log
+.DS_Store
+Thumbs.db

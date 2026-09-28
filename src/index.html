@@ -1,0 +1,1176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AtelierV - Next-Gen Creative Commission & Escrow Hub</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-base: #0a0b10;
+      --bg-surface: #12141f;
+      --bg-card: rgba(23, 27, 44, 0.7);
+      --bg-card-hover: rgba(30, 36, 60, 0.85);
+      --border: rgba(255, 255, 255, 0.08);
+      --border-accent: rgba(139, 92, 246, 0.35);
+      
+      --primary: #8b5cf6;
+      --primary-gradient: linear-gradient(135deg, #a855f7 0%, #6366f1 100%);
+      --accent-pink: #ec4899;
+      --accent-cyan: #06b6d4;
+      --accent-emerald: #10b981;
+      --accent-amber: #f59e0b;
+      --accent-rose: #f43f5e;
+
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+
+      --glow-purple: rgba(139, 92, 246, 0.25);
+      --glow-pink: rgba(236, 72, 153, 0.2);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-base);
+      color: var(--text-main);
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      background-image: 
+        radial-gradient(circle at 15% 10%, rgba(168, 85, 247, 0.12) 0%, transparent 40%),
+        radial-gradient(circle at 85% 85%, rgba(99, 102, 241, 0.1) 0%, transparent 45%);
+    }
+
+    /* Top Navigation */
+    header {
+      height: 72px;
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(16px);
+      background: rgba(10, 11, 16, 0.75);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2rem;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .brand-logo {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-weight: 800;
+      font-size: 1.4rem;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, #fff 30%, #c084fc 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-decoration: none;
+    }
+
+    .brand-badge {
+      font-size: 0.65rem;
+      padding: 2px 7px;
+      border-radius: 9999px;
+      background: rgba(139, 92, 246, 0.15);
+      border: 1px solid rgba(139, 92, 246, 0.3);
+      color: #c084fc;
+      -webkit-text-fill-color: #c084fc;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .nav-tabs {
+      display: flex;
+      gap: 0.5rem;
+      background: rgba(255, 255, 255, 0.04);
+      padding: 4px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+    }
+
+    .nav-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .nav-btn:hover {
+      color: var(--text-main);
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .nav-btn.active {
+      background: var(--primary);
+      color: #fff;
+      box-shadow: 0 4px 14px var(--glow-purple);
+    }
+
+    .user-profile-bar {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .ws-indicator {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      padding: 4px 10px;
+      border-radius: 20px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border);
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background-color: var(--accent-rose);
+      box-shadow: 0 0 8px var(--accent-rose);
+    }
+
+    .status-dot.connected {
+      background-color: var(--accent-emerald);
+      box-shadow: 0 0 8px var(--accent-emerald);
+    }
+
+    .persona-selector {
+      background: var(--bg-surface);
+      color: var(--text-main);
+      border: 1px solid var(--border-accent);
+      padding: 0.45rem 0.85rem;
+      border-radius: 10px;
+      font-size: 0.825rem;
+      font-weight: 600;
+      outline: none;
+      cursor: pointer;
+    }
+
+    /* Main Container */
+    main {
+      flex: 1;
+      max-width: 1400px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+    }
+
+    /* Stats Banner */
+    .hero-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1.25rem;
+    }
+
+    .stat-card {
+      background: var(--bg-card);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.4rem;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.25s ease, border-color 0.25s ease;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--border-accent);
+    }
+
+    .stat-title {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .stat-detail {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      margin-top: 0.35rem;
+    }
+
+    /* Layout Sections */
+    .tab-content {
+      display: none;
+      animation: fadeIn 0.25s ease-out forwards;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Commission Board */
+    .board-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .btn-create {
+      background: var(--primary-gradient);
+      color: white;
+      border: none;
+      padding: 0.65rem 1.25rem;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 0.875rem;
+      cursor: pointer;
+      box-shadow: 0 4px 15px var(--glow-purple);
+      transition: all 0.2s ease;
+    }
+
+    .btn-create:hover {
+      opacity: 0.92;
+      transform: translateY(-1px);
+    }
+
+    .commissions-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .comm-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      position: relative;
+      transition: all 0.2s ease;
+    }
+
+    .comm-card:hover {
+      border-color: rgba(139, 92, 246, 0.5);
+      background: var(--bg-card-hover);
+    }
+
+    .comm-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 0.75rem;
+    }
+
+    .comm-title {
+      font-size: 1.125rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .comm-badge {
+      font-size: 0.7rem;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-weight: 700;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .badge-requested { background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); }
+    .badge-in_progress { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
+    .badge-in_review { background: rgba(168, 85, 247, 0.15); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.3); }
+    .badge-completed { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
+    .badge-cancelled { background: rgba(244, 63, 94, 0.15); color: #fb7185; border: 1px solid rgba(244, 63, 94, 0.3); }
+
+    .comm-brief {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .comm-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      padding-top: 0.8rem;
+      margin-top: auto;
+    }
+
+    .comm-price {
+      font-weight: 700;
+      color: #38bdf8;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .comm-actions {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+
+    .btn-action {
+      flex: 1;
+      padding: 0.45rem;
+      font-size: 0.775rem;
+      font-weight: 600;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-main);
+      cursor: pointer;
+      transition: background 0.15s ease;
+    }
+
+    .btn-action:hover {
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    .btn-action.success {
+      background: rgba(16, 185, 129, 0.2);
+      border-color: rgba(16, 185, 129, 0.4);
+      color: #34d399;
+    }
+    .btn-action.success:hover {
+      background: rgba(16, 185, 129, 0.3);
+    }
+
+    /* Live Feed / Realtime Chat */
+    .dual-pane {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 1.5rem;
+    }
+
+    .feed-panel {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      display: flex;
+      flex-direction: column;
+      height: 600px;
+    }
+
+    .panel-header {
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+      font-weight: 700;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .feed-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.825rem;
+    }
+
+    .feed-entry {
+      padding: 0.75rem;
+      background: rgba(0, 0, 0, 0.25);
+      border-radius: 8px;
+      border-left: 3px solid var(--primary);
+    }
+
+    .feed-entry.escrow {
+      border-left-color: var(--accent-emerald);
+    }
+    .feed-entry.ownership {
+      border-left-color: var(--accent-pink);
+    }
+    .feed-entry.chat {
+      border-left-color: var(--accent-cyan);
+    }
+
+    .feed-time {
+      font-size: 0.7rem;
+      color: var(--text-dim);
+      margin-bottom: 0.25rem;
+    }
+
+    .chat-sender {
+      color: #c084fc;
+      font-weight: 700;
+    }
+
+    /* Escrow & Ledger Table */
+    .ledger-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.85rem;
+    }
+
+    .ledger-table th, .ledger-table td {
+      padding: 0.85rem 1.2rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .ledger-table th {
+      color: var(--text-dim);
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 0.75rem;
+    }
+
+    /* Modal Form */
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(8px);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal-box {
+      background: #151828;
+      border: 1px solid var(--border-accent);
+      border-radius: 16px;
+      width: 90%;
+      max-width: 520px;
+      padding: 2rem;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+    }
+
+    .modal-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 1.25rem;
+      color: #fff;
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 0.4rem;
+    }
+
+    .form-group input, .form-group textarea, .form-group select {
+      width: 100%;
+      background: rgba(0, 0, 0, 0.35);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: #fff;
+      padding: 0.65rem 0.85rem;
+      font-family: inherit;
+      font-size: 0.875rem;
+      outline: none;
+    }
+
+    .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+      border-color: var(--primary);
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.75rem;
+      margin-top: 1.5rem;
+    }
+
+    .btn-secondary {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      padding: 0.6rem 1.1rem;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    /* Admin Management Panels */
+    .admin-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+    }
+
+    @media (max-width: 900px) {
+      .dual-pane, .admin-grid {
+        grid-template-columns: 1fr;
+      }
+      .nav-tabs {
+        overflow-x: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navbar -->
+  <header>
+    <div style="display: flex; align-items: center; gap: 1rem;">
+      <a href="#" class="brand-logo">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color: #a855f7;">
+          <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+          <polyline points="2 17 12 22 22 17"></polyline>
+          <polyline points="2 12 12 17 22 12"></polyline>
+        </svg>
+        AtelierV
+      </a>
+      <span class="brand-badge">Local Single-Binary</span>
+    </div>
+
+    <!-- Tab navigation -->
+    <div class="nav-tabs">
+      <button class="nav-btn active" onclick="switchTab('commissions')">
+        <span>🎨</span> Commissions
+      </button>
+      <button class="nav-btn" onclick="switchTab('escrow')">
+        <span>🔒</span> Escrow & Ledger
+      </button>
+      <button class="nav-btn" onclick="switchTab('ownership')">
+        <span>📜</span> Ownership Registry
+      </button>
+      <button class="nav-btn" onclick="switchTab('admin')">
+        <span>⚙️</span> Admin & Personas
+      </button>
+    </div>
+
+    <!-- Active Persona Switcher & Live indicator -->
+    <div class="user-profile-bar">
+      <div class="ws-indicator" id="wsIndicator">
+        <span class="status-dot" id="wsDot"></span>
+        <span id="wsText">Connecting...</span>
+      </div>
+      <label style="font-size: 0.75rem; color: var(--text-dim); margin-left: 0.5rem;">Persona:</label>
+      <select class="persona-selector" id="currentPersonaSelect" onchange="onPersonaChanged()">
+        <!-- Filled dynamically -->
+      </select>
+    </div>
+  </header>
+
+  <!-- Main Body -->
+  <main>
+    <!-- Live Stats -->
+    <section class="hero-stats">
+      <div class="stat-card">
+        <div class="stat-title">
+          <span>Active Escrow</span>
+          <span>💎</span>
+        </div>
+        <div class="stat-value" id="statEscrowBalance">$0.00</div>
+        <div class="stat-detail">Locked in milestone safety</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-title">
+          <span>Active Commissions</span>
+          <span>⚡</span>
+        </div>
+        <div class="stat-value" id="statActiveComms">0</div>
+        <div class="stat-detail">Briefs in progress / review</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-title">
+          <span>Certified Titles</span>
+          <span>🛡️</span>
+        </div>
+        <div class="stat-value" id="statCertTitles">0</div>
+        <div class="stat-detail">Permanent ownership registries</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-title">
+          <span>Registered Personas</span>
+          <span>👥</span>
+        </div>
+        <div class="stat-value" id="statTotalUsers">0</div>
+        <div class="stat-detail">Admins, Artists & Clients</div>
+      </div>
+    </section>
+
+    <!-- TAB 1: COMMISSIONS -->
+    <section id="tab-commissions" class="tab-content active">
+      <div class="board-header">
+        <div>
+          <h2 style="font-size: 1.4rem; font-weight: 800;">Creative Workstation</h2>
+          <p style="color: var(--text-muted); font-size: 0.85rem;">Manage milestone stages, review briefs, and advance artist workflows.</p>
+        </div>
+        <button class="btn-create" onclick="openNewCommModal()">+ Create Brief</button>
+      </div>
+
+      <div class="commissions-grid" id="commissionsContainer">
+        <!-- Rendered dynamically -->
+      </div>
+    </section>
+
+    <!-- TAB 2: ESCROW & LEDGER -->
+    <section id="tab-escrow" class="tab-content">
+      <div class="board-header">
+        <div>
+          <h2 style="font-size: 1.4rem; font-weight: 800;">Simulated Escrow & Safe Payouts</h2>
+          <p style="color: var(--text-muted); font-size: 0.85rem;">All financial movements are protected and audited through local cryptographically-stamped ledger entries.</p>
+        </div>
+        <button class="btn-create" style="background: rgba(16, 185, 129, 0.2); border: 1px solid rgba(16, 185, 129, 0.4); color: #34d399;" onclick="openDepositModal()">+ Test Deposit</button>
+      </div>
+
+      <div class="feed-panel" style="height: auto; min-height: 400px;">
+        <table class="ledger-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Commission Ref</th>
+              <th>From / To</th>
+              <th>Amount (USD)</th>
+              <th>Escrow State</th>
+              <th>Timestamp</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="ledgerTableBody">
+            <!-- Dynamic ledger items -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- TAB 3: OWNERSHIP REGISTRY -->
+    <section id="tab-ownership" class="tab-content">
+      <div class="board-header">
+        <div>
+          <h2 style="font-size: 1.4rem; font-weight: 800;">Character & IP Copyright Registry</h2>
+          <p style="color: var(--text-muted); font-size: 0.85rem;">Permanently certificates completed deliverables to their respective client owners with hash verification.</p>
+        </div>
+      </div>
+      <div class="feed-panel" style="height: auto;">
+        <table class="ledger-table">
+          <thead>
+            <tr>
+              <th>Asset / Character</th>
+              <th>Current Legal Owner</th>
+              <th>Original Creator</th>
+              <th>Commission Ref</th>
+              <th>License Terms</th>
+              <th>Certificate Hash</th>
+            </tr>
+          </thead>
+          <tbody id="ownershipTableBody">
+            <!-- Dynamic rows -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- TAB 4: ADMIN & LIVE EVENTS -->
+    <section id="tab-admin" class="tab-content">
+      <div class="admin-grid">
+        <!-- Persona Management -->
+        <div class="feed-panel" style="height: 520px;">
+          <div class="panel-header">
+            <span>🎭 Persona Directory</span>
+            <button class="btn-action" style="max-width: 130px;" onclick="openCreateUserModal()">+ Add Persona</button>
+          </div>
+          <div style="overflow-y: auto; flex: 1; padding: 1rem;">
+            <table class="ledger-table">
+              <thead>
+                <tr>
+                  <th>Username</th>
+                  <th>Role</th>
+                  <th>Display Name</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="adminUsersTableBody">
+                <!-- User rows -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Real-Time WebSocket Event Stream -->
+        <div class="feed-panel" style="height: 520px;">
+          <div class="panel-header">
+            <span>⚡ Live WebSocket Event Bus</span>
+            <span style="font-size: 0.75rem; color: var(--accent-emerald);">● Streaming</span>
+          </div>
+          <div class="feed-list" id="realtimeFeed">
+            <div class="feed-entry">
+              <div class="feed-time">System Startup</div>
+              <div>Listening for instant WebSocket broadcasts...</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Modal: Create Commission -->
+  <div class="modal-backdrop" id="modalNewComm">
+    <div class="modal-box">
+      <div class="modal-title">Launch Commission Brief</div>
+      <form id="commForm" onsubmit="handleCreateCommission(event)">
+        <div class="form-group">
+          <label>Title</label>
+          <input type="text" id="commInputTitle" placeholder="e.g. Vtuber 2.0 Full Body Rig" required>
+        </div>
+        <div class="form-group">
+          <label>Artist</label>
+          <select id="commInputArtist" required></select>
+        </div>
+        <div class="form-group">
+          <label>Agreed Price (USD)</label>
+          <input type="number" step="0.01" id="commInputPrice" placeholder="450.00" required>
+        </div>
+        <div class="form-group">
+          <label>Brief / Requirements Specification</label>
+          <textarea id="commInputBrief" rows="4" placeholder="Character reference sheets, expression targets, commercial streaming rights..." required></textarea>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" onclick="closeModal('modalNewComm')">Cancel</button>
+          <button type="submit" class="btn-create">Deposit & Launch</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Add Persona -->
+  <div class="modal-backdrop" id="modalNewUser">
+    <div class="modal-box">
+      <div class="modal-title">Create System Persona</div>
+      <form id="userForm" onsubmit="handleCreateUser(event)">
+        <div class="form-group">
+          <label>Unique Handle</label>
+          <input type="text" id="userInputUsername" placeholder="e.g. nova_art" required>
+        </div>
+        <div class="form-group">
+          <label>Display Name</label>
+          <input type="text" id="userInputDisplayName" placeholder="e.g. Nova Live2D" required>
+        </div>
+        <div class="form-group">
+          <label>Persona Role</label>
+          <select id="userInputRole">
+            <option value="Artist">Artist</option>
+            <option value="Client">Client</option>
+            <option value="Admin">Admin</option>
+          </select>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" onclick="closeModal('modalNewUser')">Cancel</button>
+          <button type="submit" class="btn-create">Save Persona</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // State
+    let users = [];
+    let commissions = [];
+    let escrowLedger = [];
+    let ownershipLogs = [];
+    let currentUserId = null;
+    let ws = null;
+
+    // Tab switching
+    function switchTab(tabName) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+      
+      const target = document.getElementById(`tab-${tabName}`);
+      if (target) target.classList.add('active');
+
+      const btn = Array.from(document.querySelectorAll('.nav-btn')).find(b => b.textContent.toLowerCase().includes(tabName));
+      if (btn) btn.classList.add('active');
+    }
+
+    // Modal helpers
+    function openModal(id) { document.getElementById(id).classList.add('open'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+    function openNewCommModal() {
+      // populate artist select
+      const artistSelect = document.getElementById('commInputArtist');
+      artistSelect.innerHTML = users
+        .filter(u => u.role === 'Artist')
+        .map(u => `<option value="${u.id}">${u.display_name} (@${u.username})</option>`)
+        .join('');
+      openModal('modalNewComm');
+    }
+
+    function openCreateUserModal() {
+      openModal('modalNewUser');
+    }
+
+    // WebSocket init
+    function initWebSocket() {
+      const loc = window.location;
+      const wsUri = (loc.protocol === 'https:' ? 'wss://' : 'ws://') + loc.host + '/ws';
+      ws = new WebSocket(wsUri);
+
+      const dot = document.getElementById('wsDot');
+      const text = document.getElementById('wsText');
+
+      ws.onopen = () => {
+        dot.classList.add('connected');
+        text.textContent = 'Live Sync';
+        console.log('[AtelierV WS] Connected to local event stream.');
+      };
+
+      ws.onmessage = (event) => {
+        try {
+          const payload = JSON.parse(event.data);
+          handleLiveEvent(payload);
+        } catch (err) {
+          console.error('[AtelierV WS] Parse error:', err);
+        }
+      };
+
+      ws.onclose = () => {
+        dot.classList.remove('connected');
+        text.textContent = 'Reconnecting...';
+        setTimeout(initWebSocket, 2000);
+      };
+    }
+
+    function handleLiveEvent(event) {
+      const feed = document.getElementById('realtimeFeed');
+      const item = document.createElement('div');
+      item.className = `feed-entry ${event.event_type.toLowerCase()}`;
+      
+      const timeStr = new Date().toLocaleTimeString();
+      item.innerHTML = `
+        <div class="feed-time">${timeStr} &bull; <strong>${event.event_type}</strong></div>
+        <div>${event.message}</div>
+      `;
+      feed.prepend(item);
+
+      // Re-fetch affected collections
+      fetchAllData();
+    }
+
+    // API Calls
+    async function fetchAllData() {
+      try {
+        const [uRes, cRes, eRes, oRes] = await Promise.all([
+          fetch('/api/users'),
+          fetch('/api/commissions'),
+          fetch('/api/escrow'),
+          fetch('/api/ownership')
+        ]);
+
+        users = await uRes.json();
+        commissions = await cRes.json();
+        escrowLedger = await eRes.json();
+        ownershipLogs = await oRes.json();
+
+        renderPersonaDropdown();
+        renderCommissions();
+        renderLedger();
+        renderOwnership();
+        renderAdminUsers();
+        updateStats();
+      } catch (e) {
+        console.error('Fetch error:', e);
+      }
+    }
+
+    function renderPersonaDropdown() {
+      const sel = document.getElementById('currentPersonaSelect');
+      if (!currentUserId && users.length > 0) {
+        currentUserId = users[0].id;
+      }
+      sel.innerHTML = users.map(u => `
+        <option value="${u.id}" ${u.id === currentUserId ? 'selected' : ''}>
+          ${u.display_name} (${u.role})
+        </option>
+      `).join('');
+    }
+
+    function onPersonaChanged() {
+      currentUserId = parseInt(document.getElementById('currentPersonaSelect').value);
+      renderCommissions();
+    }
+
+    function updateStats() {
+      // Active Escrow balance
+      const totalEscrow = escrowLedger
+        .filter(l => l.status === 'HELD_IN_ESCROW')
+        .reduce((sum, l) => sum + l.amount, 0);
+      document.getElementById('statEscrowBalance').textContent = `$${totalEscrow.toFixed(2)}`;
+
+      const activeComms = commissions.filter(c => c.status !== 'COMPLETED' && c.status !== 'CANCELLED').length;
+      document.getElementById('statActiveComms').textContent = activeComms;
+
+      document.getElementById('statCertTitles').textContent = ownershipLogs.length;
+      document.getElementById('statTotalUsers').textContent = users.length;
+    }
+
+    function renderCommissions() {
+      const container = document.getElementById('commissionsContainer');
+      if (commissions.length === 0) {
+        container.innerHTML = `<div style="color: var(--text-dim); grid-column: 1/-1; padding: 2rem; text-align: center;">No active commission briefs. Click '+ Create Brief' to launch your first local request.</div>`;
+        return;
+      }
+
+      container.innerHTML = commissions.map(c => {
+        const client = users.find(u => u.id === c.client_id) || { display_name: 'Unknown Client' };
+        const artist = users.find(u => u.id === c.artist_id) || { display_name: 'Unknown Artist' };
+        const badgeClass = `badge-${c.status.toLowerCase()}`;
+
+        // Next Action logic based on status
+        let actionButtons = '';
+        if (c.status === 'REQUESTED') {
+          actionButtons = `<button class="btn-action success" onclick="updateCommStatus(${c.id}, 'IN_PROGRESS')">Accept & Begin</button>`;
+        } else if (c.status === 'IN_PROGRESS') {
+          actionButtons = `<button class="btn-action success" onclick="updateCommStatus(${c.id}, 'IN_REVIEW')">Submit for Review</button>`;
+        } else if (c.status === 'IN_REVIEW') {
+          actionButtons = `
+            <button class="btn-action success" onclick="completeCommission(${c.id})">Approve & Release Funds</button>
+            <button class="btn-action" onclick="updateCommStatus(${c.id}, 'IN_PROGRESS')">Request Revisions</button>
+          `;
+        } else if (c.status === 'COMPLETED') {
+          actionButtons = `<span style="font-size: 0.75rem; color: var(--accent-emerald);">✓ Milestone Complete & Certified</span>`;
+        }
+
+        return `
+          <div class="comm-card">
+            <div class="comm-header">
+              <div class="comm-title">${escapeHtml(c.title)}</div>
+              <span class="comm-badge ${badgeClass}">${c.status}</span>
+            </div>
+            <div class="comm-brief">${escapeHtml(c.brief)}</div>
+            <div class="comm-meta">
+              <div>
+                <div>Client: <strong>${escapeHtml(client.display_name)}</strong></div>
+                <div>Artist: <strong>${escapeHtml(artist.display_name)}</strong></div>
+              </div>
+              <div class="comm-price">$${c.price.toFixed(2)}</div>
+            </div>
+            <div class="comm-actions">
+              ${actionButtons}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderLedger() {
+      const tbody = document.getElementById('ledgerTableBody');
+      if (escrowLedger.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--text-dim);">No transactions recorded yet.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = escrowLedger.map(l => {
+        const client = users.find(u => u.id === l.client_id) || { display_name: 'System' };
+        const artist = users.find(u => u.id === l.artist_id) || { display_name: 'System' };
+        const isHeld = l.status === 'HELD_IN_ESCROW';
+
+        return `
+          <tr>
+            <td style="font-family: 'JetBrains Mono', monospace; font-size: 0.75rem;">#${l.id}</td>
+            <td>Ref Comm #${l.commission_id || 'N/A'}</td>
+            <td>${escapeHtml(client.display_name)} &rarr; ${escapeHtml(artist.display_name)}</td>
+            <td style="font-family: 'JetBrains Mono', monospace; font-weight: 700; color: #38bdf8;">$${l.amount.toFixed(2)}</td>
+            <td>
+              <span class="comm-badge ${isHeld ? 'badge-in_progress' : 'badge-completed'}">
+                ${l.status}
+              </span>
+            </td>
+            <td style="color: var(--text-dim); font-size: 0.75rem;">${l.created_at}</td>
+            <td>
+              ${isHeld ? `<button class="btn-action success" style="padding: 2px 8px;" onclick="releaseEscrow(${l.id})">Force Release</button>` : `<span style="color: var(--text-dim); font-size: 0.75rem;">Settled</span>`}
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function renderOwnership() {
+      const tbody = document.getElementById('ownershipTableBody');
+      if (ownershipLogs.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-dim);">No completed copyright certificates. Complete a commission to register full rights.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = ownershipLogs.map(o => {
+        const owner = users.find(u => u.id === o.owner_user_id) || { display_name: 'Unknown' };
+        const creator = users.find(u => u.id === o.creator_user_id) || { display_name: 'Unknown' };
+
+        return `
+          <tr>
+            <td><strong>${escapeHtml(o.character_name)}</strong></td>
+            <td>${escapeHtml(owner.display_name)}</td>
+            <td>${escapeHtml(creator.display_name)}</td>
+            <td>#${o.commission_id}</td>
+            <td><span class="brand-badge">${escapeHtml(o.license_type)}</span></td>
+            <td style="font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: #c084fc;">${o.certificate_hash.substring(0, 16)}...</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function renderAdminUsers() {
+      const tbody = document.getElementById('adminUsersTableBody');
+      tbody.innerHTML = users.map(u => `
+        <tr>
+          <td style="font-family: 'JetBrains Mono', monospace;">@${escapeHtml(u.username)}</td>
+          <td><span class="brand-badge">${u.role}</span></td>
+          <td>${escapeHtml(u.display_name)}</td>
+          <td>
+            <button class="btn-action" style="padding: 2px 8px; color: var(--accent-rose);" onclick="deleteUser(${u.id})">Delete</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    // Actions
+    async function handleCreateCommission(e) {
+      e.preventDefault();
+      const payload = {
+        title: document.getElementById('commInputTitle').value,
+        client_id: currentUserId,
+        artist_id: parseInt(document.getElementById('commInputArtist').value),
+        price: parseFloat(document.getElementById('commInputPrice').value),
+        brief: document.getElementById('commInputBrief').value
+      };
+
+      const res = await fetch('/api/commissions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      if (res.ok) {
+        closeModal('modalNewComm');
+        document.getElementById('commForm').reset();
+      }
+    }
+
+    async function handleCreateUser(e) {
+      e.preventDefault();
+      const payload = {
+        username: document.getElementById('userInputUsername').value,
+        display_name: document.getElementById('userInputDisplayName').value,
+        role: document.getElementById('userInputRole').value
+      };
+
+      const res = await fetch('/api/users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      if (res.ok) {
+        closeModal('modalNewUser');
+        document.getElementById('userForm').reset();
+      }
+    }
+
+    async function updateCommStatus(commId, nextStatus) {
+      await fetch(`/api/commissions/${commId}/status`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: nextStatus })
+      });
+    }
+
+    async function completeCommission(commId) {
+      const charName = prompt('Enter Character/Asset Name for Legal IP Certificate:', 'Vtuber Character Rights');
+      if (!charName) return;
+
+      await fetch(`/api/commissions/${commId}/complete`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ character_name: charName, license_type: 'Full Commercial & Streaming' })
+      });
+    }
+
+    async function releaseEscrow(ledgerId) {
+      await fetch(`/api/escrow/${ledgerId}/release`, { method: 'POST' });
+    }
+
+    async function deleteUser(userId) {
+      if (!confirm('Are you sure you want to remove this persona?')) return;
+      await fetch(`/api/users/${userId}`, { method: 'DELETE' });
+    }
+
+    function openDepositModal() {
+      const amt = prompt('Simulated Test Deposit Amount ($):', '250.00');
+      if (!amt) return;
+      fetch('/api/escrow/deposit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          client_id: currentUserId,
+          amount: parseFloat(amt)
+        })
+      });
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return str.replace(/[&<>"']/g, m => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+      }[m]));
+    }
+
+    // Startup
+    window.addEventListener('DOMContentLoaded', () => {
+      initWebSocket();
+      fetchAllData();
+    });
+  </script>
+</body>
+</html>
