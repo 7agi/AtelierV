@@ -1,49 +1,83 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AtelierV - Creative Commissions & Digital Marketplace</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap"
+    rel="stylesheet">
   <style>
-    :root {
-      --bg-base: #0a0b10;
-      --bg-surface: #12141f;
-      --bg-card: rgba(23, 27, 44, 0.7);
-      --bg-card-hover: rgba(30, 36, 60, 0.85);
-      --border: rgba(255, 255, 255, 0.08);
-      --border-accent: rgba(139, 92, 246, 0.35);
+    /* Light Theme (Default) */
+    :root, [data-theme="light"] {
+      --bg-base: #f7f6f9;
+      --bg-surface: #ffffff;
+      --bg-card: #ffffff;
+      --bg-card-hover: #fcfbfe;
+      --border: #e3deea;
+      --border-accent: #ba87d4;
+      --primary: #ba87d4;
+      --primary-hover: #a86ec6;
+      --primary-light: rgba(186, 135, 212, 0.15);
       
-      --primary: #8b5cf6;
-      --primary-gradient: linear-gradient(135deg, #a855f7 0%, #6366f1 100%);
-      --accent-pink: #ec4899;
-      --accent-cyan: #06b6d4;
+      --accent-pink: #d977a8;
+      --accent-cyan: #3ba8bf;
       --accent-emerald: #10b981;
-      --accent-amber: #f59e0b;
-      --accent-rose: #f43f5e;
-
-      --text-main: #f8fafc;
-      --text-muted: #94a3b8;
-      --text-dim: #64748b;
-
-      --glow-purple: rgba(139, 92, 246, 0.25);
+      --accent-amber: #e69214;
+      --accent-rose: #e11d48;
+      
+      --text-main: #232029;
+      --text-muted: #645f70;
+      --text-dim: #908b9c;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+      --shadow-md: 0 4px 14px rgba(0,0,0,0.07);
+      --shadow-lg: 0 12px 28px rgba(0,0,0,0.09);
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    /* Dark Theme */
+    [data-theme="dark"] {
+      --bg-base: #2d2a36;
+      --bg-surface: #24212c;
+      --bg-card: #24212c;
+      --bg-card-hover: #292633;
+      --border: #3d394a;
+      --border-accent: #ba87d4;
+      --primary: #ba87d4;
+      --primary-hover: #ca9be2;
+      --primary-light: rgba(186, 135, 212, 0.18);
+      
+      --accent-pink: #ec4899;
+      --accent-cyan: #38bdf8;
+      --accent-emerald: #34d399;
+      --accent-amber: #fbbf24;
+      --accent-rose: #f43f5e;
+      
+      --text-main: #f5f3f7;
+      --text-muted: #b8b3c4;
+      --text-dim: #847e93;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.25);
+      --shadow-md: 0 4px 14px rgba(0,0,0,0.3);
+      --shadow-lg: 0 12px 28px rgba(0,0,0,0.4);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
     body {
       background-color: var(--bg-base);
       color: var(--text-main);
-      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
       overflow-x: hidden;
-      background-image: 
-        radial-gradient(circle at 15% 10%, rgba(168, 85, 247, 0.12) 0%, transparent 40%),
-        radial-gradient(circle at 85% 85%, rgba(99, 102, 241, 0.1) 0%, transparent 45%);
+      transition: background-color 0.2s ease, color 0.2s ease;
     }
 
     /* Auth Overlay */
@@ -51,8 +85,8 @@
       position: fixed;
       inset: 0;
       z-index: 1000;
-      background: rgba(10, 11, 16, 0.94);
-      backdrop-filter: blur(20px);
+      background: rgba(45, 42, 54, 0.7);
+      backdrop-filter: blur(8px);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -60,94 +94,89 @@
     }
 
     .auth-card {
-      background: #151828;
-      border: 1px solid var(--border-accent);
-      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7);
-      border-radius: 20px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-lg);
+      border-radius: 16px;
       width: 100%;
-      max-width: 440px;
-      padding: 2.5rem;
+      max-width: 420px;
+      padding: 2.2rem;
     }
 
     .auth-logo {
       display: flex;
       align-items: center;
       gap: 0.75rem;
-      font-size: 1.6rem;
+      font-size: 1.55rem;
       font-weight: 800;
-      margin-bottom: 0.4rem;
-      background: linear-gradient(135deg, #fff 30%, #c084fc 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+      margin-bottom: 0.35rem;
+      color: var(--primary);
     }
 
     .auth-subtitle {
       font-size: 0.85rem;
       color: var(--text-muted);
-      margin-bottom: 1.5rem;
+      margin-bottom: 1.4rem;
     }
 
     .auth-toggle {
       display: flex;
-      background: rgba(255, 255, 255, 0.05);
-      border-radius: 10px;
+      background: var(--bg-base);
+      border: 1px solid var(--border);
+      border-radius: 8px;
       padding: 3px;
-      margin-bottom: 1.5rem;
+      margin-bottom: 1.4rem;
     }
 
     .auth-toggle-btn {
       flex: 1;
-      padding: 0.6rem;
+      padding: 0.55rem;
       font-size: 0.85rem;
       font-weight: 700;
-      color: var(--text-muted);
-      background: transparent;
       border: none;
-      border-radius: 8px;
+      border-radius: 6px;
       cursor: pointer;
-      transition: all 0.2s;
+      background: transparent;
+      color: var(--text-muted);
+      transition: 0.15s;
     }
 
     .auth-toggle-btn.active {
       background: var(--primary);
-      color: white;
-      box-shadow: 0 4px 12px var(--glow-purple);
+      color: #ffffff;
     }
 
-    /* Navbar */
+    /* Header & Navigation */
     header {
-      height: 72px;
+      height: 68px;
       border-bottom: 1px solid var(--border);
-      backdrop-filter: blur(16px);
-      background: rgba(10, 11, 16, 0.75);
+      background: var(--bg-surface);
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0 2rem;
+      padding: 0 1.8rem;
       position: sticky;
       top: 0;
       z-index: 50;
+      box-shadow: var(--shadow-sm);
     }
 
     .brand-logo {
       display: flex;
       align-items: center;
-      gap: 0.75rem;
+      gap: 0.65rem;
       font-weight: 800;
-      font-size: 1.4rem;
-      letter-spacing: -0.02em;
-      background: linear-gradient(135deg, #fff 30%, #c084fc 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+      font-size: 1.35rem;
+      color: var(--primary);
       text-decoration: none;
     }
 
     .nav-tabs {
       display: flex;
-      gap: 0.5rem;
-      background: rgba(255, 255, 255, 0.04);
+      gap: 0.35rem;
+      background: var(--bg-base);
       padding: 4px;
-      border-radius: 12px;
+      border-radius: 10px;
       border: 1px solid var(--border);
     }
 
@@ -155,53 +184,85 @@
       background: transparent;
       border: none;
       color: var(--text-muted);
-      padding: 0.5rem 1rem;
-      border-radius: 8px;
-      font-size: 0.875rem;
+      padding: 0.45rem 0.85rem;
+      border-radius: 7px;
+      font-size: 0.85rem;
       font-weight: 600;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: 0.15s;
       display: flex;
       align-items: center;
-      gap: 0.5rem;
+      gap: 0.45rem;
     }
 
-    .nav-btn:hover { color: var(--text-main); background: rgba(255, 255, 255, 0.04); }
-    .nav-btn.active { background: var(--primary); color: #fff; box-shadow: 0 4px 14px var(--glow-purple); }
+    .nav-btn:hover {
+      color: var(--text-main);
+      background: rgba(186, 135, 212, 0.08);
+    }
 
-    .user-profile-bar { display: flex; align-items: center; gap: 1rem; }
+    .nav-btn.active {
+      background: var(--primary);
+      color: #ffffff;
+    }
+
+    .user-profile-bar {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    /* Theme Switcher Button */
+    .theme-toggle-btn {
+      background: var(--bg-base);
+      border: 1px solid var(--border);
+      color: var(--text-main);
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: 0.15s;
+    }
+
+    .theme-toggle-btn:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
 
     .ws-indicator {
       display: flex;
       align-items: center;
       gap: 0.4rem;
-      font-size: 0.75rem;
+      font-size: 0.72rem;
       color: var(--text-dim);
-      padding: 4px 10px;
-      border-radius: 20px;
-      background: rgba(255,255,255,0.03);
+      padding: 4px 9px;
+      border-radius: 16px;
+      background: var(--bg-base);
       border: 1px solid var(--border);
     }
 
     .status-dot {
-      width: 7px; height: 7px; border-radius: 50%;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
       background-color: var(--accent-rose);
-      box-shadow: 0 0 8px var(--accent-rose);
     }
 
     .status-dot.connected {
       background-color: var(--accent-emerald);
-      box-shadow: 0 0 8px var(--accent-emerald);
     }
 
     .user-pill {
       display: flex;
       align-items: center;
       gap: 0.6rem;
-      background: var(--bg-surface);
-      border: 1px solid var(--border-accent);
-      padding: 0.4rem 0.8rem;
-      border-radius: 10px;
+      background: var(--bg-base);
+      border: 1px solid var(--border);
+      padding: 0.35rem 0.75rem;
+      border-radius: 8px;
     }
 
     .user-role-tag {
@@ -212,130 +273,162 @@
       text-transform: uppercase;
     }
 
-    .role-Artist { background: rgba(168, 85, 247, 0.2); color: #c084fc; }
-    .role-Client { background: rgba(56, 189, 248, 0.2); color: #38bdf8; }
-    .pass-tag { background: rgba(16, 185, 129, 0.2); color: #34d399; font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; font-weight: 700; }
+    .role-Artist {
+      background: var(--primary-light);
+      color: var(--primary);
+    }
+
+    .role-Client {
+      background: rgba(59, 168, 191, 0.12);
+      color: var(--accent-cyan);
+    }
+
+    .pass-tag {
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--accent-emerald);
+      font-size: 0.65rem;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: 700;
+    }
 
     .btn-logout {
       background: transparent;
       border: 1px solid var(--border);
       color: var(--text-dim);
-      padding: 0.35rem 0.55rem;
+      padding: 0.3rem 0.55rem;
       border-radius: 6px;
-      font-size: 0.75rem;
+      font-size: 0.72rem;
       cursor: pointer;
     }
 
-    .btn-logout:hover { color: var(--accent-rose); border-color: var(--accent-rose); }
-
-    /* Layout */
-    main {
-      flex: 1;
-      max-width: 1400px;
-      width: 100%;
-      margin: 0 auto;
-      padding: 2rem;
-      display: flex;
-      flex-direction: column;
-      gap: 2rem;
+    .btn-logout:hover {
+      color: var(--accent-rose);
+      border-color: var(--accent-rose);
     }
 
-    .tab-content { display: none; animation: fadeIn 0.25s ease-out forwards; }
-    .tab-content.active { display: block; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+    /* Main Container */
+    main {
+      flex: 1;
+      max-width: 1360px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 1.8rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.8rem;
+    }
 
-    /* Market Grid */
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    /* Market Banner */
     .market-banner {
-      background: linear-gradient(135deg, rgba(139, 92, 246, 0.15) 0%, rgba(236, 72, 153, 0.1) 100%);
-      border: 1px solid var(--border-accent);
-      border-radius: 20px;
-      padding: 2.2rem;
-      margin-bottom: 2rem;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--primary);
+      border-radius: 12px;
+      padding: 1.6rem 2rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      position: relative;
-      overflow: hidden;
+      gap: 1.5rem;
+      box-shadow: var(--shadow-sm);
     }
 
-    .market-title { font-size: 1.8rem; font-weight: 800; margin-bottom: 0.4rem; }
-    .market-desc { color: var(--text-muted); font-size: 0.9rem; max-width: 600px; }
+    .market-title {
+      font-size: 1.55rem;
+      font-weight: 800;
+      margin-bottom: 0.35rem;
+      color: var(--text-main);
+    }
+
+    .market-desc {
+      color: var(--text-muted);
+      font-size: 0.88rem;
+      max-width: 650px;
+      line-height: 1.45;
+    }
 
     .products-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-      gap: 1.75rem;
+      grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+      gap: 1.5rem;
     }
 
-    /* Clean Card Layout for Home Page (No vendor info clutter on home) */
+    /* Product Cards */
     .product-card {
-      background: var(--bg-card);
+      background: var(--bg-surface);
       border: 1px solid var(--border);
-      border-radius: 18px;
+      border-radius: 12px;
       overflow: hidden;
       display: flex;
       flex-direction: column;
-      transition: all 0.25s ease;
       cursor: pointer;
+      box-shadow: var(--shadow-sm);
+      transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
     }
 
     .product-card:hover {
-      transform: translateY(-4px);
+      transform: translateY(-2px);
       border-color: var(--border-accent);
-      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
+      box-shadow: var(--shadow-md);
     }
 
     .product-media-wrap {
       width: 100%;
-      height: 220px;
-      background: #000;
+      height: 200px;
+      background: #1a1721;
       position: relative;
       overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     .product-media {
       width: 100%;
       height: 100%;
       object-fit: cover;
-      transition: transform 0.3s ease;
-    }
-
-    .product-card:hover .product-media {
-      transform: scale(1.05);
     }
 
     .product-price-tag {
       position: absolute;
-      bottom: 12px;
-      right: 12px;
-      background: rgba(10, 11, 16, 0.85);
-      backdrop-filter: blur(8px);
-      border: 1px solid rgba(255, 255, 255, 0.15);
+      bottom: 10px;
+      right: 10px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
       padding: 4px 10px;
-      border-radius: 8px;
+      border-radius: 6px;
       font-weight: 800;
-      font-size: 0.9rem;
-      color: #38bdf8;
-      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+      color: var(--primary);
+      font-family: "JetBrains Mono", monospace;
+      box-shadow: var(--shadow-sm);
     }
 
     .product-body {
-      padding: 1.25rem;
+      padding: 1.1rem;
       display: flex;
       flex-direction: column;
       flex: 1;
-      gap: 0.5rem;
+      gap: 0.45rem;
     }
 
     .product-card-title {
-      font-size: 1.15rem;
+      font-size: 1.05rem;
       font-weight: 700;
-      color: #fff;
+      color: var(--text-main);
     }
 
     .product-artist {
-      font-size: 0.8rem;
-      color: #c084fc;
+      font-size: 0.78rem;
+      color: var(--primary);
       font-weight: 600;
     }
 
@@ -343,14 +436,16 @@
       display: flex;
       align-items: center;
       gap: 0.4rem;
-      font-size: 0.8rem;
+      font-size: 0.78rem;
     }
 
-    .stars { color: #f59e0b; }
+    .stars {
+      color: var(--accent-amber);
+    }
 
     .click-view-hint {
       margin-top: auto;
-      padding-top: 0.6rem;
+      padding-top: 0.5rem;
       font-size: 0.75rem;
       color: var(--primary);
       font-weight: 600;
@@ -359,30 +454,35 @@
       gap: 0.3rem;
     }
 
-    /* Modal Product Detail Screen (Product + Vendor Info + Reviews on Left, Purchase on Right) */
+    /* Modal Product Detail Screen */
     .modal-product-layout {
       display: grid;
-      grid-template-columns: 1.4fr 1fr;
-      gap: 1.75rem;
+      grid-template-columns: 1.35fr 1fr;
+      gap: 1.5rem;
     }
 
-    @media (max-width: 800px) {
-      .modal-product-layout { grid-template-columns: 1fr; }
+    @media (max-width: 820px) {
+      .modal-product-layout {
+        grid-template-columns: 1fr;
+      }
     }
 
     .detail-left {
       display: flex;
       flex-direction: column;
-      gap: 1rem;
+      gap: 0.9rem;
     }
 
     .detail-media-wrap {
       width: 100%;
-      height: 240px;
-      border-radius: 12px;
+      height: 230px;
+      border-radius: 10px;
       overflow: hidden;
-      background: #000;
+      background: #1a1721;
       border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     .detail-media {
@@ -392,38 +492,38 @@
     }
 
     .product-vendor-box {
-      background: rgba(139, 92, 246, 0.08);
-      border: 1px solid var(--border-accent);
-      border-radius: 10px;
-      padding: 0.9rem;
+      background: var(--bg-base);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.85rem;
       font-size: 0.825rem;
       color: var(--text-main);
       line-height: 1.5;
     }
 
     .detail-right-checkout {
-      background: rgba(0, 0, 0, 0.35);
+      background: var(--bg-base);
       border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 1.5rem;
+      border-radius: 12px;
+      padding: 1.4rem;
       display: flex;
       flex-direction: column;
-      gap: 1.25rem;
+      gap: 1.1rem;
     }
 
     .checkout-price-callout {
-      font-size: 1.6rem;
+      font-size: 1.55rem;
       font-weight: 800;
-      color: #38bdf8;
-      font-family: 'JetBrains Mono', monospace;
+      color: var(--primary);
+      font-family: "JetBrains Mono", monospace;
     }
 
     .reviews-section {
       border-top: 1px solid var(--border);
-      padding-top: 1rem;
+      padding-top: 0.9rem;
       display: flex;
       flex-direction: column;
-      gap: 0.75rem;
+      gap: 0.7rem;
     }
 
     .reviews-list {
@@ -431,53 +531,62 @@
       overflow-y: auto;
       display: flex;
       flex-direction: column;
-      gap: 0.5rem;
+      gap: 0.55rem;
     }
 
     .review-bubble {
-      background: rgba(255, 255, 255, 0.03);
-      padding: 0.6rem 0.8rem;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
       border-radius: 8px;
+      padding: 0.65rem 0.8rem;
       font-size: 0.8rem;
     }
 
     .btn-buy {
       width: 100%;
-      padding: 0.85rem;
-      border-radius: 10px;
+      padding: 0.75rem;
+      border-radius: 8px;
       border: none;
-      background: var(--primary-gradient);
-      color: white;
-      font-weight: 800;
-      font-size: 0.95rem;
+      background: var(--primary);
+      color: #ffffff;
+      font-weight: 700;
+      font-size: 0.92rem;
       cursor: pointer;
-      box-shadow: 0 4px 15px var(--glow-purple);
-      transition: opacity 0.2s;
+      transition: background 0.15s;
     }
 
-    .btn-buy:hover { opacity: 0.92; }
+    .btn-buy:hover {
+      background: var(--primary-hover);
+    }
 
     /* Commission Cards */
     .commissions-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
-      gap: 1.5rem;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 1.3rem;
     }
 
     .comm-card {
-      background: var(--bg-card);
+      background: var(--bg-surface);
       border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 1.5rem;
+      border-radius: 12px;
+      padding: 1.3rem;
       display: flex;
       flex-direction: column;
-      gap: 1rem;
+      gap: 0.85rem;
       cursor: pointer;
-      transition: all 0.2s ease;
+      box-shadow: var(--shadow-sm);
+      transition: 0.15s;
     }
 
-    .comm-card:hover { border-color: rgba(139, 92, 246, 0.5); }
-    .comm-card.expanded { border-color: var(--primary); box-shadow: 0 8px 30px rgba(139, 92, 246, 0.15); }
+    .comm-card:hover {
+      border-color: var(--border-accent);
+      box-shadow: var(--shadow-md);
+    }
+
+    .comm-card.expanded {
+      border-color: var(--primary);
+    }
 
     .comm-badge {
       font-size: 0.7rem;
@@ -486,157 +595,287 @@
       font-weight: 700;
       text-transform: uppercase;
     }
-    .badge-requested { background: rgba(59, 130, 246, 0.15); color: #60a5fa; }
-    .badge-in_progress { background: rgba(245, 158, 11, 0.15); color: #fbbf24; }
-    .badge-in_review { background: rgba(168, 85, 247, 0.15); color: #c084fc; }
-    .badge-completed { background: rgba(16, 185, 129, 0.15); color: #34d399; }
+
+    .badge-requested {
+      background: rgba(59, 130, 246, 0.12);
+      color: #3b82f6;
+    }
+
+    .badge-in_progress {
+      background: rgba(230, 146, 20, 0.12);
+      color: var(--accent-amber);
+    }
+
+    .badge-in_review {
+      background: var(--primary-light);
+      color: var(--primary);
+    }
+
+    .badge-completed {
+      background: rgba(16, 185, 129, 0.12);
+      color: var(--accent-emerald);
+    }
 
     .progress-drawer {
       display: none;
-      background: rgba(0, 0, 0, 0.35);
-      border-radius: 12px;
-      padding: 1rem;
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      margin-top: 0.5rem;
+      background: var(--bg-base);
+      border-radius: 8px;
+      padding: 0.9rem;
+      border: 1px solid var(--border);
+      margin-top: 0.4rem;
     }
-    .progress-drawer.open { display: block; }
 
-    .timeline-step { display: flex; gap: 0.75rem; position: relative; padding-bottom: 0.85rem; }
-    .timeline-step:last-child { padding-bottom: 0; }
-    .timeline-step:not(:last-child)::before {
-      content: ''; position: absolute; left: 7px; top: 14px; bottom: 0; width: 2px; background: rgba(255, 255, 255, 0.1);
+    .progress-drawer.open {
+      display: block;
     }
-    .timeline-dot { width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--primary); margin-top: 2px; }
-    .timeline-dot.done { background: var(--accent-emerald); border-color: var(--accent-emerald); }
+
+    .timeline-step {
+      display: flex;
+      gap: 0.75rem;
+      position: relative;
+      padding-bottom: 0.85rem;
+    }
+
+    .timeline-step:last-child {
+      padding-bottom: 0;
+    }
+
+    .timeline-step:not(:last-child)::before {
+      content: "";
+      position: absolute;
+      left: 7px;
+      top: 14px;
+      bottom: 0;
+      width: 2px;
+      background: var(--border);
+    }
+
+    .timeline-dot {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      border: 2px solid var(--primary);
+      margin-top: 2px;
+      background: var(--bg-surface);
+    }
+
+    .timeline-dot.done {
+      background: var(--accent-emerald);
+      border-color: var(--accent-emerald);
+    }
 
     .btn-create {
-      background: var(--primary-gradient);
-      color: white;
+      background: var(--primary);
+      color: #ffffff;
       border: none;
-      padding: 0.65rem 1.25rem;
-      border-radius: 10px;
+      padding: 0.6rem 1.15rem;
+      border-radius: 8px;
       font-weight: 700;
-      font-size: 0.875rem;
+      font-size: 0.85rem;
       cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .btn-create:hover {
+      background: var(--primary-hover);
     }
 
     .btn-action {
       flex: 1;
-      padding: 0.55rem;
+      padding: 0.5rem;
       font-size: 0.775rem;
       font-weight: 600;
-      border-radius: 8px;
+      border-radius: 6px;
       border: 1px solid var(--border);
-      background: rgba(255, 255, 255, 0.05);
+      background: var(--bg-base);
       color: var(--text-main);
       cursor: pointer;
     }
-    .btn-action.success { background: rgba(16, 185, 129, 0.2); color: #34d399; border-color: rgba(16, 185, 129, 0.4); }
+
+    .btn-action.success {
+      background: rgba(16, 185, 129, 0.12);
+      color: var(--accent-emerald);
+      border-color: rgba(16, 185, 129, 0.3);
+    }
 
     /* Modals */
     .modal-backdrop {
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.8);
-      backdrop-filter: blur(8px);
+      background: rgba(45, 42, 54, 0.65);
+      backdrop-filter: blur(6px);
       z-index: 200;
       align-items: center;
       justify-content: center;
     }
-    .modal-backdrop.open { display: flex; }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
     .modal-box {
-      background: #151828;
-      border: 1px solid var(--border-accent);
-      border-radius: 18px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-lg);
+      border-radius: 14px;
       width: 90%;
       max-width: 540px;
-      padding: 2rem;
+      padding: 1.8rem;
     }
-    .form-group { margin-bottom: 1rem; }
-    .form-group label { display: block; font-size: 0.8rem; font-weight: 600; color: var(--text-muted); margin-bottom: 0.4rem; }
-    .form-group input, .form-group textarea, .form-group select {
+
+    .modal-title {
+      font-size: 1.25rem;
+      font-weight: 800;
+      margin-bottom: 1.2rem;
+      color: var(--text-main);
+    }
+
+    .form-group {
+      margin-bottom: 0.9rem;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 0.35rem;
+    }
+
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
       width: 100%;
-      background: rgba(0, 0, 0, 0.35);
+      background: var(--bg-base);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text-main);
+      padding: 0.6rem 0.8rem;
+      font-family: inherit;
+      font-size: 0.85rem;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus,
+    .form-group select:focus {
+      border-color: var(--primary);
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.75rem;
+      margin-top: 1.3rem;
+    }
+
+    .btn-secondary {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      padding: 0.55rem 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.85rem;
+    }
+
+    .btn-secondary:hover {
+      color: var(--text-main);
+      border-color: var(--text-muted);
+    }
+
+    /* Tables */
+    .feed-panel {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .ledger-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.85rem;
+    }
+
+    .ledger-table th,
+    .ledger-table td {
+      padding: 0.8rem 1.1rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .ledger-table th {
+      color: var(--text-dim);
+      text-transform: uppercase;
+      font-size: 0.72rem;
+      background: var(--bg-base);
+    }
+
+    /* Vendor Info Composer */
+    .vendor-composer {
+      background: var(--bg-base);
       border: 1px solid var(--border);
       border-radius: 8px;
-      color: #fff;
-      padding: 0.65rem 0.85rem;
-      font-family: inherit;
-      font-size: 0.875rem;
-      outline: none;
-    }
-    .modal-actions { display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem; }
-    .btn-secondary { background: transparent; border: 1px solid var(--border); color: var(--text-muted); padding: 0.6rem 1.1rem; border-radius: 8px; cursor: pointer; }
-
-    .ledger-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.85rem; }
-    .ledger-table th, .ledger-table td { padding: 0.85rem 1.2rem; border-bottom: 1px solid var(--border); }
-    .ledger-table th { color: var(--text-dim); text-transform: uppercase; font-size: 0.75rem; }
-
-    /* Vendor Info Composer & Rich Specs */
-    .vendor-composer {
-      background: rgba(0, 0, 0, 0.25);
-      border: 1px solid var(--border);
-      border-radius: 10px;
       padding: 0.85rem;
       display: flex;
       flex-direction: column;
       gap: 0.75rem;
     }
+
     .composer-sublabel {
       font-size: 0.75rem;
       font-weight: 700;
-      color: #c084fc;
+      color: var(--primary);
       display: flex;
       align-items: center;
       justify-content: space-between;
       margin-bottom: 0.35rem;
     }
+
     .composer-mini-btn {
-      background: rgba(139, 92, 246, 0.15);
+      background: var(--primary-light);
       border: 1px solid var(--border-accent);
-      color: #c084fc;
+      color: var(--primary);
       border-radius: 5px;
       font-size: 0.7rem;
       font-weight: 600;
       padding: 2px 7px;
       cursor: pointer;
+      transition: 0.15s;
     }
+
     .composer-mini-btn:hover {
-      background: rgba(139, 92, 246, 0.3);
-      color: #fff;
+      background: var(--primary);
+      color: #ffffff;
     }
-    .bullet-row {
+
+    .bullet-row, .kv-row {
       display: flex;
       gap: 0.4rem;
       align-items: center;
       margin-bottom: 0.35rem;
     }
-    .bullet-row input {
+
+    .bullet-row input, .kv-row .kv-k {
       flex: 1;
       padding: 0.45rem 0.65rem;
       font-size: 0.8rem;
     }
-    .kv-row {
-      display: flex;
-      gap: 0.4rem;
-      align-items: center;
-      margin-bottom: 0.35rem;
-    }
-    .kv-row .kv-k {
-      flex: 1;
-      padding: 0.45rem 0.65rem;
-      font-size: 0.8rem;
-    }
+
     .kv-row .kv-v {
       flex: 1.5;
       padding: 0.45rem 0.65rem;
       font-size: 0.8rem;
     }
+
     .btn-row-del {
-      background: rgba(244, 63, 94, 0.15);
-      border: 1px solid rgba(244, 63, 94, 0.3);
-      color: #fb7185;
+      background: rgba(225, 29, 72, 0.1);
+      border: 1px solid rgba(225, 29, 72, 0.25);
+      color: var(--accent-rose);
       border-radius: 6px;
       width: 28px;
       height: 28px;
@@ -647,62 +886,70 @@
       font-size: 0.8rem;
       flex-shrink: 0;
     }
+
     .btn-row-del:hover {
-      background: rgba(244, 63, 94, 0.35);
-      color: #fff;
+      background: var(--accent-rose);
+      color: #ffffff;
     }
 
-    /* Spec Key-Value Table in Product Details */
+    /* Spec Key-Value Table */
     .product-spec-table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 0.6rem;
+      margin-top: 0.5rem;
       font-size: 0.8rem;
     }
+
     .product-spec-table tr {
-      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      border-bottom: 1px solid var(--border);
     }
+
     .product-spec-table tr:last-child {
       border-bottom: none;
     }
+
     .product-spec-table td {
       padding: 0.35rem 0.4rem;
       vertical-align: top;
     }
+
     .product-spec-table td.spec-key {
       font-weight: 700;
-      color: #c084fc;
+      color: var(--primary);
       width: 38%;
-      letter-spacing: 0.02em;
     }
+
     .product-spec-table td.spec-val {
-      color: #e2e8f0;
+      color: var(--text-main);
     }
+
     .vendor-bullet-list {
-      margin: 0.4rem 0 0.5rem 1.1rem;
+      margin: 0.35rem 0 0.45rem 1.1rem;
       padding: 0;
       font-size: 0.8rem;
       color: var(--text-muted);
     }
+
     .vendor-bullet-list li {
-      margin-bottom: 0.25rem;
+      margin-bottom: 0.2rem;
     }
 
-    /* Upload Media / File Dropzone Styling */
+    /* Upload Zone */
     .upload-zone {
       border: 1.5px dashed var(--border-accent);
-      border-radius: 10px;
+      border-radius: 8px;
       padding: 0.85rem;
       text-align: center;
-      background: rgba(139, 92, 246, 0.03);
+      background: var(--primary-light);
       cursor: pointer;
-      transition: all 0.2s;
+      transition: 0.15s;
       position: relative;
     }
-    .upload-zone:hover, .upload-zone.dragover {
-      border-color: var(--primary);
-      background: rgba(139, 92, 246, 0.09);
+
+    .upload-zone:hover {
+      border-color: var(--primary-hover);
     }
+
     .upload-zone input[type="file"] {
       position: absolute;
       inset: 0;
@@ -711,17 +958,19 @@
       width: 100%;
       height: 100%;
     }
+
     .upload-preview-wrap {
       margin-top: 0.5rem;
       max-height: 110px;
       display: none;
       align-items: center;
       gap: 0.75rem;
-      background: rgba(0, 0, 0, 0.4);
+      background: var(--bg-base);
       padding: 0.4rem 0.6rem;
       border-radius: 8px;
       border: 1px solid var(--border);
     }
+
     .upload-preview-thumb {
       max-height: 80px;
       max-width: 100px;
@@ -731,13 +980,18 @@
     }
   </style>
 </head>
+
 <body>
 
   <!-- Auth Overlay -->
   <div id="authOverlay">
     <div class="auth-card">
       <div class="auth-logo">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+          <polyline points="2 17 12 22 22 17"></polyline>
+          <polyline points="2 12 12 17 22 12"></polyline>
+        </svg>
         AtelierV
       </div>
       <div class="auth-subtitle">Creative Commissions, Escrow & Digital Goods Hub</div>
@@ -757,7 +1011,7 @@
           <label>Password</label>
           <input type="password" id="loginPassword" placeholder="••••••••" required autocomplete="current-password">
         </div>
-        <button type="submit" class="btn-buy">Sign In</button>
+        <button type="submit" class="btn-buy" style="margin-top: 0.5rem;">Sign In</button>
       </form>
 
       <!-- Signup -->
@@ -781,12 +1035,10 @@
           <label>Password</label>
           <input type="password" id="signupPassword" placeholder="••••••••" required autocomplete="new-password">
         </div>
-        <button type="submit" class="btn-buy">Create Account & Enter</button>
+        <button type="submit" class="btn-buy" style="margin-top: 0.5rem;">Create Account & Enter</button>
       </form>
 
       <div id="authErrorMsg" style="color: var(--accent-rose); font-size: 0.8rem; margin-top: 0.75rem; text-align: center;"></div>
-
-
     </div>
   </div>
 
@@ -794,10 +1046,14 @@
   <header>
     <div style="display: flex; align-items: center; gap: 1rem;">
       <a href="#" class="brand-logo" onclick="switchTab('marketplace')">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+          <polyline points="2 17 12 22 22 17"></polyline>
+          <polyline points="2 12 12 17 22 12"></polyline>
+        </svg>
         AtelierV
       </a>
-      <span class="user-role-tag role-Client" style="background: rgba(139,92,246,0.2); color:#c084fc;">User Portal</span>
+      <span class="user-role-tag role-Client">User Portal</span>
     </div>
 
     <!-- Main Navigation Tabs -->
@@ -820,6 +1076,11 @@
     </div>
 
     <div class="user-profile-bar">
+      <!-- Dark / Light Theme Toggle Button -->
+      <button type="button" class="theme-toggle-btn" id="btnThemeToggle" onclick="toggleTheme()" title="Switch Light/Dark Mode">
+        🌙
+      </button>
+
       <div class="ws-indicator">
         <span class="status-dot" id="wsDot"></span>
         <span id="wsText">Live Sync</span>
@@ -848,7 +1109,7 @@
       </div>
 
       <div class="products-grid" id="productsContainer">
-        <!-- Rendered dynamically -->
+        <!-- Injected via JavaScript -->
       </div>
     </section>
 
@@ -861,10 +1122,12 @@
         </div>
         <button class="btn-create" id="btnNewBrief" onclick="openNewCommModal()">+ Create Brief</button>
       </div>
-      <div class="commissions-grid" id="commissionsContainer"></div>
+      <div class="commissions-grid" id="commissionsContainer">
+        <!-- Injected via JavaScript -->
+      </div>
     </section>
 
-    <!-- TAB 3: MY DOWNLOADS / VAULT -->
+    <!-- TAB 3: VAULT / DOWNLOADS -->
     <section id="tab-vault" class="tab-content">
       <div style="margin-bottom: 1.5rem;">
         <h2 style="font-size: 1.4rem; font-weight: 800;">Purchased Digital Goods</h2>
@@ -874,13 +1137,15 @@
         <table class="ledger-table">
           <thead>
             <tr>
-              <th>Asset Name</th>
-              <th>Status / Amount</th>
-              <th>Access Date</th>
-              <th>Direct Download</th>
+              <th>Item / Product</th>
+              <th>Paid Amount</th>
+              <th>Purchase Date</th>
+              <th>Asset Download</th>
             </tr>
           </thead>
-          <tbody id="purchasesTableBody"></tbody>
+          <tbody id="purchasesTableBody">
+            <!-- Injected via JavaScript -->
+          </tbody>
         </table>
       </div>
     </section>
@@ -892,26 +1157,29 @@
           <h2 style="font-size: 1.4rem; font-weight: 800;">Simulated Milestone Escrow</h2>
           <p style="color: var(--text-muted); font-size: 0.85rem;">Funds securely audited and locked until client acceptance.</p>
         </div>
-        <button class="btn-create" style="background: rgba(16, 185, 129, 0.2); border: 1px solid rgba(16, 185, 129, 0.4); color: #34d399;" onclick="testDeposit()">+ Deposit Funds</button>
+        <button class="btn-create" style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.4); color: var(--accent-emerald);" onclick="testDeposit()">+ Deposit Funds</button>
       </div>
       <div class="feed-panel" style="height: auto; min-height: 250px;">
         <table class="ledger-table">
           <thead>
             <tr>
               <th>ID</th>
-              <th>Ref</th>
-              <th>Transfer</th>
+              <th>Commission Ref</th>
+              <th>Client</th>
+              <th>Artist</th>
               <th>Amount</th>
               <th>Status</th>
-              <th>Actions</th>
+              <th>Action</th>
             </tr>
           </thead>
-          <tbody id="ledgerTableBody"></tbody>
+          <tbody id="escrowTableBody">
+            <!-- Injected via JavaScript -->
+          </tbody>
         </table>
       </div>
     </section>
 
-    <!-- TAB 5: OWNERSHIP REGISTRY -->
+    <!-- TAB 5: COPYRIGHT REGISTRY -->
     <section id="tab-ownership" class="tab-content">
       <div style="margin-bottom: 1.5rem;">
         <h2 style="font-size: 1.4rem; font-weight: 800;">Character & IP Copyright Registry</h2>
@@ -921,45 +1189,47 @@
         <table class="ledger-table">
           <thead>
             <tr>
-              <th>Character / Asset</th>
-              <th>Owner ID</th>
-              <th>Creator ID</th>
+              <th>Character / Asset Title</th>
+              <th>Owner</th>
+              <th>Original Creator</th>
               <th>License Terms</th>
-              <th>Certificate Hash</th>
+              <th>Cryptographic Certificate Hash</th>
             </tr>
           </thead>
-          <tbody id="ownershipTableBody"></tbody>
+          <tbody id="ownershipTableBody">
+            <!-- Injected via JavaScript -->
+          </tbody>
         </table>
       </div>
     </section>
   </main>
 
-  <!-- Comprehensive Product Modal (Item preview, Vendor info, Reviews near comments, and Purchase on Right) -->
+  <!-- Modal: Product Detail, Specs, Reviews & Purchase -->
   <div class="modal-backdrop" id="modalProductDetail">
-    <div class="modal-box" style="max-width: 900px;">
+    <div class="modal-box" style="max-width: 880px;">
       <div class="modal-product-layout">
-        
+
         <!-- Left Side: Digital Product, Vendor Info Box, Star Reviews & Comments -->
         <div class="detail-left">
           <div class="detail-media-wrap">
-            <img id="detailModalImg" class="detail-media" src="" alt="Digital Asset Preview">
-          </div>
-          
-          <div>
-            <h2 id="detailModalTitle" style="font-size: 1.35rem; font-weight: 800;"></h2>
-            <div id="detailModalArtist" style="font-size: 0.85rem; color: #c084fc; font-weight: 600; margin-top: 2px;"></div>
-            <div id="detailModalDesc" style="font-size: 0.85rem; color: var(--text-muted); margin-top: 6px; line-height: 1.4;"></div>
+            <img class="detail-media" id="detailModalImg" src="" alt="Deliverable Preview">
           </div>
 
-          <!-- Vendor Info Box (Inside Modal Only, Not on Home Page) -->
+          <div>
+            <h2 id="detailModalTitle" style="font-size: 1.3rem; font-weight: 800;"></h2>
+            <div id="detailModalArtist" style="font-size: 0.85rem; color: var(--primary); font-weight: 600; margin-top: 2px;"></div>
+            <div id="detailModalDesc" style="font-size: 0.85rem; color: var(--text-muted); margin-top: 6px; line-height: 1.45;"></div>
+          </div>
+
+          <!-- Vendor Info Box -->
           <div class="product-vendor-box">
-            <div style="font-weight: 800; font-size: 0.8rem; color: #c084fc; text-transform: uppercase; margin-bottom: 4px;">
+            <div style="font-weight: 800; font-size: 0.78rem; color: var(--primary); text-transform: uppercase; margin-bottom: 4px;">
               📦 Vendor Specs & Licensing:
             </div>
             <div id="detailModalVendorInfo"></div>
           </div>
 
-          <!-- Star Reviews & Comments Section (Below Info Box) -->
+          <!-- Star Reviews & Comments Section -->
           <div class="reviews-section">
             <div style="display: flex; justify-content: space-between; align-items: center;">
               <h4 style="font-size: 0.95rem; font-weight: 700;">Collector Reviews & Comments</h4>
@@ -970,7 +1240,7 @@
             <div class="reviews-list" id="detailReviewsList"></div>
 
             <!-- Add Review Input -->
-            <form id="formAddReview" onsubmit="handleAddReview(event)" style="background: rgba(0,0,0,0.3); padding: 0.75rem; border-radius: 8px;">
+            <form id="formAddReview" onsubmit="handleAddReview(event)" style="background: var(--bg-surface); border: 1px solid var(--border); padding: 0.75rem; border-radius: 8px;">
               <input type="hidden" id="detailModalProductId">
               <div style="display: flex; gap: 0.75rem; margin-bottom: 0.5rem; align-items: center;">
                 <label style="font-size: 0.75rem; color: var(--text-dim); white-space: nowrap;">Your Rating:</label>
@@ -992,7 +1262,7 @@
 
         <!-- Right Side: Purchase / Unlock Column -->
         <div class="detail-right-checkout">
-          <div style="font-size: 0.85rem; color: var(--text-dim); text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em;">
+          <div style="font-size: 0.82rem; color: var(--text-dim); text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em;">
             Unlock Deliverable
           </div>
 
@@ -1001,7 +1271,7 @@
             <div class="checkout-price-callout" id="detailModalBasePrice">$0.00</div>
           </div>
 
-          <div id="testerInstantUnlockBanner" style="display: none; background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.4); color: #34d399; padding: 0.75rem; border-radius: 8px; font-size: 0.8rem;">
+          <div id="testerInstantUnlockBanner" style="display: none; background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.3); color: var(--accent-emerald); padding: 0.75rem; border-radius: 8px; font-size: 0.8rem;">
             ⚡ <strong>All-Download Testing Pass Active</strong><br>
             No purchase popup or fee required. Click below to add directly to your downloads.
           </div>
@@ -1010,7 +1280,7 @@
           <form id="formCheckout" onsubmit="handleExecutePurchase(event)">
             <input type="hidden" id="checkoutProductId">
             <div id="checkoutInputArea" class="form-group">
-              <label>Offer Price (USD) - Pay What You Want:</label>
+              <label>Your Price / Support Creator (USD):</label>
               <input type="number" step="0.01" id="checkoutOfferedPrice" required>
               <div style="font-size: 0.72rem; color: var(--text-dim); margin-top: 4px;">
                 You can support the creator with any amount &ge; the base price.
@@ -1057,7 +1327,7 @@
 
           <div id="mediaUploadZone" class="upload-zone">
             <input type="file" id="pubMediaFile" accept="image/*,.gif,.png,.jpg,.jpeg,.webp,.svg" onchange="handleLocalMediaUpload(event)">
-            <div style="font-size: 0.825rem; color: #c084fc; font-weight: 600;">
+            <div style="font-size: 0.825rem; color: var(--primary); font-weight: 600;">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 4px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
               Choose image or GIF file from your device
             </div>
@@ -1074,7 +1344,7 @@
           <div class="upload-preview-wrap" id="mediaPreviewWrap">
             <img class="upload-preview-thumb" id="mediaPreviewImg" src="" alt="Preview">
             <div style="flex: 1; min-width: 0;">
-              <div style="font-size: 0.78rem; font-weight: 700; color: #34d399;" id="mediaPreviewStatus">File Loaded Successfully</div>
+              <div style="font-size: 0.78rem; font-weight: 700; color: var(--accent-emerald);" id="mediaPreviewStatus">File Loaded Successfully</div>
               <div style="font-size: 0.72rem; color: var(--text-dim); text-overflow: ellipsis; overflow: hidden; white-space: nowrap;" id="mediaPreviewInfo">Ready for buyers</div>
             </div>
             <button type="button" class="btn-row-del" onclick="clearMediaSelection()" title="Remove file">✕</button>
@@ -1177,6 +1447,29 @@
     let currentDetailProduct = null;
 
     const STORAGE_KEY = 'atelierv_user_session';
+    const THEME_KEY = 'atelierv_theme';
+
+    // Theme Management
+    function initTheme() {
+      const savedTheme = localStorage.getItem(THEME_KEY) || 'light';
+      applyTheme(savedTheme);
+    }
+
+    function applyTheme(theme) {
+      document.documentElement.setAttribute('data-theme', theme);
+      localStorage.setItem(THEME_KEY, theme);
+      const btn = document.getElementById('btnThemeToggle');
+      if (btn) {
+        btn.textContent = theme === 'dark' ? '☀️' : '🌙';
+        btn.title = theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode';
+      }
+    }
+
+    function toggleTheme() {
+      const current = document.documentElement.getAttribute('data-theme') || 'light';
+      const next = current === 'dark' ? 'light' : 'dark';
+      applyTheme(next);
+    }
 
     function switchAuthMode(mode) {
       document.getElementById('authErrorMsg').textContent = '';
@@ -1286,7 +1579,7 @@
     function openModal(id) { document.getElementById(id).classList.add('open'); }
     function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 
-    function openPublishModal() { 
+    function openPublishModal() {
       switchMediaInputMode('file');
       const bContainer = document.getElementById('pubBulletContainer');
       if (bContainer && bContainer.children.length === 0) {
@@ -1299,7 +1592,7 @@
         addVendorKvRow('Resolution', '1080x1080 / 112x112 / 56x56');
         addVendorKvRow('License', 'Full Commercial / Monetized Streams');
       }
-      openModal('modalPublishProduct'); 
+      openModal('modalPublishProduct');
     }
 
     async function openNewCommModal() {
@@ -1360,7 +1653,7 @@
       }
     }
 
-    // Home Page Product Cards: Clean view (Vendor info moved inside product detail click!)
+    // Home Page Product Cards
     function renderProducts() {
       const c = document.getElementById('productsContainer');
       if (products.length === 0) {
@@ -1417,7 +1710,7 @@
       const fullStars = Math.round(p.average_rating);
       document.getElementById('detailModalRatingBadge').innerHTML = `
         <span class="stars">${'★'.repeat(fullStars)}${'☆'.repeat(5 - fullStars)}</span>
-        <span style="font-weight: 700; color: #fff;">${p.average_rating.toFixed(1)}</span>
+        <span style="font-weight: 700; color: var(--text-main);">${p.average_rating.toFixed(1)}</span>
         <span style="color: var(--text-dim);">(${p.review_count} reviews)</span>
       `;
 
@@ -1444,83 +1737,6 @@
 
       await loadProductReviews(p.id);
       openModal('modalProductDetail');
-    }
-
-    async function loadProductReviews(prodId) {
-      const res = await fetch(`/api/products/${prodId}/reviews`);
-      const list = await res.json();
-      const container = document.getElementById('detailReviewsList');
-      if (list.length === 0) {
-        container.innerHTML = `<div style="color: var(--text-dim); font-size: 0.8rem; font-style: italic;">No reviews yet. Be the first to share your experience!</div>`;
-      } else {
-        container.innerHTML = list.map(r => `
-          <div class="review-bubble">
-            <div style="display: flex; justify-content: space-between; margin-bottom: 2px;">
-              <strong>${escapeHtml(r.user_name)}</strong>
-              <span class="stars">${'★'.repeat(r.rating)}${'☆'.repeat(5 - r.rating)}</span>
-            </div>
-            <div style="color: var(--text-muted); font-size: 0.775rem;">${escapeHtml(r.comment)}</div>
-          </div>
-        `).join('');
-      }
-    }
-
-    async function handleAddReview(e) {
-      e.preventDefault();
-      const prodId = parseInt(document.getElementById('detailModalProductId').value);
-      const rating = parseInt(document.getElementById('revRatingInput').value);
-      const comment = document.getElementById('revCommentInput').value.trim();
-
-      const res = await fetch(`/api/products/${prodId}/reviews`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          product_id: prodId,
-          user_id: currentUser.id,
-          rating: rating,
-          comment: comment
-        })
-      });
-
-      if (res.ok) {
-        document.getElementById('revCommentInput').value = '';
-        loadProductReviews(prodId);
-        fetchAllData();
-      }
-    }
-
-    async function handleExecutePurchase(e) {
-      e.preventDefault();
-      const prodId = parseInt(document.getElementById('checkoutProductId').value);
-      const isTester = currentUser && currentUser.all_download_access;
-      const offer = isTester ? 0.0 : parseFloat(document.getElementById('checkoutOfferedPrice').value);
-
-      const res = await fetch(`/api/products/${prodId}/purchase`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          product_id: prodId,
-          client_id: currentUser.id,
-          offered_price: offer
-        })
-      });
-
-      if (!res.ok) {
-        alert(await res.text() || 'Purchase error');
-        return;
-      }
-
-      const data = await res.json();
-      closeModal('modalProductDetail');
-
-      if (isTester) {
-        alert(`⚡ Asset unlocked instantly via your All-Download Testing Pass!\n\nAccess it anytime in the 'My Downloads' tab.`);
-      } else {
-        alert(`🎉 Purchase Successful for $${data.amount_paid.toFixed(2)}!\n\nYour file download link is ready in the 'My Downloads' tab.`);
-      }
-
-      switchTab('vault');
-      fetchAllData();
     }
 
     // Structured Vendor Info Renderer
@@ -1586,17 +1802,17 @@
       if (mode === 'file') {
         zoneUpload.style.display = 'block';
         zoneUrl.style.display = 'none';
-        btnFile.style.background = 'rgba(139, 92, 246, 0.4)';
+        btnFile.style.background = 'var(--primary)';
         btnFile.style.color = '#fff';
-        btnUrl.style.background = 'rgba(139, 92, 246, 0.15)';
-        btnUrl.style.color = '#c084fc';
+        btnUrl.style.background = 'var(--primary-light)';
+        btnUrl.style.color = 'var(--primary)';
       } else {
         zoneUpload.style.display = 'none';
         zoneUrl.style.display = 'block';
-        btnUrl.style.background = 'rgba(139, 92, 246, 0.4)';
+        btnUrl.style.background = 'var(--primary)';
         btnUrl.style.color = '#fff';
-        btnFile.style.background = 'rgba(139, 92, 246, 0.15)';
-        btnFile.style.color = '#c084fc';
+        btnFile.style.background = 'var(--primary-light)';
+        btnFile.style.color = 'var(--primary)';
 
         const directUrlInput = document.getElementById('pubMediaUrl');
         directUrlInput.oninput = () => {
@@ -1648,7 +1864,7 @@
       const row = document.createElement('div');
       row.className = 'bullet-row';
       row.innerHTML = `
-        <span style="color: #c084fc; font-weight: bold;">•</span>
+        <span style="color: var(--primary); font-weight: bold;">•</span>
         <input type="text" class="pub-bullet-item" placeholder="e.g. Includes 3 color variants + animated loop" value="${escapeHtml(val)}">
         <button type="button" class="btn-row-del" onclick="this.parentElement.remove()" title="Delete">✕</button>
       `;
@@ -1668,6 +1884,82 @@
       `;
       container.appendChild(row);
       row.querySelector('.kv-k').focus();
+    }
+
+    async function loadProductReviews(prodId) {
+      const res = await fetch(`/api/products/${prodId}/reviews`);
+      const list = await res.json();
+      const container = document.getElementById('detailReviewsList');
+      if (list.length === 0) {
+        container.innerHTML = `<div style="color: var(--text-dim); font-size: 0.8rem; font-style: italic;">No reviews yet. Be the first to share your experience!</div>`;
+      } else {
+        container.innerHTML = list.map(r => `
+          <div class="review-bubble">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 2px;">
+              <strong>${escapeHtml(r.user_name)}</strong>
+              <span class="stars">${'★'.repeat(r.rating)}${'☆'.repeat(5 - r.rating)}</span>
+            </div>
+            <div style="color: var(--text-muted); font-size: 0.775rem;">${escapeHtml(r.comment)}</div>
+          </div>
+        `).join('');
+      }
+    }
+
+    async function handleAddReview(e) {
+      e.preventDefault();
+      const prodId = parseInt(document.getElementById('detailModalProductId').value);
+      const rating = parseInt(document.getElementById('revRatingInput').value);
+      const comment = document.getElementById('revCommentInput').value.trim();
+
+      const res = await fetch(`/api/products/${prodId}/reviews`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          user_id: currentUser.id,
+          rating: rating,
+          comment: comment
+        })
+      });
+
+      if (res.ok) {
+        document.getElementById('revCommentInput').value = '';
+        await loadProductReviews(prodId);
+        fetchAllData();
+      }
+    }
+
+    async function handleExecutePurchase(e) {
+      e.preventDefault();
+      const prodId = parseInt(document.getElementById('checkoutProductId').value);
+      const isTester = currentUser && currentUser.all_download_access;
+      const offer = isTester ? 0.0 : parseFloat(document.getElementById('checkoutOfferedPrice').value);
+
+      const res = await fetch(`/api/products/${prodId}/purchase`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          product_id: prodId,
+          client_id: currentUser.id,
+          offered_price: offer
+        })
+      });
+
+      if (!res.ok) {
+        alert(await res.text() || 'Purchase error');
+        return;
+      }
+
+      const data = await res.json();
+      closeModal('modalProductDetail');
+
+      if (isTester) {
+        alert(`⚡ Asset unlocked instantly via your All-Download Testing Pass!\n\nAccess it anytime in the 'My Downloads' tab.`);
+      } else {
+        alert(`🎉 Purchase Successful for $${data.amount_paid.toFixed(2)}!\n\nYour file download link is ready in the 'My Downloads' tab.`);
+      }
+
+      switchTab('vault');
+      fetchAllData();
     }
 
     async function handlePublishProduct(e) {
@@ -1741,76 +2033,92 @@
           if (isArtist) {
             actionButtons = `<button class="btn-action success" onclick="updateCommStatus(${comm.id}, 'IN_PROGRESS', 'Artist accepted brief and began drafts')">Accept & Begin</button>`;
           } else {
-            actionButtons = `<span style="font-size: 0.75rem; color: #60a5fa;">Awaiting Artist Acceptance</span>`;
+            actionButtons = `<span style="font-size: 0.75rem; color: #3b82f6;">Awaiting Artist Acceptance</span>`;
           }
         } else if (comm.status === 'IN_PROGRESS') {
           if (isArtist) {
             actionButtons = `<button class="btn-action success" onclick="updateCommStatus(${comm.id}, 'IN_REVIEW', 'Artist submitted milestone drafts for feedback')">Submit For Review</button>`;
           } else {
-            actionButtons = `<span style="font-size: 0.75rem; color: #fbbf24;">Artist is creating deliverables</span>`;
+            actionButtons = `<span style="font-size: 0.75rem; color: var(--accent-amber);">Artist is creating deliverables</span>`;
           }
         } else if (comm.status === 'IN_REVIEW') {
-          if (!isArtist) {
-            actionButtons = `
-              <button class="btn-action success" onclick="completeComm(${comm.id})">Approve & Release Funds</button>
-              <button class="btn-action" onclick="updateCommStatus(${comm.id}, 'IN_PROGRESS', 'Client requested revisions')">Request Revisions</button>
-            `;
+          if (isArtist) {
+            actionButtons = `<span style="font-size: 0.75rem; color: var(--primary);">Client is reviewing draft milestones</span>`;
           } else {
-            actionButtons = `<span style="font-size: 0.75rem; color: #c084fc;">Under Client Review</span>`;
+            actionButtons = `<button class="btn-action success" onclick="completeComm(${comm.id})">Approve & Release Final Payment</button>`;
           }
         } else if (comm.status === 'COMPLETED') {
-          actionButtons = `<span style="font-size: 0.75rem; color: var(--accent-emerald);">✓ Completed & Certified</span>`;
+          actionButtons = `<span style="font-size: 0.75rem; color: var(--accent-emerald); font-weight: 700;">✓ Completed & Certified</span>`;
         }
 
         return `
-          <div class="comm-card" id="card-comm-${comm.id}" onclick="toggleMilestones(${comm.id}, event)">
+          <div class="comm-card" id="commCard-${comm.id}" onclick="toggleCommProgress(${comm.id})">
             <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-              <strong style="font-size: 1.1rem; color: #fff;">${escapeHtml(comm.title)}</strong>
-              <span class="comm-badge badge-${comm.status.toLowerCase()}">${comm.status}</span>
-            </div>
-            <div style="font-size: 0.85rem; color: var(--text-muted);">${escapeHtml(comm.brief)}</div>
-            
-            <div style="font-size: 0.72rem; color: var(--primary); font-weight: 600;">
-              ▼ Click card to inspect milestone progress
+              <div>
+                <span class="comm-badge badge-${comm.status.toLowerCase()}">${comm.status.replace('_', ' ')}</span>
+                <h3 style="margin-top: 0.4rem; font-size: 1.05rem; font-weight: 700;">${escapeHtml(comm.title)}</h3>
+                <div style="font-size: 0.75rem; color: var(--text-dim); margin-top: 2px;">
+                  Client: #${comm.client_id} • Artist: #${comm.artist_id}
+                </div>
+              </div>
+              <div style="font-family: 'JetBrains Mono', monospace; font-weight: 700; color: var(--primary); font-size: 1.05rem;">
+                $${comm.price.toFixed(2)}
+              </div>
             </div>
 
-            <!-- In-Card Progress Drawer -->
-            <div class="progress-drawer" id="drawer-comm-${comm.id}"></div>
-
-            <div style="display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-dim); border-top: 1px solid rgba(255,255,255,0.06); padding-top: 0.75rem; margin-top: auto;">
-              <div>Client #${comm.client_id} &bull; Artist #${comm.artist_id}</div>
-              <div style="font-weight: 700; color: #38bdf8; font-family: 'JetBrains Mono', monospace;">$${comm.price.toFixed(2)}</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.4;">
+              ${escapeHtml(comm.brief)}
             </div>
-            <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">${actionButtons}</div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border); padding-top: 0.65rem;" onclick="event.stopPropagation()">
+              <div>${actionButtons}</div>
+              <span style="font-size: 0.72rem; color: var(--primary); cursor: pointer;" onclick="toggleCommProgress(${comm.id})">
+                Audit Trail ▼
+              </span>
+            </div>
+
+            <!-- In-Card Progress Timeline Drawer -->
+            <div class="progress-drawer" id="commDrawer-${comm.id}" onclick="event.stopPropagation()">
+              <div style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.6rem; text-transform: uppercase;">
+                Milestone Audit History
+              </div>
+              <div id="commTimeline-${comm.id}" style="display: flex; flex-direction: column;">
+                <div style="color: var(--text-dim); font-size: 0.75rem;">Loading milestones...</div>
+              </div>
+            </div>
           </div>
         `;
       }).join('');
     }
 
-    async function toggleMilestones(commId, e) {
-      if (e && e.target.closest('button')) return;
-      const d = document.getElementById(`drawer-comm-${commId}`);
-      const c = document.getElementById(`card-comm-${commId}`);
-      if (!d) return;
+    async function toggleCommProgress(id) {
+      const drawer = document.getElementById(`commDrawer-${id}`);
+      const card = document.getElementById(`commCard-${id}`);
+      const isOpen = drawer.classList.contains('open');
 
-      if (d.classList.contains('open')) {
-        d.classList.remove('open');
-        c.classList.remove('expanded');
+      if (isOpen) {
+        drawer.classList.remove('open');
+        card.classList.remove('expanded');
+      } else {
+        drawer.classList.add('open');
+        card.classList.add('expanded');
+        await loadMilestones(id);
+      }
+    }
+
+    async function loadMilestones(id) {
+      const container = document.getElementById(`commTimeline-${id}`);
+      const res = await fetch(`/api/commissions/${id}/milestones`);
+      const list = await res.json();
+      if (list.length === 0) {
+        container.innerHTML = `<div style="color: var(--text-dim); font-size: 0.75rem;">No milestone events recorded yet.</div>`;
         return;
       }
-
-      d.classList.add('open');
-      c.classList.add('expanded');
-      d.innerHTML = `<div style="font-size:0.75rem; color:var(--text-dim);">Loading milestones...</div>`;
-
-      const res = await fetch(`/api/commissions/${commId}/milestones`);
-      const list = await res.json();
-
-      d.innerHTML = list.map(m => `
+      container.innerHTML = list.map(m => `
         <div class="timeline-step">
           <div class="timeline-dot ${m.stage_name === 'COMPLETED' ? 'done' : ''}"></div>
           <div style="font-size: 0.8rem;">
-            <div style="font-weight: 700; color: #fff;">${escapeHtml(m.stage_name)}</div>
+            <div style="font-weight: 700; color: var(--text-main);">${escapeHtml(m.stage_name)}</div>
             <div style="font-size: 0.75rem; color: var(--text-muted);">${escapeHtml(m.note)}</div>
             <div style="font-size: 0.68rem; color: var(--text-dim);">${escapeHtml(m.created_at)}</div>
           </div>
@@ -1865,33 +2173,49 @@
       tb.innerHTML = purchases.map(p => `
         <tr>
           <td><strong>${escapeHtml(p.product_title)}</strong></td>
-          <td style="color: #38bdf8; font-weight: 700;">
+          <td style="color: var(--primary); font-weight: 700;">
             ${p.amount_paid > 0 ? `$${p.amount_paid.toFixed(2)}` : '<span class="pass-tag">FREE (All-Access Pass)</span>'}
           </td>
-          <td style="font-size: 0.75rem; color: var(--text-dim);">${p.purchased_at}</td>
+          <td style="color: var(--text-dim); font-size: 0.8rem;">${escapeHtml(p.purchased_at)}</td>
           <td>
-            <a href="${escapeHtml(p.file_download_url)}" target="_blank" class="btn-create" style="padding: 4px 10px; font-size: 0.75rem; text-decoration: none; display: inline-block;">Download Asset</a>
+            <a href="${escapeHtml(p.file_download_url)}" target="_blank" class="composer-mini-btn" style="text-decoration: none; display: inline-block;">
+              Download Vault File ⬇
+            </a>
           </td>
         </tr>
       `).join('');
     }
 
     function renderLedger() {
-      const tb = document.getElementById('ledgerTableBody');
+      const tb = document.getElementById('escrowTableBody');
       if (escrowLedger.length === 0) {
-        tb.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-dim);">No escrow logs.</td></tr>`;
+        tb.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--text-dim);">No escrow transaction records found.</td></tr>`;
         return;
       }
-      tb.innerHTML = escrowLedger.map(l => `
+      tb.innerHTML = escrowLedger.map(e => `
         <tr>
-          <td style="font-family: monospace; font-size: 0.75rem;">#${l.id}</td>
-          <td>${l.commission_id ? `Comm #${l.commission_id}` : 'Digital Good'}</td>
-          <td>User #${l.client_id} &rarr; Artist #${l.artist_id}</td>
-          <td style="color: #38bdf8; font-weight: 700;">$${l.amount.toFixed(2)}</td>
-          <td><span class="comm-badge badge-completed">${l.status}</span></td>
-          <td><span style="font-size: 0.75rem; color: var(--text-dim);">${l.created_at}</span></td>
+          <td>#${e.id}</td>
+          <td>${e.commission_id ? `Commission #${e.commission_id}` : 'Direct Deposit'}</td>
+          <td>User #${e.client_id}</td>
+          <td>Artist #${e.artist_id}</td>
+          <td style="font-weight: 700; color: var(--primary);">$${e.amount.toFixed(2)}</td>
+          <td>
+            <span class="comm-badge ${e.status === 'RELEASED' ? 'badge-completed' : 'badge-in_progress'}">
+              ${escapeHtml(e.status)}
+            </span>
+          </td>
+          <td>
+            ${e.status === 'HELD' && currentUser && currentUser.id === e.client_id ? 
+              `<button class="btn-action success" style="padding: 2px 6px;" onclick="releaseEscrow(${e.id})">Release</button>` : 
+              '<span style="color: var(--text-dim); font-size: 0.75rem;">Audited</span>'}
+          </td>
         </tr>
       `).join('');
+    }
+
+    async function releaseEscrow(id) {
+      await fetch(`/api/escrow/${id}/release`, { method: 'POST' });
+      fetchAllData();
     }
 
     function renderOwnership() {
@@ -1906,7 +2230,7 @@
           <td>User #${o.owner_user_id}</td>
           <td>Artist #${o.creator_user_id}</td>
           <td><span class="user-role-tag role-Client">${escapeHtml(o.license_type)}</span></td>
-          <td style="font-family: monospace; font-size: 0.7rem; color: #c084fc;">${o.certificate_hash.substring(0, 18)}...</td>
+          <td style="font-family: monospace; font-size: 0.72rem; color: var(--primary);">${o.certificate_hash.substring(0, 18)}...</td>
         </tr>
       `).join('');
     }
@@ -1926,8 +2250,9 @@
       return s.replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
     }
 
-    // Startup Session Restoration
+    // Startup Session Restoration & Theme Init
     window.addEventListener('DOMContentLoaded', () => {
+      initTheme();
       initWebSocket();
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
@@ -1944,4 +2269,5 @@
     });
   </script>
 </body>
+
 </html>
