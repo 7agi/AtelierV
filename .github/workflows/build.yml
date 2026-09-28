@@ -1,4 +1,4 @@
-name: Build & Release AtelierV Executables
+name: Build & Release AtelierV Suite
 
 on:
   push:
@@ -12,7 +12,7 @@ permissions:
 
 jobs:
   build-windows:
-    name: Build Windows Binaries (.exe)
+    name: Build Complete Windows Suite
     runs-on: windows-latest
 
     steps:
@@ -27,31 +27,34 @@ jobs:
       - name: Rust Cache
         uses: Swatinem/rust-cache@v2
 
-      - name: Compile Release Binaries (User Portal & Admin Portal)
+      - name: Compile Release Binaries (User & Admin)
         run: |
           cargo build --release --target x86_64-pc-windows-msvc --bin atelierv
           cargo build --release --target x86_64-pc-windows-msvc --bin atelierv-admin
 
-      - name: Upload User Portal Executable (.exe)
+      - name: Package Single Unified Suite
+        shell: bash
+        run: |
+          mkdir -p dist
+          cp target/x86_64-pc-windows-msvc/release/atelierv.exe dist/
+          cp target/x86_64-pc-windows-msvc/release/atelierv-admin.exe dist/
+          cp run.bat dist/
+          cp run-admin.bat dist/
+          cp README.md dist/
+
+      - name: Upload Unified Suite Artifact (Runs on Same DB)
         uses: actions/upload-artifact@v4
         with:
-          name: atelierv-windows-x64
-          path: target/x86_64-pc-windows-msvc/release/atelierv.exe
+          name: atelierv-suite-windows-x64
+          path: dist/*
           if-no-files-found: error
 
-      - name: Upload Admin Portal Executable (.exe)
-        uses: actions/upload-artifact@v4
-        with:
-          name: atelierv-admin-windows-x64
-          path: target/x86_64-pc-windows-msvc/release/atelierv-admin.exe
-          if-no-files-found: error
-
-      - name: Release to GitHub Releases (if tag or dispatch release)
+      - name: Release to GitHub Releases (if tag)
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            target/x86_64-pc-windows-msvc/release/atelierv.exe
-            target/x86_64-pc-windows-msvc/release/atelierv-admin.exe
+            dist/atelierv.exe
+            dist/atelierv-admin.exe
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
