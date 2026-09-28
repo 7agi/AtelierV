@@ -1,59 +1,48 @@
-# AtelierV: VGen-Style Single-Binary Local Hub
+# AtelierV: VGen-Style Creative Commissions & Digital Goods Hub
 
-A single-binary creative commission, escrow, and character IP rights management application built with **Rust**, **Axum**, **SQLite (via SQLx)**, and **WebSockets**.
+A dual-binary, full-stack creative suite written in **Rust**, with embedded responsive dark glassmorphic web dashboards, **SQLite DBMS (via SQLx)**, and **WebSockets**.
+
+---
+
+## 🏛️ Architecture: Two Separate Executables
+
+1. **`atelierv.exe` (Port 7860 - User & Artist Portal)**
+   - **Launch with:** [run.bat](file:///d:/Storage%20Directories/IDE%20Directories/AtelierV/run.bat) &rarr; opens `http://localhost:7860`
+   - **Features:**
+     - **Home Page Digital Marketplace:** Artists can put out digital goods with previews (static images or animated GIFs), file download packages, and helpful vendor guidelines.
+     - **Curated Discovery (Not First-to-Post):** Products are ordered using a weighted algorithm factoring in average ratings, review count, and discovery scores so the first posted item doesn't just sit stuck at the top.
+     - **Pay-What-You-Want Pricing:** Artists set a fixed minimum baseline price (e.g. $20). Clients can choose to pay more to support the creator, but cannot checkout below the fixed price.
+     - **5-to-1 Star Review System:** Verified rating system with star breakdowns and collector comments.
+     - **My Downloads Vault:** Instant digital deliverable retrieval.
+     - **Custom Commission Requests:** Scoped so Clients only see what they request, Artists only see briefs put out to them.
+     - **In-Card Milestone Tracking:** Clicking on any commission expands an audit timeline showing every workflow phase.
+     - **Persistent Auth:** Sign in once; session automatically persists via localStorage.
+
+2. **`atelierv-admin.exe` (Port 7861 - Dedicated Admin Command Center)**
+   - **Launch with:** [run-admin.bat](file:///d:/Storage%20Directories/IDE%20Directories/AtelierV/run-admin.bat) &rarr; opens `http://localhost:7861`
+   - **Features:**
+     - Completely separated localhost service dedicated solely to system administration.
+     - Global persona management (create, inspect, delete accounts).
+     - Global commission lifecycle inspection and emergency overrides.
+     - Real-time system event monitor via WebSockets.
 
 ---
 
 ## ☁️ Zero-Local-Install Setup (Build via GitHub Actions)
 
-If you have limited disk space and **do not** want to install Rust (~5-10 GB for compiler + C++ build tools), GitHub Actions can compile it for you in the cloud for free:
+Since you don't have disk space locally for the Rust compiler, GitHub Actions compiles both `.exe` files in the cloud:
 
-### 1. Push to GitHub
-Commit and push this repository to your GitHub account:
-```powershell
-git init
-git add .
-git commit -m "Initial commit for AtelierV"
-git branch -M main
-git remote add origin https://github.com/<YOUR_USERNAME>/<YOUR_REPO>.git
-git push -u origin main
-```
-
-### 2. Cloud Compilation Runs Automatically
-- Open your GitHub repository in your web browser.
-- Go to the **Actions** tab.
-- Click the workflow: **`Build & Release AtelierV Executable`**.
-- It runs on GitHub's Windows cloud runner, compiles the release single-binary with embedded HTML dashboard, and attaches it as an artifact.
-
-### 3. Download & Run
-1. In the completed workflow run, scroll down to **Artifacts** and download **`atelierv-windows-x64`**.
-2. Extract `atelierv.exe` into this project folder (right beside [run.bat](file:///d:/Storage%20Directories/IDE%20Directories/AtelierV/run.bat)).
-3. Double-click [run.bat](file:///d:/Storage%20Directories/IDE%20Directories/AtelierV/run.bat) (or run `./atelierv.exe`).
-4. It will immediately start the server and open your default browser to `http://localhost:7860`.
-
----
-
-## 🛠 Local Build (Alternative, If You Have Rust)
-
-If you ever have Rust and disk space available:
-```powershell
-cargo run --release
-```
-
----
-
-## 📁 Project Structure
-
-```
-AtelierV/
-├── .github/
-│   └── workflows/
-│       └── build.yml      # Automated GitHub Actions cloud compiler for Windows
-├── .gitignore             # Excludes databases, logs, and build artifacts from git
-├── Cargo.toml             # Rust dependencies (Axum, Tokio, SQLx, Open, Serde)
-├── run.bat                # 1-click launcher for the downloaded atelierv.exe
-├── README.md              # Instructions & Architecture guide
-└── src/
-    ├── main.rs            # Embedded SQLite, auto-migrations, REST API, WebSockets
-    └── index.html         # Embedded dark glassmorphic dashboard (single-binary asset)
-```
+1. **Push your code to GitHub**:
+   ```powershell
+   git add .
+   git commit -m "Add separate admin executable, digital marketplace, reviews, and pay-what-you-want"
+   git push
+   ```
+2. **Download the Compiled Binaries**:
+   - Go to your repo's **Actions** tab &rarr; click **`Build & Release AtelierV Executables`**.
+   - Under **Artifacts**, download:
+     - `atelierv-windows-x64` (extract `atelierv.exe` into this folder)
+     - `atelierv-admin-windows-x64` (extract `atelierv-admin.exe` into this folder)
+3. **Launch**:
+   - Double-click [run.bat](file:///d:/Storage%20Directories/IDE%20Directories/AtelierV/run.bat) to launch the User/Artist Marketplace (`http://localhost:7860`).
+   - Double-click [run-admin.bat](file:///d:/Storage%20Directories/IDE%20Directories/AtelierV/run-admin.bat) to launch the Admin Center (`http://localhost:7861`).

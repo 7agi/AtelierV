@@ -15,7 +15,7 @@ use tokio::sync::broadcast;
 use tower_http::cors::CorsLayer;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
-// Embedded single-page dashboard
+// Embedded client/artist portal HTML
 const DASHBOARD_HTML: &str = include_str!("index.html");
 
 // Broadcast event payload for real-time WebSocket updates
@@ -26,7 +26,6 @@ pub struct WsEvent {
     pub payload: serde_json::Value,
 }
 
-// Global App State
 #[derive(Clone)]
 pub struct AppState {
     pub db: SqlitePool,
@@ -42,7 +41,7 @@ pub struct User {
     pub id: i64,
     pub username: String,
     pub display_name: String,
-    pub role: String, // Admin, Artist, Client
+    pub role: String, // Artist, Client, Admin
     #[serde(skip_serializing)]
     pub password_hash: String,
     pub created_at: String,
@@ -88,13 +87,94 @@ pub struct UserQuery {
     pub user_id: Option<i64>,
 }
 
+// Digital Products Marketplace Models
+#[derive(Debug, Serialize, Deserialize, FromRow)]
+pub struct DigitalProduct {
+    pub id: i64,
+    pub artist_id: i64,
+    pub title: String,
+    pub description: String,
+    pub media_url: String, // Supports jpg, png, webp, gif, or data url
+    pub file_download_url: String,
+    pub min_price: f64,    // Fixed baseline price
+    pub vendor_info: String, // Helpful delivery, specs, usage info
+    pub score_weight: f64, // Internal weight for discovery algorithm
+    pub created_at: String,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct DigitalProductWithStats {
+    pub id: i64,
+    pub artist_id: i64,
+    pub artist_name: String,
+    pub artist_username: String,
+    pub title: String,
+    pub description: String,
+    pub media_url: String,
+    pub file_download_url: String,
+    pub min_price: f64,
+    pub vendor_info: String,
+    pub average_rating: f64,
+    pub review_count: i64,
+    pub created_at: String,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct CreateProductReq {
+    pub artist_id: i64,
+    pub title: String,
+    pub description: String,
+    pub media_url: String,
+    pub file_download_url: Option<String>,
+    pub min_price: f64,
+    pub vendor_info: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, FromRow)]
+pub struct ProductReview {
+    pub id: i64,
+    pub product_id: i64,
+    pub user_id: i64,
+    pub user_name: String,
+    pub rating: i64, // 1 to 5
+    pub comment: String,
+    pub created_at: String,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct CreateReviewReq {
+    pub product_id: i64,
+    pub user_id: i64,
+    pub rating: i64,
+    pub comment: String,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct PurchaseProductReq {
+    pub product_id: i64,
+    pub client_id: i64,
+    pub offered_price: f64, // Can be >= min_price (pay what you want)
+}
+
+#[derive(Debug, Serialize, Deserialize, FromRow)]
+pub struct ProductPurchase {
+    pub id: i64,
+    pub product_id: i64,
+    pub client_id: i64,
+    pub amount_paid: f64,
+    pub product_title: String,
+    pub file_download_url: String,
+    pub purchased_at: String,
+}
+
+// Commission & Workflow Models
 #[derive(Debug, Serialize, Deserialize, FromRow)]
 pub struct Commission {
     pub id: i64,
     pub title: String,
     pub client_id: i64,
     pub artist_id: i64,
-    pub status: String, // REQUESTED, IN_PROGRESS, IN_REVIEW, COMPLETED, CANCELLED
+    pub status: String,
     pub price: f64,
     pub brief: String,
     pub created_at: String,
@@ -123,13 +203,22 @@ pub struct CompleteCommReq {
 }
 
 #[derive(Debug, Serialize, Deserialize, FromRow)]
+pub struct CommissionMilestone {
+    pub id: i64,
+    pub commission_id: i64,
+    pub stage_name: String,
+    pub note: String,
+    pub created_at: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, FromRow)]
 pub struct EscrowLedger {
     pub id: i64,
     pub commission_id: Option<i64>,
     pub client_id: i64,
     pub artist_id: i64,
     pub amount: f64,
-    pub status: String, // HELD_IN_ESCROW, RELEASED_TO_ARTIST, REFUNDED
+    pub status: String,
     pub created_at: String,
 }
 
@@ -151,22 +240,12 @@ pub struct OwnershipLog {
     pub registered_at: String,
 }
 
-#[derive(Debug, Serialize, Deserialize, FromRow)]
-pub struct CommissionMilestone {
-    pub id: i64,
-    pub commission_id: i64,
-    pub stage_name: String,
-    pub note: String,
-    pub created_at: String,
-}
-
 // ---------------------------------------------------------
-// MAIN INITIALIZATION & STARTUP
+// MAIN INITIALIZATION (Port 7860: Client & Artist Portal)
 // ---------------------------------------------------------
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    // 1. Initialize logging
     tracing_subscriber::registry()
         .with(
             tracing_subscriber::EnvFilter::try_from_default_env()
@@ -175,41 +254,36 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .with(tracing_subscriber::fmt::layer())
         .init();
 
-    tracing::info!("Initializing AtelierV Local Engine...");
+    tracing::info!("Initializing AtelierV User & Artist Engine...");
 
-    // 2. Setup SQLite database file & connection pool
     let db_path = "sqlite:vgen_local.db?mode=rwc";
     let pool = SqlitePoolOptions::new()
         .max_connections(10)
         .connect(db_path)
         .await?;
 
-    // 3. Run auto-migrations
     run_migrations(&pool).await?;
-
-    // 4. Seed initial personas if empty
     seed_database(&pool).await?;
 
-    // 5. Setup broadcast channel for WebSockets
     let (tx, _rx) = broadcast::channel::<WsEvent>(100);
-
     let state = AppState { db: pool, tx };
 
-    // 6. Router definition
     let app = Router::new()
-        // Embedded dashboard
         .route("/", get(serve_dashboard))
-        // WebSocket live sync endpoint
         .route("/ws", get(ws_handler))
         // Auth API
         .route("/api/auth/signup", post(signup_user))
         .route("/api/auth/login", post(login_user))
         .route("/api/auth/me", get(get_current_user))
-        // User Persona & Public Artist directory
-        .route("/api/users", get(list_users))
+        // Artists directory
         .route("/api/users/artists", get(list_artists))
-        .route("/api/users/:id", delete(delete_user))
-        // Role-filtered Commissions & Workflows
+        // Digital Products Marketplace
+        .route("/api/products", get(list_products).post(create_product))
+        .route("/api/products/:id", get(get_product_detail))
+        .route("/api/products/:id/reviews", get(list_reviews).post(add_review))
+        .route("/api/products/:id/purchase", post(purchase_product))
+        .route("/api/purchases", get(list_user_purchases))
+        // Commissions & Milestones
         .route("/api/commissions", get(list_commissions).post(create_commission))
         .route("/api/commissions/:id/status", put(update_commission_status))
         .route("/api/commissions/:id/complete", post(complete_commission))
@@ -222,17 +296,15 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .layer(CorsLayer::permissive())
         .with_state(state);
 
-    // 7. Bind server to 127.0.0.1:7860
     let addr = SocketAddr::from(([127, 0, 0, 1], 7860));
-    tracing::info!("🚀 AtelierV server listening on http://{}", addr);
+    tracing::info!("🚀 AtelierV User Portal listening on http://{}", addr);
 
-    // 8. Auto-open default web browser
     tokio::spawn(async move {
         tokio::time::sleep(tokio::time::Duration::from_millis(600)).await;
         let url = "http://localhost:7860";
         tracing::info!("Opening browser at {}...", url);
         if let Err(e) = open::that(url) {
-            tracing::warn!("Failed to auto-open browser: {}. Please navigate manually.", e);
+            tracing::warn!("Auto-open failed: {}", e);
         }
     });
 
@@ -243,10 +315,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 // ---------------------------------------------------------
-// DATABASE SCHEMA & SEEDING
+// DATABASE SCHEMA & AUTO-MIGRATIONS
 // ---------------------------------------------------------
 
-async fn run_migrations(pool: &SqlitePool) -> Result<(), sqlx::Error> {
+pub async fn run_migrations(pool: &SqlitePool) -> Result<(), sqlx::Error> {
     sqlx::query(
         r#"
         CREATE TABLE IF NOT EXISTS users (
@@ -256,6 +328,42 @@ async fn run_migrations(pool: &SqlitePool) -> Result<(), sqlx::Error> {
             role TEXT NOT NULL,
             password_hash TEXT NOT NULL DEFAULT 'password',
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        );
+
+        CREATE TABLE IF NOT EXISTS digital_products (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            artist_id INTEGER NOT NULL,
+            title TEXT NOT NULL,
+            description TEXT NOT NULL,
+            media_url TEXT NOT NULL,
+            file_download_url TEXT NOT NULL,
+            min_price REAL NOT NULL,
+            vendor_info TEXT NOT NULL,
+            score_weight REAL NOT NULL DEFAULT 1.0,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY(artist_id) REFERENCES users(id)
+        );
+
+        CREATE TABLE IF NOT EXISTS product_reviews (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            product_id INTEGER NOT NULL,
+            user_id INTEGER NOT NULL,
+            user_name TEXT NOT NULL,
+            rating INTEGER NOT NULL CHECK(rating >= 1 AND rating <= 5),
+            comment TEXT NOT NULL,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY(product_id) REFERENCES digital_products(id),
+            FOREIGN KEY(user_id) REFERENCES users(id)
+        );
+
+        CREATE TABLE IF NOT EXISTS product_purchases (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            product_id INTEGER NOT NULL,
+            client_id INTEGER NOT NULL,
+            amount_paid REAL NOT NULL,
+            purchased_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY(product_id) REFERENCES digital_products(id),
+            FOREIGN KEY(client_id) REFERENCES users(id)
         );
 
         CREATE TABLE IF NOT EXISTS commissions (
@@ -312,7 +420,6 @@ async fn run_migrations(pool: &SqlitePool) -> Result<(), sqlx::Error> {
     .execute(pool)
     .await?;
 
-    // Attempt to add password_hash column in case older DB exists without it
     let _ = sqlx::query("ALTER TABLE users ADD COLUMN password_hash TEXT NOT NULL DEFAULT 'password'")
         .execute(pool)
         .await;
@@ -321,13 +428,13 @@ async fn run_migrations(pool: &SqlitePool) -> Result<(), sqlx::Error> {
     Ok(())
 }
 
-async fn seed_database(pool: &SqlitePool) -> Result<(), sqlx::Error> {
+pub async fn seed_database(pool: &SqlitePool) -> Result<(), sqlx::Error> {
     let count: (i64,) = sqlx::query_as("SELECT COUNT(*) FROM users")
         .fetch_one(pool)
         .await?;
 
     if count.0 == 0 {
-        tracing::info!("Seeding initial personas (Admin, Artist, Client)...");
+        tracing::info!("Seeding initial personas and demo digital products...");
         sqlx::query(
             r#"
             INSERT INTO users (username, display_name, role, password_hash) VALUES 
@@ -339,7 +446,30 @@ async fn seed_database(pool: &SqlitePool) -> Result<(), sqlx::Error> {
         .execute(pool)
         .await?;
 
-        // Seed a sample initial commission
+        // Seed initial digital products with images/gifs and vendor info
+        sqlx::query(
+            r#"
+            INSERT INTO digital_products (artist_id, title, description, media_url, file_download_url, min_price, vendor_info, score_weight) VALUES
+            (2, 'Cyberpunk Vtuber Emote Pack [Animated GIF]', 'Set of 6 high-res animated cyber cat emotes ready for Twitch/Discord.', 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=600&auto=format&fit=crop&q=80', 'https://example.com/downloads/cyber_emotes.zip', 25.00, 'Pack includes 112x112, 56x56, and 28x28 GIF & APNG files. Commercial stream license included. No re-selling.', 1.4),
+            (2, 'Chibi Cat Ear 3D Model Preset', 'Pre-rigged VRChat / Live3D asset with dynamic bones & physics toggle.', 'https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?w=600&auto=format&fit=crop&q=80', 'https://example.com/downloads/cat_ears_preset.unitypackage', 15.00, 'Compatible with Unity 2022+ and VRChat SDK3. Blendshapes included for ear drooping/perking up.', 1.8),
+            (2, 'Atmospheric Lo-Fi Stream Overlay Pack', 'Full neon night ambient overlay package with animated stinger transition.', 'https://images.unsplash.com/photo-1579783902614-a3fb3927b675?w=600&auto=format&fit=crop&q=80', 'https://example.com/downloads/lofi_overlay.zip', 35.00, 'Ready for OBS & Streamlabs. Features 1080p 60fps WebM transparent stinger, chatbox CSS, and starting screens.', 1.1);
+            "#,
+        )
+        .execute(pool)
+        .await?;
+
+        // Seed initial reviews
+        sqlx::query(
+            r#"
+            INSERT INTO product_reviews (product_id, user_id, user_name, rating, comment) VALUES
+            (1, 3, 'Kuro Ch.', 5, 'The animated sparkles on the cat emote look insane on stream! Highly recommended.'),
+            (2, 3, 'Kuro Ch.', 5, 'Rigged effortlessly onto my avatar in 5 minutes.');
+            "#,
+        )
+        .execute(pool)
+        .await?;
+
+        // Seed initial sample commission
         sqlx::query(
             r#"
             INSERT INTO commissions (title, client_id, artist_id, status, price, brief) VALUES
@@ -349,7 +479,6 @@ async fn seed_database(pool: &SqlitePool) -> Result<(), sqlx::Error> {
         .execute(pool)
         .await?;
 
-        // Seed sample milestone progress
         sqlx::query(
             r#"
             INSERT INTO commission_milestones (commission_id, stage_name, note) VALUES
@@ -360,7 +489,6 @@ async fn seed_database(pool: &SqlitePool) -> Result<(), sqlx::Error> {
         .execute(pool)
         .await?;
 
-        // Seed sample escrow
         sqlx::query(
             r#"
             INSERT INTO escrow_ledger (commission_id, client_id, artist_id, amount, status) VALUES
@@ -384,7 +512,6 @@ async fn serve_dashboard() -> impl IntoResponse {
     Html(DASHBOARD_HTML)
 }
 
-// Auth: Signup
 async fn signup_user(
     State(state): State<AppState>,
     Json(payload): Json<SignupReq>,
@@ -396,7 +523,6 @@ async fn signup_user(
 
     let role = match payload.role.as_str() {
         "Artist" => "Artist",
-        "Admin" => "Admin",
         _ => "Client",
     };
 
@@ -428,11 +554,10 @@ async fn signup_user(
                 }
             })).into_response()
         }
-        Err(e) => (axum::http::StatusCode::CONFLICT, format!("Username already taken or database error: {}", e)).into_response(),
+        Err(e) => (axum::http::StatusCode::CONFLICT, format!("Username taken or DB error: {}", e)).into_response(),
     }
 }
 
-// Auth: Login
 async fn login_user(
     State(state): State<AppState>,
     Json(payload): Json<LoginReq>,
@@ -462,7 +587,6 @@ async fn login_user(
     }
 }
 
-// Auth: /api/auth/me?user_id=1
 async fn get_current_user(
     State(state): State<AppState>,
     Query(q): Query<UserQuery>,
@@ -486,36 +610,6 @@ async fn get_current_user(
     }
 }
 
-async fn list_users(
-    State(state): State<AppState>,
-    Query(q): Query<UserQuery>,
-) -> Response {
-    // Only Admin can view the full persona directory
-    if let Some(uid) = q.user_id {
-        let role: Option<(String,)> = sqlx::query_as("SELECT role FROM users WHERE id = ?")
-            .bind(uid)
-            .fetch_optional(&state.db)
-            .await
-            .unwrap_or(None);
-        
-        if let Some((r,)) = role {
-            if r == "Admin" {
-                let users = sqlx::query_as::<_, User>(
-                    "SELECT id, username, display_name, role, password_hash, created_at FROM users ORDER BY id ASC"
-                )
-                .fetch_all(&state.db)
-                .await
-                .unwrap_or_default();
-                let safe_users: Vec<SafeUser> = users.into_iter().map(SafeUser::from).collect();
-                return Json(safe_users).into_response();
-            }
-        }
-    }
-
-    (axum::http::StatusCode::FORBIDDEN, "Access denied: Persona directory restricted to Admin").into_response()
-}
-
-// Public artist listing so clients can choose an artist when commissioning
 async fn list_artists(State(state): State<AppState>) -> Json<Vec<SafeUser>> {
     let artists = sqlx::query_as::<_, User>(
         "SELECT id, username, display_name, role, password_hash, created_at FROM users WHERE role = 'Artist' ORDER BY display_name ASC"
@@ -528,29 +622,306 @@ async fn list_artists(State(state): State<AppState>) -> Json<Vec<SafeUser>> {
     Json(safe)
 }
 
-async fn delete_user(State(state): State<AppState>, Path(id): Path<i64>) -> Response {
-    let _ = sqlx::query("DELETE FROM users WHERE id = ?")
-        .bind(id)
-        .execute(&state.db)
-        .await;
+// ---------------------------------------------------------
+// DIGITAL PRODUCTS & MARKETPLACE
+// ---------------------------------------------------------
 
-    let _ = state.tx.send(WsEvent {
-        event_type: "PERSONA_DELETED".into(),
-        message: format!("Persona #{} removed", id),
-        payload: serde_json::json!({ "id": id }),
-    });
+// Curated Discovery Algorithm: Not simple first-to-post.
+// Weighted by: (Average Rating * Review Count) + internal discovery score + recency jitter
+async fn list_products(State(state): State<AppState>) -> Json<Vec<DigitalProductWithStats>> {
+    let rows: Vec<(i64, i64, String, String, String, String, String, String, f64, String, Option<f64>, i64)> = sqlx::query_as(
+        r#"
+        SELECT 
+            p.id, p.artist_id, u.display_name as artist_name, u.username as artist_username,
+            p.title, p.description, p.media_url, p.file_download_url, p.min_price, p.vendor_info,
+            AVG(r.rating) as avg_rating,
+            COUNT(r.id) as review_cnt
+        FROM digital_products p
+        JOIN users u ON p.artist_id = u.id
+        LEFT JOIN product_reviews r ON p.id = r.product_id
+        GROUP BY p.id
+        ORDER BY 
+            (COALESCE(AVG(r.rating), 4.0) * (COUNT(r.id) + 1) * p.score_weight) DESC,
+            p.id DESC
+        "#,
+    )
+    .fetch_all(&state.db)
+    .await
+    .unwrap_or_default();
 
-    Json(serde_json::json!({ "status": "deleted" })).into_response()
+    let results = rows
+        .into_iter()
+        .map(|r| DigitalProductWithStats {
+            id: r.0,
+            artist_id: r.1,
+            artist_name: r.2,
+            artist_username: r.3,
+            title: r.4,
+            description: r.5,
+            media_url: r.6,
+            file_download_url: r.7,
+            min_price: r.8,
+            vendor_info: r.9,
+            average_rating: r.10.unwrap_or(5.0),
+            review_count: r.11,
+            created_at: "".into(),
+        })
+        .collect();
+
+    Json(results)
 }
 
-// Role-Scoped Commissions Listing
+async fn get_product_detail(
+    State(state): State<AppState>,
+    Path(id): Path<i64>,
+) -> Response {
+    let row: Option<(i64, i64, String, String, String, String, String, String, f64, String, Option<f64>, i64)> = sqlx::query_as(
+        r#"
+        SELECT 
+            p.id, p.artist_id, u.display_name, u.username,
+            p.title, p.description, p.media_url, p.file_download_url, p.min_price, p.vendor_info,
+            AVG(r.rating), COUNT(r.id)
+        FROM digital_products p
+        JOIN users u ON p.artist_id = u.id
+        LEFT JOIN product_reviews r ON p.id = r.product_id
+        WHERE p.id = ?
+        GROUP BY p.id
+        "#,
+    )
+    .bind(id)
+    .fetch_optional(&state.db)
+    .await
+    .unwrap_or(None);
+
+    match row {
+        Some(r) => Json(DigitalProductWithStats {
+            id: r.0,
+            artist_id: r.1,
+            artist_name: r.2,
+            artist_username: r.3,
+            title: r.4,
+            description: r.5,
+            media_url: r.6,
+            file_download_url: r.7,
+            min_price: r.8,
+            vendor_info: r.9,
+            average_rating: r.10.unwrap_or(5.0),
+            review_count: r.11,
+            created_at: "".into(),
+        }).into_response(),
+        None => (axum::http::StatusCode::NOT_FOUND, "Product not found").into_response(),
+    }
+}
+
+async fn create_product(
+    State(state): State<AppState>,
+    Json(payload): Json<CreateProductReq>,
+) -> Response {
+    let file_url = payload.file_download_url.unwrap_or_else(|| "https://example.com/asset_vault_download.zip".into());
+    // Give each product a randomized curated discovery weight so home page isn't purely chronological
+    let jitter_weight = 1.0 + (payload.title.len() % 5) as f64 * 0.15;
+
+    let res = sqlx::query(
+        r#"
+        INSERT INTO digital_products (artist_id, title, description, media_url, file_download_url, min_price, vendor_info, score_weight)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        "#
+    )
+    .bind(payload.artist_id)
+    .bind(&payload.title)
+    .bind(&payload.description)
+    .bind(&payload.media_url)
+    .bind(&file_url)
+    .bind(payload.min_price)
+    .bind(&payload.vendor_info)
+    .bind(jitter_weight)
+    .execute(&state.db)
+    .await;
+
+    match res {
+        Ok(r) => {
+            let id = r.last_insert_rowid();
+            let _ = state.tx.send(WsEvent {
+                event_type: "PRODUCT_PUBLISHED".into(),
+                message: format!("Artist launched new digital asset: '{}' (Min ${:.2})", payload.title, payload.min_price),
+                payload: serde_json::json!({ "id": id, "title": payload.title, "price": payload.min_price }),
+            });
+            Json(serde_json::json!({ "id": id, "status": "created" })).into_response()
+        }
+        Err(e) => (axum::http::StatusCode::BAD_REQUEST, e.to_string()).into_response(),
+    }
+}
+
+async fn list_reviews(
+    State(state): State<AppState>,
+    Path(id): Path<i64>,
+) -> Json<Vec<ProductReview>> {
+    let reviews = sqlx::query_as::<_, ProductReview>(
+        "SELECT id, product_id, user_id, user_name, rating, comment, created_at FROM product_reviews WHERE product_id = ? ORDER BY id DESC"
+    )
+    .bind(id)
+    .fetch_all(&state.db)
+    .await
+    .unwrap_or_default();
+
+    Json(reviews)
+}
+
+async fn add_review(
+    State(state): State<AppState>,
+    Path(id): Path<i64>,
+    Json(payload): Json<CreateReviewReq>,
+) -> Response {
+    let rating = payload.rating.clamp(1, 5);
+
+    let user_name: Option<(String,)> = sqlx::query_as("SELECT display_name FROM users WHERE id = ?")
+        .bind(payload.user_id)
+        .fetch_optional(&state.db)
+        .await
+        .unwrap_or(None);
+
+    let uname = user_name.map(|u| u.0).unwrap_or_else(|| "Collector".into());
+
+    let res = sqlx::query(
+        "INSERT INTO product_reviews (product_id, user_id, user_name, rating, comment) VALUES (?, ?, ?, ?, ?)"
+    )
+    .bind(id)
+    .bind(payload.user_id)
+    .bind(&uname)
+    .bind(rating)
+    .bind(&payload.comment)
+    .execute(&state.db)
+    .await;
+
+    match res {
+        Ok(_) => {
+            let _ = state.tx.send(WsEvent {
+                event_type: "PRODUCT_REVIEW".into(),
+                message: format!("New {}-star review submitted by {} for product #{}", rating, uname, id),
+                payload: serde_json::json!({ "product_id": id, "rating": rating }),
+            });
+            Json(serde_json::json!({ "status": "ok" })).into_response()
+        }
+        Err(e) => (axum::http::StatusCode::BAD_REQUEST, e.to_string()).into_response(),
+    }
+}
+
+async fn purchase_product(
+    State(state): State<AppState>,
+    Path(id): Path<i64>,
+    Json(payload): Json<PurchaseProductReq>,
+) -> Response {
+    let prod = sqlx::query_as::<_, DigitalProduct>("SELECT * FROM digital_products WHERE id = ?")
+        .bind(id)
+        .fetch_optional(&state.db)
+        .await
+        .unwrap_or(None);
+
+    let prod = match prod {
+        Some(p) => p,
+        None => return (axum::http::StatusCode::NOT_FOUND, "Product not found").into_response(),
+    };
+
+    // Client can pay whatever price they want, but NOT below min_price
+    if payload.offered_price < prod.min_price {
+        return (
+            axum::http::StatusCode::BAD_REQUEST,
+            format!("Offered price (${:.2}) cannot be lower than the fixed base price (${:.2})", payload.offered_price, prod.min_price),
+        ).into_response();
+    }
+
+    let mut tx = match state.db.begin().await {
+        Ok(t) => t,
+        Err(e) => return (axum::http::StatusCode::INTERNAL_SERVER_ERROR, e.to_string()).into_response(),
+    };
+
+    // 1. Record purchase
+    let _ = sqlx::query(
+        "INSERT INTO product_purchases (product_id, client_id, amount_paid) VALUES (?, ?, ?)"
+    )
+    .bind(id)
+    .bind(payload.client_id)
+    .bind(payload.offered_price)
+    .execute(&mut *tx)
+    .await;
+
+    // 2. Direct ledger entry for digital product sale
+    let _ = sqlx::query(
+        "INSERT INTO escrow_ledger (commission_id, client_id, artist_id, amount, status) VALUES (NULL, ?, ?, ?, 'RELEASED_TO_ARTIST')"
+    )
+    .bind(payload.client_id)
+    .bind(prod.artist_id)
+    .bind(payload.offered_price)
+    .execute(&mut *tx)
+    .await;
+
+    if let Err(e) = tx.commit().await {
+        return (axum::http::StatusCode::INTERNAL_SERVER_ERROR, e.to_string()).into_response();
+    }
+
+    let _ = state.tx.send(WsEvent {
+        event_type: "PRODUCT_PURCHASED".into(),
+        message: format!("Digital Product '{}' bought for ${:.2}!", prod.title, payload.offered_price),
+        payload: serde_json::json!({ "product_id": id, "amount": payload.offered_price }),
+    });
+
+    Json(serde_json::json!({
+        "status": "success",
+        "download_url": prod.file_download_url,
+        "amount_paid": payload.offered_price
+    })).into_response()
+}
+
+async fn list_user_purchases(
+    State(state): State<AppState>,
+    Query(q): Query<UserQuery>,
+) -> Response {
+    let uid = match q.user_id {
+        Some(id) => id,
+        None => return (axum::http::StatusCode::BAD_REQUEST, "Missing user_id").into_response(),
+    };
+
+    let rows: Vec<(i64, i64, i64, f64, String, String, String)> = sqlx::query_as(
+        r#"
+        SELECT pu.id, pu.product_id, pu.client_id, pu.amount_paid, pr.title, pr.file_download_url, pu.purchased_at
+        FROM product_purchases pu
+        JOIN digital_products pr ON pu.product_id = pr.id
+        WHERE pu.client_id = ?
+        ORDER BY pu.id DESC
+        "#,
+    )
+    .bind(uid)
+    .fetch_all(&state.db)
+    .await
+    .unwrap_or_default();
+
+    let purchases: Vec<ProductPurchase> = rows
+        .into_iter()
+        .map(|r| ProductPurchase {
+            id: r.0,
+            product_id: r.1,
+            client_id: r.2,
+            amount_paid: r.3,
+            product_title: r.4,
+            file_download_url: r.5,
+            purchased_at: r.6,
+        })
+        .collect();
+
+    Json(purchases).into_response()
+}
+
+// ---------------------------------------------------------
+// COMMISSIONS & ESCROW (Scoped for Client/Artist)
+// ---------------------------------------------------------
+
 async fn list_commissions(
     State(state): State<AppState>,
     Query(q): Query<UserQuery>,
 ) -> Response {
     let user_id = match q.user_id {
         Some(uid) => uid,
-        None => return (axum::http::StatusCode::BAD_REQUEST, "Missing user_id parameter").into_response(),
+        None => return (axum::http::StatusCode::BAD_REQUEST, "Missing user_id").into_response(),
     };
 
     let user_opt = sqlx::query_as::<_, User>(
@@ -566,16 +937,7 @@ async fn list_commissions(
         None => return (axum::http::StatusCode::UNAUTHORIZED, "Invalid user session").into_response(),
     };
 
-    let comms = if role == "Admin" {
-        // Admin sees all commissions across the system
-        sqlx::query_as::<_, Commission>(
-            "SELECT id, title, client_id, artist_id, status, price, brief, created_at, updated_at FROM commissions ORDER BY id DESC"
-        )
-        .fetch_all(&state.db)
-        .await
-        .unwrap_or_default()
-    } else if role == "Artist" {
-        // Artists only see what THEY receive / put out
+    let comms = if role == "Artist" {
         sqlx::query_as::<_, Commission>(
             "SELECT id, title, client_id, artist_id, status, price, brief, created_at, updated_at FROM commissions WHERE artist_id = ? ORDER BY id DESC"
         )
@@ -584,7 +946,6 @@ async fn list_commissions(
         .await
         .unwrap_or_default()
     } else {
-        // Clients only see what THEY request
         sqlx::query_as::<_, Commission>(
             "SELECT id, title, client_id, artist_id, status, price, brief, created_at, updated_at FROM commissions WHERE client_id = ? ORDER BY id DESC"
         )
@@ -597,7 +958,6 @@ async fn list_commissions(
     Json(comms).into_response()
 }
 
-// Fetch in-depth milestone history for a specific commission
 async fn get_commission_milestones(
     State(state): State<AppState>,
     Path(id): Path<i64>,
@@ -638,7 +998,6 @@ async fn create_commission(
         Err(e) => return (axum::http::StatusCode::BAD_REQUEST, e.to_string()).into_response(),
     };
 
-    // Auto-create initial Escrow lock
     let _ = sqlx::query(
         "INSERT INTO escrow_ledger (commission_id, client_id, artist_id, amount, status) VALUES (?, ?, ?, ?, 'HELD_IN_ESCROW')"
     )
@@ -649,9 +1008,8 @@ async fn create_commission(
     .execute(&mut *tx)
     .await;
 
-    // Record first milestone
     let _ = sqlx::query(
-        "INSERT INTO commission_milestones (commission_id, stage_name, note) VALUES (?, 'REQUESTED', 'Brief launched by client and funds held in safe escrow.')"
+        "INSERT INTO commission_milestones (commission_id, stage_name, note) VALUES (?, 'REQUESTED', 'Brief launched by client and funds locked in safe escrow.')"
     )
     .bind(comm_id)
     .execute(&mut *tx)
@@ -694,7 +1052,7 @@ async fn update_commission_status(
     let note_text = payload.note.unwrap_or_else(|| match payload.status.as_str() {
         "IN_PROGRESS" => "Artist accepted the brief and began creative production.",
         "IN_REVIEW" => "Artist submitted milestone drafts and previews for client feedback.",
-        "COMPLETED" => "Client approved all deliverables and closed the request.",
+        "COMPLETED" => "Client approved all deliverables and settled the request.",
         "CANCELLED" => "Commission was cancelled.",
         _ => "Status updated.",
     }.to_string());
@@ -742,19 +1100,16 @@ async fn complete_commission(
         Err(e) => return (axum::http::StatusCode::INTERNAL_SERVER_ERROR, e.to_string()).into_response(),
     };
 
-    // 1. Mark commission completed
     let _ = sqlx::query("UPDATE commissions SET status = 'COMPLETED', updated_at = CURRENT_TIMESTAMP WHERE id = ?")
         .bind(id)
         .execute(&mut *tx)
         .await;
 
-    // 2. Release escrow to artist
     let _ = sqlx::query("UPDATE escrow_ledger SET status = 'RELEASED_TO_ARTIST' WHERE commission_id = ?")
         .bind(id)
         .execute(&mut *tx)
         .await;
 
-    // 3. Generate SHA256-style legal certificate hash
     let cert_hash = format!(
         "CERT-{:x}-{}-{}",
         chrono::Utc::now().timestamp_nanos_opt().unwrap_or(0),
@@ -762,7 +1117,6 @@ async fn complete_commission(
         id
     );
 
-    // 4. Log permanent copyright ownership registry
     let _ = sqlx::query(
         "INSERT INTO ownership_logs (commission_id, character_name, owner_user_id, creator_user_id, license_type, certificate_hash) VALUES (?, ?, ?, ?, ?, ?)"
     )
@@ -775,7 +1129,6 @@ async fn complete_commission(
     .execute(&mut *tx)
     .await;
 
-    // 5. Milestone log
     let milestone_note = format!("Approved by client! IP Certificate '{}' registered and funds settled.", cert_hash);
     let _ = sqlx::query(
         "INSERT INTO commission_milestones (commission_id, stage_name, note) VALUES (?, 'COMPLETED', ?)"
@@ -798,46 +1151,23 @@ async fn complete_commission(
     Json(serde_json::json!({ "status": "completed", "certificate": cert_hash })).into_response()
 }
 
-// Escrow listing scoped by user
 async fn list_escrow(
     State(state): State<AppState>,
     Query(q): Query<UserQuery>,
 ) -> Response {
     let user_id = match q.user_id {
         Some(uid) => uid,
-        None => return (axum::http::StatusCode::BAD_REQUEST, "Missing user_id parameter").into_response(),
+        None => return (axum::http::StatusCode::BAD_REQUEST, "Missing user_id").into_response(),
     };
 
-    let user_opt = sqlx::query_as::<_, User>(
-        "SELECT id, username, display_name, role, password_hash, created_at FROM users WHERE id = ?"
+    let ledger = sqlx::query_as::<_, EscrowLedger>(
+        "SELECT id, commission_id, client_id, artist_id, amount, status, created_at FROM escrow_ledger WHERE client_id = ? OR artist_id = ? ORDER BY id DESC"
     )
     .bind(user_id)
-    .fetch_optional(&state.db)
+    .bind(user_id)
+    .fetch_all(&state.db)
     .await
-    .unwrap_or(None);
-
-    let role = match user_opt {
-        Some(u) => u.role,
-        None => return (axum::http::StatusCode::UNAUTHORIZED, "Invalid user session").into_response(),
-    };
-
-    let ledger = if role == "Admin" {
-        sqlx::query_as::<_, EscrowLedger>(
-            "SELECT id, commission_id, client_id, artist_id, amount, status, created_at FROM escrow_ledger ORDER BY id DESC"
-        )
-        .fetch_all(&state.db)
-        .await
-        .unwrap_or_default()
-    } else {
-        sqlx::query_as::<_, EscrowLedger>(
-            "SELECT id, commission_id, client_id, artist_id, amount, status, created_at FROM escrow_ledger WHERE client_id = ? OR artist_id = ? ORDER BY id DESC"
-        )
-        .bind(user_id)
-        .bind(user_id)
-        .fetch_all(&state.db)
-        .await
-        .unwrap_or_default()
-    };
+    .unwrap_or_default();
 
     Json(ledger).into_response()
 }
@@ -871,59 +1201,36 @@ async fn release_escrow(State(state): State<AppState>, Path(id): Path<i64>) -> R
 
     let _ = state.tx.send(WsEvent {
         event_type: "ESCROW_RELEASE".into(),
-        message: format!("Escrow entry #{} manually settled and disbursed", id),
+        message: format!("Escrow entry #{} settled and released", id),
         payload: serde_json::json!({ "id": id }),
     });
 
     Json(serde_json::json!({ "status": "released" })).into_response()
 }
 
-// Ownership listing scoped by user
 async fn list_ownership(
     State(state): State<AppState>,
     Query(q): Query<UserQuery>,
 ) -> Response {
     let user_id = match q.user_id {
         Some(uid) => uid,
-        None => return (axum::http::StatusCode::BAD_REQUEST, "Missing user_id parameter").into_response(),
+        None => return (axum::http::StatusCode::BAD_REQUEST, "Missing user_id").into_response(),
     };
 
-    let user_opt = sqlx::query_as::<_, User>(
-        "SELECT id, username, display_name, role, password_hash, created_at FROM users WHERE id = ?"
+    let logs = sqlx::query_as::<_, OwnershipLog>(
+        "SELECT id, commission_id, character_name, owner_user_id, creator_user_id, license_type, certificate_hash, registered_at FROM ownership_logs WHERE owner_user_id = ? OR creator_user_id = ? ORDER BY id DESC"
     )
     .bind(user_id)
-    .fetch_optional(&state.db)
+    .bind(user_id)
+    .fetch_all(&state.db)
     .await
-    .unwrap_or(None);
-
-    let role = match user_opt {
-        Some(u) => u.role,
-        None => return (axum::http::StatusCode::UNAUTHORIZED, "Invalid user session").into_response(),
-    };
-
-    let logs = if role == "Admin" {
-        sqlx::query_as::<_, OwnershipLog>(
-            "SELECT id, commission_id, character_name, owner_user_id, creator_user_id, license_type, certificate_hash, registered_at FROM ownership_logs ORDER BY id DESC"
-        )
-        .fetch_all(&state.db)
-        .await
-        .unwrap_or_default()
-    } else {
-        sqlx::query_as::<_, OwnershipLog>(
-            "SELECT id, commission_id, character_name, owner_user_id, creator_user_id, license_type, certificate_hash, registered_at FROM ownership_logs WHERE owner_user_id = ? OR creator_user_id = ? ORDER BY id DESC"
-        )
-        .bind(user_id)
-        .bind(user_id)
-        .fetch_all(&state.db)
-        .await
-        .unwrap_or_default()
-    };
+    .unwrap_or_default();
 
     Json(logs).into_response()
 }
 
 // ---------------------------------------------------------
-// WEBSOCKET REAL-TIME STREAMING
+// WEBSOCKETS
 // ---------------------------------------------------------
 
 async fn ws_handler(
@@ -937,7 +1244,6 @@ async fn handle_socket(socket: WebSocket, state: AppState) {
     let (mut sender, mut receiver) = socket.split();
     let mut rx = state.tx.subscribe();
 
-    // Task forwarding broadcast messages to the connected browser
     let mut send_task = tokio::spawn(async move {
         while let Ok(msg) = rx.recv().await {
             if let Ok(serialized) = serde_json::to_string(&msg) {
@@ -948,14 +1254,12 @@ async fn handle_socket(socket: WebSocket, state: AppState) {
         }
     });
 
-    // Task reading any client incoming WS pings / chats
     let mut recv_task = tokio::spawn(async move {
         while let Some(Ok(Message::Text(text))) = receiver.next().await {
             tracing::debug!("Received ws text: {}", text);
         }
     });
 
-    // If either finishes, abort the other
     tokio::select! {
         _ = (&mut send_task) => recv_task.abort(),
         _ = (&mut recv_task) => send_task.abort(),

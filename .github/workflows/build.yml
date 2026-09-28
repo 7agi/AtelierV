@@ -1,4 +1,4 @@
-name: Build & Release AtelierV Executable
+name: Build & Release AtelierV Executables
 
 on:
   push:
@@ -12,7 +12,7 @@ permissions:
 
 jobs:
   build-windows:
-    name: Build Windows Single Binary (.exe)
+    name: Build Windows Binaries (.exe)
     runs-on: windows-latest
 
     steps:
@@ -27,20 +27,31 @@ jobs:
       - name: Rust Cache
         uses: Swatinem/rust-cache@v2
 
-      - name: Compile Release Binary
-        run: cargo build --release --target x86_64-pc-windows-msvc
+      - name: Compile Release Binaries (User Portal & Admin Portal)
+        run: |
+          cargo build --release --target x86_64-pc-windows-msvc --bin atelierv
+          cargo build --release --target x86_64-pc-windows-msvc --bin atelierv-admin
 
-      - name: Upload Build Artifact (.exe)
+      - name: Upload User Portal Executable (.exe)
         uses: actions/upload-artifact@v4
         with:
           name: atelierv-windows-x64
           path: target/x86_64-pc-windows-msvc/release/atelierv.exe
           if-no-files-found: error
 
+      - name: Upload Admin Portal Executable (.exe)
+        uses: actions/upload-artifact@v4
+        with:
+          name: atelierv-admin-windows-x64
+          path: target/x86_64-pc-windows-msvc/release/atelierv-admin.exe
+          if-no-files-found: error
+
       - name: Release to GitHub Releases (if tag or dispatch release)
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
         with:
-          files: target/x86_64-pc-windows-msvc/release/atelierv.exe
+          files: |
+            target/x86_64-pc-windows-msvc/release/atelierv.exe
+            target/x86_64-pc-windows-msvc/release/atelierv-admin.exe
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

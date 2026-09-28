@@ -2,7 +2,15 @@
 name = "atelierv"
 version = "0.1.0"
 edition = "2021"
-description = "VGen-inspired single-binary commission, escrow, and ownership management hub"
+description = "VGen-inspired single-binary commission, escrow, digital marketplace & admin hub"
+
+[[bin]]
+name = "atelierv"
+path = "src/main.rs"
+
+[[bin]]
+name = "atelierv-admin"
+path = "src/admin.rs"
 
 [dependencies]
 axum = { version = "0.7", features = ["ws"] }
