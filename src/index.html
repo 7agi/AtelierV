@@ -364,9 +364,9 @@
       box-shadow: var(--shadow-md);
     }
 
+    /* Product Cards - natural aspect ratio images */
     .product-media-wrap {
       width: 100%;
-      height: 200px;
       background: #1a1721;
       position: relative;
       overflow: hidden;
@@ -377,8 +377,10 @@
 
     .product-media {
       width: 100%;
-      height: 100%;
-      object-fit: cover;
+      max-height: 320px;
+      min-height: 130px;
+      object-fit: contain;
+      display: block;
     }
 
     .product-price-tag {
@@ -458,19 +460,21 @@
 
     .detail-media-wrap {
       width: 100%;
-      height: 230px;
       border-radius: 12px;
       overflow: hidden;
       background: #1a1721;
       display: flex;
       align-items: center;
       justify-content: center;
+      max-height: 380px;
     }
 
     .detail-media {
       width: 100%;
-      height: 100%;
-      object-fit: cover;
+      max-height: 380px;
+      object-fit: contain;
+      display: block;
+      border-radius: 12px;
     }
 
     .product-vendor-box {
@@ -1003,6 +1007,136 @@
       border-radius: 6px;
       object-fit: cover;
     }
+
+    /* Thumbnail Position Adjuster */
+    .thumb-adjuster {
+      margin-top: 0.65rem;
+      background: var(--bg-subtle);
+      border-radius: 8px;
+      padding: 0.75rem;
+      display: none;
+      flex-direction: column;
+      gap: 0.55rem;
+    }
+
+    .thumb-adjuster.visible {
+      display: flex;
+    }
+
+    .thumb-preview-box {
+      width: 100%;
+      height: 180px;
+      background: #1a1721;
+      border-radius: 8px;
+      overflow: hidden;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .thumb-preview-img {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .thumb-slider-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .thumb-slider-row input[type="range"] {
+      flex: 1;
+      accent-color: var(--primary);
+    }
+
+    /* Category Chips */
+    .category-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.45rem;
+      margin-top: 0.35rem;
+    }
+
+    .cat-chip {
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      background: var(--primary-light);
+      color: var(--primary);
+      cursor: default;
+    }
+
+    /* My Profile Tab */
+    .my-profile-section {
+      background: var(--bg-surface);
+      border-radius: 14px;
+      padding: 1.8rem 2rem;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      gap: 1.4rem;
+    }
+
+    .profile-field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+
+    .profile-field-label {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .category-checkbox-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 0.5rem;
+      margin-top: 0.35rem;
+    }
+
+    .cat-checkbox-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      cursor: pointer;
+      padding: 0.5rem 0.7rem;
+      border-radius: 8px;
+      background: var(--bg-subtle);
+      transition: 0.15s;
+      font-size: 0.83rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      user-select: none;
+    }
+
+    .cat-checkbox-item:hover {
+      background: var(--primary-light);
+      color: var(--primary);
+    }
+
+    .cat-checkbox-item input[type="checkbox"] {
+      accent-color: var(--primary);
+      width: 15px;
+      height: 15px;
+      cursor: pointer;
+    }
+
+    .cat-checkbox-item.checked {
+      background: var(--primary-light);
+      color: var(--primary);
+      font-weight: 700;
+    }
   </style>
 </head>
 
@@ -1098,8 +1232,11 @@
       <button class="nav-btn" id="tabBtnOwnership" onclick="switchTab('ownership')">
         <span>📜</span> Copyright Registry
       </button>
+      <button class="nav-btn" id="tabBtnMyProfile" onclick="switchTab('my-profile')">
+        <span>👤</span> My Profile
+      </button>
       <button class="nav-btn" id="tabBtnProfile" style="display: none;" onclick="switchTab('profile')">
-        <span>👤</span> Creator Profile
+        <span>🎨</span> Artist Page
       </button>
     </div>
 
@@ -1141,6 +1278,41 @@
       </div>
     </section>
 
+    <!-- TAB: MY OWN PROFILE (Artist & Client) -->
+    <section id="tab-my-profile" class="tab-content">
+      <div class="my-profile-section">
+        <div style="display: flex; align-items: center; gap: 1.1rem;">
+          <div class="profile-avatar-large" id="myProfAvatar">?</div>
+          <div>
+            <div style="font-size: 1.4rem; font-weight: 800;" id="myProfDisplayName">Your Name</div>
+            <div style="color: var(--text-dim); font-size: 0.85rem;" id="myProfUsername">@username</div>
+            <span class="user-role-tag role-Client" id="myProfRoleTag" style="margin-top: 4px; display: inline-block;">Client</span>
+          </div>
+        </div>
+
+        <!-- Artist-only: Creator Categories -->
+        <div id="artistCategoriesSection" style="display: none;">
+          <div class="profile-field-label">🎨 Creator Specializations</div>
+          <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.6rem;">Select the categories that best describe your creative work. These appear on your public profile.</p>
+          <div class="category-checkbox-grid" id="categoryCheckboxGrid">
+            <!-- Injected by JS -->
+          </div>
+          <div style="margin-top: 1rem;">
+            <button class="btn-create" onclick="saveArtistCategories()" style="padding: 0.5rem 1.2rem;">Save Profile</button>
+          </div>
+        </div>
+
+        <!-- Client section (no posting) -->
+        <div id="clientProfileInfo" style="display: none;">
+          <div class="profile-field-label">Your Account</div>
+          <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5;">
+            As a <strong>Client</strong>, you can browse the marketplace, purchase digital assets, and commission artists for custom work.
+            To create and sell content, register as an <strong>Artist</strong> account.
+          </p>
+        </div>
+      </div>
+    </section>
+
     <!-- TAB: DEDICATED ARTIST PROFILE PAGE -->
     <section id="tab-profile" class="tab-content">
       <div class="profile-banner">
@@ -1152,6 +1324,7 @@
               <span class="user-role-tag role-Artist">Verified Creator</span>
             </div>
             <div style="font-size: 0.85rem; color: var(--text-dim); margin-top: 2px;" id="profUsername">@artist</div>
+            <div class="category-chips" id="profCategoryChips" style="margin-top: 6px;"></div>
             <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 6px;" id="profStats">Digital Assets • Available for Custom Briefs</p>
           </div>
         </div>
@@ -1408,10 +1581,9 @@
             <input type="url" id="pubMediaUrl" placeholder="https://... (or direct .gif / .png link)">
           </div>
 
-          <!-- Hidden storage for final media data -->
           <input type="hidden" id="pubFinalMediaUrl" required>
 
-          <div class="upload-preview-wrap" id="mediaPreviewWrap">
+          <div class="upload-preview-wrap" id="mediaPreviewWrap" style="display: none; margin-top: 0.5rem;">
             <img class="upload-preview-thumb" id="mediaPreviewImg" src="" alt="Preview">
             <div style="flex: 1; min-width: 0;">
               <div style="font-size: 0.78rem; font-weight: 700; color: var(--accent-emerald);" id="mediaPreviewStatus">File Loaded Successfully</div>
@@ -1419,6 +1591,31 @@
             </div>
             <button type="button" class="btn-row-del" onclick="clearMediaSelection()" title="Remove file">✕</button>
           </div>
+        </div>
+
+        <!-- Thumbnail Position Adjuster -->
+        <div class="thumb-adjuster" id="thumbAdjuster">
+          <div style="font-size: 0.78rem; font-weight: 700; color: var(--primary);">🖼 Thumbnail Card Preview (Adjust Focus Point)</div>
+          <div class="thumb-preview-box">
+            <img class="thumb-preview-img" id="thumbAdjPreview" src="" alt="Preview">
+          </div>
+          <div class="thumb-slider-row">
+            <span style="white-space: nowrap;">Horizontal</span>
+            <input type="range" min="0" max="100" value="50" id="thumbPosX" oninput="updateThumbPos()">
+            <span id="thumbPosXVal">50%</span>
+          </div>
+          <div class="thumb-slider-row">
+            <span style="white-space: nowrap;">Vertical</span>
+            <input type="range" min="0" max="100" value="50" id="thumbPosY" oninput="updateThumbPos()">
+            <span id="thumbPosYVal">50%</span>
+          </div>
+          <div class="thumb-slider-row">
+            <span style="white-space: nowrap;">Zoom</span>
+            <input type="range" min="100" max="300" value="100" id="thumbZoom" oninput="updateThumbPos()">
+            <span id="thumbZoomVal">1×</span>
+          </div>
+          <input type="hidden" id="pubThumbObjectPosition" value="50% 50%">
+          <input type="hidden" id="pubThumbZoom" value="1">
         </div>
 
         <div class="form-group">
@@ -1602,6 +1799,20 @@
       setSession(data.user);
     }
 
+    const CREATOR_CATEGORIES = [
+      'Music',
+      'Art',
+      '3D Art',
+      'Animation',
+      'Live2D Rigging',
+      '3D Rigging',
+      'Branding',
+      'Streaming Assets',
+      'Emotes',
+      '2D Avatars',
+      'Writing'
+    ];
+
     function setSession(user) {
       currentUser = user;
       localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
@@ -1623,13 +1834,75 @@
         document.getElementById('btnPublishProduct').style.display = 'block';
         document.getElementById('btnNewBrief').style.display = 'none';
         document.getElementById('commHeading').textContent = 'Commissions Put Out to You';
+        document.getElementById('artistCategoriesSection').style.display = 'block';
+        document.getElementById('clientProfileInfo').style.display = 'none';
+        buildCategoryCheckboxes(user.creator_categories);
       } else {
         document.getElementById('btnPublishProduct').style.display = 'none';
         document.getElementById('btnNewBrief').style.display = 'block';
         document.getElementById('commHeading').textContent = 'Your Commission Briefs';
+        document.getElementById('artistCategoriesSection').style.display = 'none';
+        document.getElementById('clientProfileInfo').style.display = 'block';
       }
 
+      // Populate My Profile tab
+      document.getElementById('myProfAvatar').textContent = (user.display_name || user.username || '?').charAt(0).toUpperCase();
+      document.getElementById('myProfDisplayName').textContent = user.display_name;
+      document.getElementById('myProfUsername').textContent = `@${user.username}`;
+      const myTag = document.getElementById('myProfRoleTag');
+      myTag.textContent = user.role;
+      myTag.className = `user-role-tag role-${user.role}`;
+
       fetchAllData();
+    }
+
+    function buildCategoryCheckboxes(savedCategoriesStr) {
+      const grid = document.getElementById('categoryCheckboxGrid');
+      if (!grid) return;
+      const selected = (savedCategoriesStr || '')
+        .split(',')
+        .map(s => s.trim())
+        .filter(Boolean);
+
+      grid.innerHTML = CREATOR_CATEGORIES.map(cat => {
+        const checked = selected.includes(cat);
+        return `
+          <label class="cat-checkbox-item ${checked ? 'checked' : ''}">
+            <input type="checkbox" value="${escapeHtml(cat)}" ${checked ? 'checked' : ''} onchange="this.parentElement.classList.toggle('checked', this.checked)">
+            <span>${escapeHtml(cat)}</span>
+          </label>
+        `;
+      }).join('');
+    }
+
+    async function saveArtistCategories() {
+      if (!currentUser || currentUser.role !== 'Artist') return;
+      const checkedBoxes = Array.from(document.querySelectorAll('#categoryCheckboxGrid input[type="checkbox"]:checked'));
+      const chosen = checkedBoxes.map(cb => cb.value.trim());
+      const categoriesStr = chosen.join(',');
+
+      try {
+        const res = await fetch(`/api/users/${currentUser.id}/profile`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            creator_categories: categoriesStr
+          })
+        });
+
+        if (res.ok) {
+          const updatedUser = await res.json();
+          currentUser = updatedUser;
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(currentUser));
+          alert('✓ Creator profile specializations saved successfully!');
+          fetchAllData();
+        } else {
+          alert(await res.text() || 'Failed to update profile');
+        }
+      } catch (err) {
+        console.error('Error saving profile:', err);
+        alert('Could not save profile at this time.');
+      }
     }
 
     function handleLogout() {
@@ -1659,6 +1932,22 @@
 
     function openPublishModal() {
       switchMediaInputMode('file');
+      clearMediaSelection();
+      // Reset thumbnail adjuster sliders
+      document.getElementById('thumbPosX').value = 50;
+      document.getElementById('thumbPosY').value = 50;
+      document.getElementById('thumbZoom').value = 100;
+      document.getElementById('thumbPosXVal').textContent = '50%';
+      document.getElementById('thumbPosYVal').textContent = '50%';
+      document.getElementById('thumbZoomVal').textContent = '1×';
+      document.getElementById('pubThumbObjectPosition').value = '50% 50%';
+      document.getElementById('pubThumbZoom').value = '1';
+      const adjImg = document.getElementById('thumbAdjPreview');
+      if (adjImg) {
+        adjImg.style.objectPosition = '50% 50%';
+        adjImg.style.transform = 'scale(1)';
+      }
+
       const bContainer = document.getElementById('pubBulletContainer');
       if (bContainer && bContainer.children.length === 0) {
         addVendorBulletRow('Original high-res deliverable files included');
@@ -1686,16 +1975,41 @@
     }
 
     // Artist Profile Navigation & Render
-    function viewArtistProfile(artistId, artistName, artistUsername) {
+    function viewArtistProfile(artistId, artistName, artistUsername, categories = null) {
+      // If categories not passed directly, look up from availableArtists
+      if (!categories && availableArtists.length > 0) {
+        const found = availableArtists.find(a => a.id === artistId);
+        if (found && found.creator_categories) {
+          categories = found.creator_categories;
+        }
+      }
+
       activeProfileArtist = {
         id: artistId,
         display_name: artistName,
-        username: artistUsername
+        username: artistUsername,
+        creator_categories: categories
       };
 
       document.getElementById('profDisplayName').textContent = artistName;
       document.getElementById('profUsername').textContent = `@${artistUsername}`;
       document.getElementById('profAvatar').textContent = (artistName || 'A').charAt(0).toUpperCase();
+
+      // Render category chips
+      const chipsContainer = document.getElementById('profCategoryChips');
+      if (chipsContainer) {
+        const catList = (categories || '')
+          .split(',')
+          .map(s => s.trim())
+          .filter(Boolean);
+        if (catList.length > 0) {
+          chipsContainer.innerHTML = catList.map(c => `<span class="cat-chip">${escapeHtml(c)}</span>`).join('');
+          chipsContainer.style.display = 'flex';
+        } else {
+          chipsContainer.innerHTML = '';
+          chipsContainer.style.display = 'none';
+        }
+      }
 
       const profileTabBtn = document.getElementById('tabBtnProfile');
       profileTabBtn.style.display = 'flex';
@@ -1731,10 +2045,20 @@
         const fullStars = Math.round(p.average_rating);
         const starStr = '★'.repeat(fullStars) + '☆'.repeat(5 - fullStars);
 
+        let imgStyle = '';
+        try {
+          const vi = JSON.parse(p.vendor_info);
+          if (vi && (vi.thumb_pos || vi.thumb_zoom)) {
+            const pos = vi.thumb_pos || '50% 50%';
+            const zoom = vi.thumb_zoom || '1';
+            imgStyle = `object-fit: cover; object-position: ${escapeHtml(pos)}; transform: scale(${escapeHtml(zoom)}); transform-origin: ${escapeHtml(pos)};`;
+          }
+        } catch (e) {}
+
         return `
           <div class="product-card" onclick="openProductDetailModal(${p.id})">
             <div class="product-media-wrap">
-              <img class="product-media" src="${escapeHtml(p.media_url)}" alt="${escapeHtml(p.title)}" loading="lazy">
+              <img class="product-media" src="${escapeHtml(p.media_url)}" alt="${escapeHtml(p.title)}" loading="lazy" style="${imgStyle}">
               <div class="product-price-tag">From $${p.min_price.toFixed(2)}</div>
             </div>
             <div class="product-body">
@@ -1787,12 +2111,13 @@
       if (!currentUser) return;
       try {
         const uid = currentUser.id;
-        const [pRes, cRes, puRes, eRes, oRes] = await Promise.all([
+        const [pRes, cRes, puRes, eRes, oRes, aRes] = await Promise.all([
           fetch('/api/products'),
           fetch(`/api/commissions?user_id=${uid}`),
           fetch(`/api/purchases?user_id=${uid}`),
           fetch(`/api/escrow?user_id=${uid}`),
-          fetch(`/api/ownership?user_id=${uid}`)
+          fetch(`/api/ownership?user_id=${uid}`),
+          fetch('/api/users/artists')
         ]);
 
         products = await pRes.json();
@@ -1800,6 +2125,7 @@
         purchases = await puRes.json();
         escrowLedger = await eRes.json();
         ownershipLogs = await oRes.json();
+        availableArtists = await aRes.json();
 
         renderProducts();
         if (activeProfileArtist) {
@@ -1826,10 +2152,20 @@
         const fullStars = Math.round(p.average_rating);
         const starStr = '★'.repeat(fullStars) + '☆'.repeat(5 - fullStars);
 
+        let imgStyle = '';
+        try {
+          const vi = JSON.parse(p.vendor_info);
+          if (vi && (vi.thumb_pos || vi.thumb_zoom)) {
+            const pos = vi.thumb_pos || '50% 50%';
+            const zoom = vi.thumb_zoom || '1';
+            imgStyle = `object-fit: cover; object-position: ${escapeHtml(pos)}; transform: scale(${escapeHtml(zoom)}); transform-origin: ${escapeHtml(pos)};`;
+          }
+        } catch (e) {}
+
         return `
           <div class="product-card" onclick="openProductDetailModal(${p.id})">
             <div class="product-media-wrap">
-              <img class="product-media" src="${escapeHtml(p.media_url)}" alt="${escapeHtml(p.title)}" loading="lazy">
+              <img class="product-media" src="${escapeHtml(p.media_url)}" alt="${escapeHtml(p.title)}" loading="lazy" style="${imgStyle}">
               <div class="product-price-tag">From $${p.min_price.toFixed(2)}</div>
             </div>
             <div class="product-body">
@@ -2006,6 +2342,25 @@
       reader.readAsDataURL(file);
     }
 
+    function updateThumbPos() {
+      const x = document.getElementById('thumbPosX').value;
+      const y = document.getElementById('thumbPosY').value;
+      const zoom = (document.getElementById('thumbZoom').value / 100).toFixed(2);
+
+      document.getElementById('thumbPosXVal').textContent = `${x}%`;
+      document.getElementById('thumbPosYVal').textContent = `${y}%`;
+      document.getElementById('thumbZoomVal').textContent = `${(zoom * 1).toFixed(1)}×`;
+
+      document.getElementById('pubThumbObjectPosition').value = `${x}% ${y}%`;
+      document.getElementById('pubThumbZoom').value = zoom;
+
+      const adjImg = document.getElementById('thumbAdjPreview');
+      if (adjImg) {
+        adjImg.style.objectPosition = `${x}% ${y}%`;
+        adjImg.style.transform = `scale(${zoom})`;
+      }
+    }
+
     function setMediaPreview(srcUrl, title, info) {
       document.getElementById('pubFinalMediaUrl').value = srcUrl;
       const previewWrap = document.getElementById('mediaPreviewWrap');
@@ -2014,6 +2369,15 @@
       document.getElementById('mediaPreviewStatus').textContent = title;
       document.getElementById('mediaPreviewInfo').textContent = info;
       previewWrap.style.display = 'flex';
+
+      // Show and sync thumbnail adjuster
+      const adj = document.getElementById('thumbAdjuster');
+      const adjImg = document.getElementById('thumbAdjPreview');
+      if (adj && adjImg) {
+        adj.classList.add('visible');
+        adjImg.src = srcUrl;
+        updateThumbPos();
+      }
     }
 
     function clearMediaSelection() {
@@ -2022,6 +2386,11 @@
       document.getElementById('pubMediaUrl').value = '';
       document.getElementById('mediaPreviewWrap').style.display = 'none';
       document.getElementById('mediaPreviewImg').src = '';
+
+      const adj = document.getElementById('thumbAdjuster');
+      const adjImg = document.getElementById('thumbAdjPreview');
+      if (adj) adj.classList.remove('visible');
+      if (adjImg) adjImg.src = '';
     }
 
     // Dynamic Bullet Row Builder
@@ -2157,10 +2526,15 @@
         }))
         .filter(r => r.key.length > 0);
 
+      const thumbPos = document.getElementById('pubThumbObjectPosition').value || '50% 50%';
+      const thumbZoom = document.getElementById('pubThumbZoom').value || '1';
+
       const structuredVendorInfo = JSON.stringify({
         description: desc,
         bullets: bullets,
-        kv: kv
+        kv: kv,
+        thumb_pos: thumbPos,
+        thumb_zoom: thumbZoom
       });
 
       const payload = {
