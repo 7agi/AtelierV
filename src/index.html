@@ -114,21 +114,6 @@
       box-shadow: 0 4px 12px var(--glow-purple);
     }
 
-    .demo-chip {
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid var(--border);
-      color: var(--text-muted);
-      font-size: 0.7rem;
-      padding: 4px 8px;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-
-    .demo-chip:hover {
-      background: rgba(139, 92, 246, 0.2);
-      color: #fff;
-    }
-
     /* Navbar */
     header {
       height: 72px;
@@ -644,14 +629,7 @@
 
       <div id="authErrorMsg" style="color: var(--accent-rose); font-size: 0.8rem; margin-top: 0.75rem; text-align: center;"></div>
 
-      <div style="margin-top: 1.25rem; padding-top: 1.25rem; border-top: 1px solid var(--border); font-size: 0.75rem; color: var(--text-dim);">
-        <div>Quick Login:</div>
-        <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem; flex-wrap: wrap;">
-          <button type="button" class="demo-chip" onclick="quickFill('kuro', 'client123')">Client (kuro)</button>
-          <button type="button" class="demo-chip" onclick="quickFill('lyra', 'artist123')">Artist (lyra)</button>
-          <button type="button" class="demo-chip" style="color:#34d399; border-color:rgba(16,185,129,0.3);" onclick="quickFill('tester', 'tester123')">⚡ Tester (All-Access)</button>
-        </div>
-      </div>
+
     </div>
   </div>
 
@@ -994,12 +972,6 @@
         document.getElementById('btnTabLogin').classList.remove('active');
         document.getElementById('btnTabSignup').classList.add('active');
       }
-    }
-
-    function quickFill(u, p) {
-      switchAuthMode('login');
-      document.getElementById('loginUsername').value = u;
-      document.getElementById('loginPassword').value = p;
     }
 
     async function handleAuthLogin(e) {

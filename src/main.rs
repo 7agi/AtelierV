@@ -442,72 +442,18 @@ pub async fn seed_database(pool: &SqlitePool) -> Result<(), sqlx::Error> {
         .await?;
 
     if count.0 == 0 {
-        tracing::info!("Seeding initial personas and demo digital products...");
+        tracing::info!("Seeding default admin and tester accounts...");
         sqlx::query(
             r#"
-            INSERT INTO users (username, display_name, role, password_hash, all_download_access) VALUES 
-            ('admin', 'Atelier Director (Admin)', 'Admin', 'admin123', 1),
-            ('lyra', 'Lyra - 2D Live Rigging (Artist)', 'Artist', 'artist123', 0),
-            ('kuro', 'Kuro Ch. (Client)', 'Client', 'client123', 0),
+            INSERT INTO users (username, display_name, role, password_hash, all_download_access) VALUES
+            ('admin', 'Atelier Director', 'Admin', 'admin123', 1),
             ('tester', 'QA Tester (All Access)', 'Client', 'tester123', 1);
             "#,
         )
         .execute(pool)
         .await?;
 
-        // Seed initial digital products with images/gifs and vendor info
-        sqlx::query(
-            r#"
-            INSERT INTO digital_products (artist_id, title, description, media_url, file_download_url, min_price, vendor_info, score_weight) VALUES
-            (2, 'Cyberpunk Vtuber Emote Pack [Animated GIF]', 'Set of 6 high-res animated cyber cat emotes ready for Twitch/Discord.', 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=600&auto=format&fit=crop&q=80', 'https://example.com/downloads/cyber_emotes.zip', 25.00, 'Pack includes 112x112, 56x56, and 28x28 GIF & APNG files. Commercial stream license included. No re-selling.', 1.4),
-            (2, 'Chibi Cat Ear 3D Model Preset', 'Pre-rigged VRChat / Live3D asset with dynamic bones & physics toggle.', 'https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?w=600&auto=format&fit=crop&q=80', 'https://example.com/downloads/cat_ears_preset.unitypackage', 15.00, 'Compatible with Unity 2022+ and VRChat SDK3. Blendshapes included for ear drooping/perking up.', 1.8),
-            (2, 'Atmospheric Lo-Fi Stream Overlay Pack', 'Full neon night ambient overlay package with animated stinger transition.', 'https://images.unsplash.com/photo-1579783902614-a3fb3927b675?w=600&auto=format&fit=crop&q=80', 'https://example.com/downloads/lofi_overlay.zip', 35.00, 'Ready for OBS & Streamlabs. Features 1080p 60fps WebM transparent stinger, chatbox CSS, and starting screens.', 1.1);
-            "#,
-        )
-        .execute(pool)
-        .await?;
-
-        // Seed initial reviews
-        sqlx::query(
-            r#"
-            INSERT INTO product_reviews (product_id, user_id, user_name, rating, comment) VALUES
-            (1, 3, 'Kuro Ch.', 5, 'The animated sparkles on the cat emote look insane on stream! Highly recommended.'),
-            (2, 3, 'Kuro Ch.', 5, 'Rigged effortlessly onto my avatar in 5 minutes.');
-            "#,
-        )
-        .execute(pool)
-        .await?;
-
-        // Seed initial sample commission
-        sqlx::query(
-            r#"
-            INSERT INTO commissions (title, client_id, artist_id, status, price, brief) VALUES
-            ('Debut Vtuber Rig & Expressions', 3, 2, 'IN_PROGRESS', 550.00, 'Full body rig with 5 toggle expressions and physics for long flowing hair.');
-            "#,
-        )
-        .execute(pool)
-        .await?;
-
-        sqlx::query(
-            r#"
-            INSERT INTO commission_milestones (commission_id, stage_name, note) VALUES
-            (1, 'REQUESTED', 'Brief initiated and safe escrow locked by client.'),
-            (1, 'IN_PROGRESS', 'Artist accepted request and began base mesh splitting.');
-            "#,
-        )
-        .execute(pool)
-        .await?;
-
-        sqlx::query(
-            r#"
-            INSERT INTO escrow_ledger (commission_id, client_id, artist_id, amount, status) VALUES
-            (1, 3, 2, 550.00, 'HELD_IN_ESCROW');
-            "#,
-        )
-        .execute(pool)
-        .await?;
-
-        tracing::info!("Default database seeding complete.");
+        tracing::info!("Default accounts seeded: @admin / @tester");
     }
 
     Ok(())
