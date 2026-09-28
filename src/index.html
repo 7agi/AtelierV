@@ -572,6 +572,163 @@
     .ledger-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.85rem; }
     .ledger-table th, .ledger-table td { padding: 0.85rem 1.2rem; border-bottom: 1px solid var(--border); }
     .ledger-table th { color: var(--text-dim); text-transform: uppercase; font-size: 0.75rem; }
+
+    /* Vendor Info Composer & Rich Specs */
+    .vendor-composer {
+      background: rgba(0, 0, 0, 0.25);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 0.85rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    .composer-sublabel {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #c084fc;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.35rem;
+    }
+    .composer-mini-btn {
+      background: rgba(139, 92, 246, 0.15);
+      border: 1px solid var(--border-accent);
+      color: #c084fc;
+      border-radius: 5px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 2px 7px;
+      cursor: pointer;
+    }
+    .composer-mini-btn:hover {
+      background: rgba(139, 92, 246, 0.3);
+      color: #fff;
+    }
+    .bullet-row {
+      display: flex;
+      gap: 0.4rem;
+      align-items: center;
+      margin-bottom: 0.35rem;
+    }
+    .bullet-row input {
+      flex: 1;
+      padding: 0.45rem 0.65rem;
+      font-size: 0.8rem;
+    }
+    .kv-row {
+      display: flex;
+      gap: 0.4rem;
+      align-items: center;
+      margin-bottom: 0.35rem;
+    }
+    .kv-row .kv-k {
+      flex: 1;
+      padding: 0.45rem 0.65rem;
+      font-size: 0.8rem;
+    }
+    .kv-row .kv-v {
+      flex: 1.5;
+      padding: 0.45rem 0.65rem;
+      font-size: 0.8rem;
+    }
+    .btn-row-del {
+      background: rgba(244, 63, 94, 0.15);
+      border: 1px solid rgba(244, 63, 94, 0.3);
+      color: #fb7185;
+      border-radius: 6px;
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 0.8rem;
+      flex-shrink: 0;
+    }
+    .btn-row-del:hover {
+      background: rgba(244, 63, 94, 0.35);
+      color: #fff;
+    }
+
+    /* Spec Key-Value Table in Product Details */
+    .product-spec-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 0.6rem;
+      font-size: 0.8rem;
+    }
+    .product-spec-table tr {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .product-spec-table tr:last-child {
+      border-bottom: none;
+    }
+    .product-spec-table td {
+      padding: 0.35rem 0.4rem;
+      vertical-align: top;
+    }
+    .product-spec-table td.spec-key {
+      font-weight: 700;
+      color: #c084fc;
+      width: 38%;
+      letter-spacing: 0.02em;
+    }
+    .product-spec-table td.spec-val {
+      color: #e2e8f0;
+    }
+    .vendor-bullet-list {
+      margin: 0.4rem 0 0.5rem 1.1rem;
+      padding: 0;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+    .vendor-bullet-list li {
+      margin-bottom: 0.25rem;
+    }
+
+    /* Upload Media / File Dropzone Styling */
+    .upload-zone {
+      border: 1.5px dashed var(--border-accent);
+      border-radius: 10px;
+      padding: 0.85rem;
+      text-align: center;
+      background: rgba(139, 92, 246, 0.03);
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+    }
+    .upload-zone:hover, .upload-zone.dragover {
+      border-color: var(--primary);
+      background: rgba(139, 92, 246, 0.09);
+    }
+    .upload-zone input[type="file"] {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+      width: 100%;
+      height: 100%;
+    }
+    .upload-preview-wrap {
+      margin-top: 0.5rem;
+      max-height: 110px;
+      display: none;
+      align-items: center;
+      gap: 0.75rem;
+      background: rgba(0, 0, 0, 0.4);
+      padding: 0.4rem 0.6rem;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+    .upload-preview-thumb {
+      max-height: 80px;
+      max-width: 100px;
+      border-radius: 6px;
+      object-fit: cover;
+      border: 1px solid var(--border-accent);
+    }
   </style>
 </head>
 <body>
@@ -882,33 +1039,95 @@
 
   <!-- Modal: Artist Publish Product -->
   <div class="modal-backdrop" id="modalPublishProduct">
-    <div class="modal-box">
+    <div class="modal-box" style="max-width: 620px; max-height: 90vh; overflow-y: auto;">
       <div class="modal-title">Put Out Digital Product For Sale</div>
       <form id="formPublish" onsubmit="handlePublishProduct(event)">
         <div class="form-group">
           <label>Product Title</label>
           <input type="text" id="pubTitle" placeholder="e.g. Cyberpunk Catgirl Animated Emote Pack" required>
         </div>
+
+        <!-- Media / Preview (Local File Upload or Direct URL) -->
         <div class="form-group">
-          <label>Media / Preview URL (Image or Animated GIF)</label>
-          <input type="url" id="pubMediaUrl" placeholder="https://... (or direct .gif / .png link)" required>
+          <label>Product Media / Preview (Image, GIF, Animated PNG)</label>
+          <div style="display: flex; gap: 0.5rem; margin-bottom: 0.4rem;">
+            <button type="button" class="composer-mini-btn" id="btnMediaModeFile" onclick="switchMediaInputMode('file')" style="flex:1;">📁 Upload from Device (Image / GIF)</button>
+            <button type="button" class="composer-mini-btn" id="btnMediaModeUrl" onclick="switchMediaInputMode('url')" style="flex:1;">🔗 Remote Web URL</button>
+          </div>
+
+          <div id="mediaUploadZone" class="upload-zone">
+            <input type="file" id="pubMediaFile" accept="image/*,.gif,.png,.jpg,.jpeg,.webp,.svg" onchange="handleLocalMediaUpload(event)">
+            <div style="font-size: 0.825rem; color: #c084fc; font-weight: 600;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 4px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+              Choose image or GIF file from your device
+            </div>
+            <div style="font-size: 0.72rem; color: var(--text-dim); margin-top: 2px;">Supports PNG, Animated GIF, JPG, WebP, SVG</div>
+          </div>
+
+          <div id="mediaUrlZone" style="display: none;">
+            <input type="url" id="pubMediaUrl" placeholder="https://... (or direct .gif / .png link)">
+          </div>
+
+          <!-- Hidden storage for final media data -->
+          <input type="hidden" id="pubFinalMediaUrl" required>
+
+          <div class="upload-preview-wrap" id="mediaPreviewWrap">
+            <img class="upload-preview-thumb" id="mediaPreviewImg" src="" alt="Preview">
+            <div style="flex: 1; min-width: 0;">
+              <div style="font-size: 0.78rem; font-weight: 700; color: #34d399;" id="mediaPreviewStatus">File Loaded Successfully</div>
+              <div style="font-size: 0.72rem; color: var(--text-dim); text-overflow: ellipsis; overflow: hidden; white-space: nowrap;" id="mediaPreviewInfo">Ready for buyers</div>
+            </div>
+            <button type="button" class="btn-row-del" onclick="clearMediaSelection()" title="Remove file">✕</button>
+          </div>
         </div>
+
         <div class="form-group">
           <label>Fixed Base Price (USD) - Clients cannot pay below this</label>
           <input type="number" step="0.01" id="pubMinPrice" placeholder="20.00" required>
         </div>
+
+        <!-- Structured Vendor Info Composer -->
         <div class="form-group">
-          <label>Vendor Information (What client gets, usage rules, specs)</label>
-          <textarea id="pubVendorInfo" rows="3" placeholder="Includes transparent APNG + GIF files in 112x112, 56x56. Permitted for commercial live streams. Re-distribution strictly prohibited." required></textarea>
+          <label>Vendor Information & Specifications</label>
+          <div class="vendor-composer">
+            <!-- Text Description / General Rules -->
+            <div>
+              <div class="composer-sublabel">
+                <span>📝 Description & Usage Rules</span>
+              </div>
+              <textarea id="pubVendorDesc" rows="2" placeholder="e.g. Transparent animated GIF + APNG files. Permitted for commercial VTuber streams and Twitch emotes."></textarea>
+            </div>
+
+            <!-- Bullet Points -->
+            <div>
+              <div class="composer-sublabel">
+                <span>• What's Included / Bullet Points</span>
+                <button type="button" class="composer-mini-btn" onclick="addVendorBulletRow()">+ Add Bullet</button>
+              </div>
+              <div id="pubBulletContainer"></div>
+            </div>
+
+            <!-- Key-Value Table -->
+            <div>
+              <div class="composer-sublabel">
+                <span>📋 Key-Value Specs Table (Format, License, Resolution, etc.)</span>
+                <button type="button" class="composer-mini-btn" onclick="addVendorKvRow()">+ Add Spec Row</button>
+              </div>
+              <div id="pubKvContainer"></div>
+            </div>
+          </div>
         </div>
+
         <div class="form-group">
-          <label>Product Description</label>
-          <textarea id="pubDescription" rows="2" placeholder="Describe the creative work..." required></textarea>
+          <label>Short Product Overview / Tagline</label>
+          <textarea id="pubDescription" rows="2" placeholder="Brief summary of creative aesthetic..." required></textarea>
         </div>
+
         <div class="form-group">
-          <label>Downloadable File Link</label>
-          <input type="url" id="pubDownloadUrl" placeholder="https://storage.link/asset.zip">
+          <label>Deliverable Package / Downloadable File Link (Direct Link or Storage Vault)</label>
+          <input type="text" id="pubDownloadUrl" placeholder="https://storage.link/asset.zip (or leave blank for test vault)">
         </div>
+
         <div class="modal-actions">
           <button type="button" class="btn-secondary" onclick="closeModal('modalPublishProduct')">Cancel</button>
           <button type="submit" class="btn-create">Publish to Market</button>
@@ -1067,7 +1286,21 @@
     function openModal(id) { document.getElementById(id).classList.add('open'); }
     function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 
-    function openPublishModal() { openModal('modalPublishProduct'); }
+    function openPublishModal() { 
+      switchMediaInputMode('file');
+      const bContainer = document.getElementById('pubBulletContainer');
+      if (bContainer && bContainer.children.length === 0) {
+        addVendorBulletRow('Original high-res deliverable files included');
+        addVendorBulletRow('Commercial broadcast & streaming rights granted');
+      }
+      const kContainer = document.getElementById('pubKvContainer');
+      if (kContainer && kContainer.children.length === 0) {
+        addVendorKvRow('File Format', 'Transparent PNG + Animated GIF');
+        addVendorKvRow('Resolution', '1080x1080 / 112x112 / 56x56');
+        addVendorKvRow('License', 'Full Commercial / Monetized Streams');
+      }
+      openModal('modalPublishProduct'); 
+    }
 
     async function openNewCommModal() {
       const res = await fetch('/api/users/artists');
@@ -1179,7 +1412,7 @@
       document.getElementById('detailModalTitle').textContent = p.title;
       document.getElementById('detailModalArtist').textContent = `Created by ${p.artist_name} (@${p.artist_username})`;
       document.getElementById('detailModalDesc').textContent = p.description;
-      document.getElementById('detailModalVendorInfo').textContent = p.vendor_info;
+      renderDetailVendorInfo(p.vendor_info);
 
       const fullStars = Math.round(p.average_rating);
       document.getElementById('detailModalRatingBadge').innerHTML = `
@@ -1290,14 +1523,186 @@
       fetchAllData();
     }
 
+    // Structured Vendor Info Renderer
+    function renderDetailVendorInfo(raw) {
+      const container = document.getElementById('detailModalVendorInfo');
+      if (!raw) {
+        container.innerHTML = '<span style="color: var(--text-dim); font-style: italic;">No vendor specifications provided.</span>';
+        return;
+      }
+
+      try {
+        const data = JSON.parse(raw);
+        if (typeof data === 'object' && data !== null) {
+          let html = '';
+
+          // Paragraph / Description
+          if (data.description) {
+            html += `<div style="margin-bottom: 0.5rem; color: var(--text-main); font-size: 0.825rem; line-height: 1.45;">${escapeHtml(data.description)}</div>`;
+          }
+
+          // Bullet Points
+          if (Array.isArray(data.bullets) && data.bullets.length > 0) {
+            html += `<ul class="vendor-bullet-list">`;
+            data.bullets.forEach(b => {
+              if (b && b.trim()) {
+                html += `<li>${escapeHtml(b.trim())}</li>`;
+              }
+            });
+            html += `</ul>`;
+          }
+
+          // Key-Value Table
+          if (Array.isArray(data.kv) && data.kv.length > 0) {
+            const validRows = data.kv.filter(r => r.key && r.key.trim());
+            if (validRows.length > 0) {
+              html += `<table class="product-spec-table"><tbody>`;
+              validRows.forEach(r => {
+                html += `<tr>
+                  <td class="spec-key">${escapeHtml(r.key.trim())}</td>
+                  <td class="spec-val">${escapeHtml(r.value || '')}</td>
+                </tr>`;
+              });
+              html += `</tbody></table>`;
+            }
+          }
+
+          container.innerHTML = html || escapeHtml(raw);
+          return;
+        }
+      } catch (e) {
+        // Fallback: raw text if not JSON
+      }
+      container.textContent = raw;
+    }
+
+    // Media Input Mode Switcher (File vs URL)
+    function switchMediaInputMode(mode) {
+      const btnFile = document.getElementById('btnMediaModeFile');
+      const btnUrl = document.getElementById('btnMediaModeUrl');
+      const zoneUpload = document.getElementById('mediaUploadZone');
+      const zoneUrl = document.getElementById('mediaUrlZone');
+
+      if (mode === 'file') {
+        zoneUpload.style.display = 'block';
+        zoneUrl.style.display = 'none';
+        btnFile.style.background = 'rgba(139, 92, 246, 0.4)';
+        btnFile.style.color = '#fff';
+        btnUrl.style.background = 'rgba(139, 92, 246, 0.15)';
+        btnUrl.style.color = '#c084fc';
+      } else {
+        zoneUpload.style.display = 'none';
+        zoneUrl.style.display = 'block';
+        btnUrl.style.background = 'rgba(139, 92, 246, 0.4)';
+        btnUrl.style.color = '#fff';
+        btnFile.style.background = 'rgba(139, 92, 246, 0.15)';
+        btnFile.style.color = '#c084fc';
+
+        const directUrlInput = document.getElementById('pubMediaUrl');
+        directUrlInput.oninput = () => {
+          const val = directUrlInput.value.trim();
+          if (val) {
+            setMediaPreview(val, 'Remote URL Linked', val);
+          } else {
+            clearMediaSelection();
+          }
+        };
+      }
+    }
+
+    // Local file handler for images & animated GIFs
+    function handleLocalMediaUpload(e) {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (loadEvt) => {
+        const dataUrl = loadEvt.target.result;
+        const sizeKb = (file.size / 1024).toFixed(1);
+        setMediaPreview(dataUrl, file.name, `${file.type || 'Image/GIF'} • ${sizeKb} KB`);
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function setMediaPreview(srcUrl, title, info) {
+      document.getElementById('pubFinalMediaUrl').value = srcUrl;
+      const previewWrap = document.getElementById('mediaPreviewWrap');
+      const previewImg = document.getElementById('mediaPreviewImg');
+      previewImg.src = srcUrl;
+      document.getElementById('mediaPreviewStatus').textContent = title;
+      document.getElementById('mediaPreviewInfo').textContent = info;
+      previewWrap.style.display = 'flex';
+    }
+
+    function clearMediaSelection() {
+      document.getElementById('pubFinalMediaUrl').value = '';
+      document.getElementById('pubMediaFile').value = '';
+      document.getElementById('pubMediaUrl').value = '';
+      document.getElementById('mediaPreviewWrap').style.display = 'none';
+      document.getElementById('mediaPreviewImg').src = '';
+    }
+
+    // Dynamic Bullet Row Builder
+    function addVendorBulletRow(val = '') {
+      const container = document.getElementById('pubBulletContainer');
+      const row = document.createElement('div');
+      row.className = 'bullet-row';
+      row.innerHTML = `
+        <span style="color: #c084fc; font-weight: bold;">•</span>
+        <input type="text" class="pub-bullet-item" placeholder="e.g. Includes 3 color variants + animated loop" value="${escapeHtml(val)}">
+        <button type="button" class="btn-row-del" onclick="this.parentElement.remove()" title="Delete">✕</button>
+      `;
+      container.appendChild(row);
+      row.querySelector('input').focus();
+    }
+
+    // Dynamic Key-Value Spec Row Builder
+    function addVendorKvRow(k = '', v = '') {
+      const container = document.getElementById('pubKvContainer');
+      const row = document.createElement('div');
+      row.className = 'kv-row';
+      row.innerHTML = `
+        <input type="text" class="kv-k" placeholder="Spec / Key (e.g. File Format)" value="${escapeHtml(k)}">
+        <input type="text" class="kv-v" placeholder="Value (e.g. Transparent GIF, PNG 4K)" value="${escapeHtml(v)}">
+        <button type="button" class="btn-row-del" onclick="this.parentElement.remove()" title="Delete">✕</button>
+      `;
+      container.appendChild(row);
+      row.querySelector('.kv-k').focus();
+    }
+
     async function handlePublishProduct(e) {
       e.preventDefault();
+
+      const finalMedia = document.getElementById('pubFinalMediaUrl').value.trim();
+      if (!finalMedia) {
+        alert('Please select an image or GIF file from your device, or supply a media URL.');
+        return;
+      }
+
+      // Collect structured vendor info
+      const desc = document.getElementById('pubVendorDesc').value.trim();
+      const bullets = Array.from(document.querySelectorAll('.pub-bullet-item'))
+        .map(i => i.value.trim())
+        .filter(Boolean);
+      const kv = Array.from(document.querySelectorAll('.kv-row'))
+        .map(row => ({
+          key: row.querySelector('.kv-k').value.trim(),
+          value: row.querySelector('.kv-v').value.trim()
+        }))
+        .filter(r => r.key.length > 0);
+
+      const structuredVendorInfo = JSON.stringify({
+        description: desc,
+        bullets: bullets,
+        kv: kv
+      });
+
       const payload = {
         artist_id: currentUser.id,
         title: document.getElementById('pubTitle').value.trim(),
-        media_url: document.getElementById('pubMediaUrl').value.trim(),
+        media_url: finalMedia,
         min_price: parseFloat(document.getElementById('pubMinPrice').value),
-        vendor_info: document.getElementById('pubVendorInfo').value.trim(),
+        vendor_info: structuredVendorInfo,
         description: document.getElementById('pubDescription').value.trim(),
         file_download_url: document.getElementById('pubDownloadUrl').value.trim() || undefined
       };
@@ -1311,7 +1716,12 @@
       if (res.ok) {
         closeModal('modalPublishProduct');
         document.getElementById('formPublish').reset();
+        clearMediaSelection();
+        document.getElementById('pubBulletContainer').innerHTML = '';
+        document.getElementById('pubKvContainer').innerHTML = '';
         fetchAllData();
+      } else {
+        alert(await res.text() || 'Failed to publish product');
       }
     }
 
