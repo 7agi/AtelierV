@@ -1,7 +1,7 @@
 use axum::{
     extract::{
         ws::{Message, WebSocket, WebSocketUpgrade},
-        Path, State,
+        Path, Query, State,
     },
     response::{Html, IntoResponse, Response},
     routing::{delete, get, post, put},
@@ -43,14 +43,49 @@ pub struct User {
     pub username: String,
     pub display_name: String,
     pub role: String, // Admin, Artist, Client
+    #[serde(skip_serializing)]
+    pub password_hash: String,
     pub created_at: String,
 }
 
-#[derive(Debug, Deserialize)]
-pub struct CreateUserReq {
+#[derive(Debug, Serialize, Deserialize)]
+pub struct SafeUser {
+    pub id: i64,
     pub username: String,
     pub display_name: String,
     pub role: String,
+    pub created_at: String,
+}
+
+impl From<User> for SafeUser {
+    fn from(u: User) -> Self {
+        SafeUser {
+            id: u.id,
+            username: u.username,
+            display_name: u.display_name,
+            role: u.role,
+            created_at: u.created_at,
+        }
+    }
+}
+
+#[derive(Debug, Deserialize)]
+pub struct SignupReq {
+    pub username: String,
+    pub display_name: String,
+    pub role: String,
+    pub password: String,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct LoginReq {
+    pub username: String,
+    pub password: String,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct UserQuery {
+    pub user_id: Option<i64>,
 }
 
 #[derive(Debug, Serialize, Deserialize, FromRow)]
@@ -78,6 +113,7 @@ pub struct CreateCommissionReq {
 #[derive(Debug, Deserialize)]
 pub struct UpdateStatusReq {
     pub status: String,
+    pub note: Option<String>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -113,6 +149,15 @@ pub struct OwnershipLog {
     pub license_type: String,
     pub certificate_hash: String,
     pub registered_at: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, FromRow)]
+pub struct CommissionMilestone {
+    pub id: i64,
+    pub commission_id: i64,
+    pub stage_name: String,
+    pub note: String,
+    pub created_at: String,
 }
 
 // ---------------------------------------------------------
@@ -156,12 +201,20 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .route("/", get(serve_dashboard))
         // WebSocket live sync endpoint
         .route("/ws", get(ws_handler))
-        // REST API
-        .route("/api/users", get(list_users).post(create_user))
+        // Auth API
+        .route("/api/auth/signup", post(signup_user))
+        .route("/api/auth/login", post(login_user))
+        .route("/api/auth/me", get(get_current_user))
+        // User Persona & Public Artist directory
+        .route("/api/users", get(list_users))
+        .route("/api/users/artists", get(list_artists))
         .route("/api/users/:id", delete(delete_user))
+        // Role-filtered Commissions & Workflows
         .route("/api/commissions", get(list_commissions).post(create_commission))
         .route("/api/commissions/:id/status", put(update_commission_status))
         .route("/api/commissions/:id/complete", post(complete_commission))
+        .route("/api/commissions/:id/milestones", get(get_commission_milestones))
+        // Escrow & Ownership
         .route("/api/escrow", get(list_escrow))
         .route("/api/escrow/deposit", post(test_deposit))
         .route("/api/escrow/:id/release", post(release_escrow))
@@ -201,6 +254,7 @@ async fn run_migrations(pool: &SqlitePool) -> Result<(), sqlx::Error> {
             username TEXT NOT NULL UNIQUE,
             display_name TEXT NOT NULL,
             role TEXT NOT NULL,
+            password_hash TEXT NOT NULL DEFAULT 'password',
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP
         );
 
@@ -216,6 +270,15 @@ async fn run_migrations(pool: &SqlitePool) -> Result<(), sqlx::Error> {
             updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY(client_id) REFERENCES users(id),
             FOREIGN KEY(artist_id) REFERENCES users(id)
+        );
+
+        CREATE TABLE IF NOT EXISTS commission_milestones (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            commission_id INTEGER NOT NULL,
+            stage_name TEXT NOT NULL,
+            note TEXT NOT NULL,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY(commission_id) REFERENCES commissions(id)
         );
 
         CREATE TABLE IF NOT EXISTS escrow_ledger (
@@ -249,6 +312,11 @@ async fn run_migrations(pool: &SqlitePool) -> Result<(), sqlx::Error> {
     .execute(pool)
     .await?;
 
+    // Attempt to add password_hash column in case older DB exists without it
+    let _ = sqlx::query("ALTER TABLE users ADD COLUMN password_hash TEXT NOT NULL DEFAULT 'password'")
+        .execute(pool)
+        .await;
+
     tracing::info!("Database schema validated.");
     Ok(())
 }
@@ -262,10 +330,10 @@ async fn seed_database(pool: &SqlitePool) -> Result<(), sqlx::Error> {
         tracing::info!("Seeding initial personas (Admin, Artist, Client)...");
         sqlx::query(
             r#"
-            INSERT INTO users (username, display_name, role) VALUES 
-            ('admin_nexus', 'Atelier Director (Admin)', 'Admin'),
-            ('lyra_v', 'Lyra - 2D Live Rigging (Artist)', 'Artist'),
-            ('kuro_stream', 'Kuro Ch. (Client)', 'Client');
+            INSERT INTO users (username, display_name, role, password_hash) VALUES 
+            ('admin', 'Atelier Director (Admin)', 'Admin', 'admin123'),
+            ('lyra', 'Lyra - 2D Live Rigging (Artist)', 'Artist', 'artist123'),
+            ('kuro', 'Kuro Ch. (Client)', 'Client', 'client123');
             "#,
         )
         .execute(pool)
@@ -276,6 +344,17 @@ async fn seed_database(pool: &SqlitePool) -> Result<(), sqlx::Error> {
             r#"
             INSERT INTO commissions (title, client_id, artist_id, status, price, brief) VALUES
             ('Debut Vtuber Rig & Expressions', 3, 2, 'IN_PROGRESS', 550.00, 'Full body rig with 5 toggle expressions and physics for long flowing hair.');
+            "#,
+        )
+        .execute(pool)
+        .await?;
+
+        // Seed sample milestone progress
+        sqlx::query(
+            r#"
+            INSERT INTO commission_milestones (commission_id, stage_name, note) VALUES
+            (1, 'REQUESTED', 'Brief initiated and safe escrow locked by client.'),
+            (1, 'IN_PROGRESS', 'Artist accepted request and began base mesh splitting.');
             "#,
         )
         .execute(pool)
@@ -305,24 +384,29 @@ async fn serve_dashboard() -> impl IntoResponse {
     Html(DASHBOARD_HTML)
 }
 
-async fn list_users(State(state): State<AppState>) -> Json<Vec<User>> {
-    let users = sqlx::query_as::<_, User>("SELECT id, username, display_name, role, created_at FROM users ORDER BY id ASC")
-        .fetch_all(&state.db)
-        .await
-        .unwrap_or_default();
-    Json(users)
-}
-
-async fn create_user(
+// Auth: Signup
+async fn signup_user(
     State(state): State<AppState>,
-    Json(payload): Json<CreateUserReq>,
+    Json(payload): Json<SignupReq>,
 ) -> Response {
+    let clean_user = payload.username.trim().to_lowercase();
+    if clean_user.is_empty() || payload.password.trim().is_empty() {
+        return (axum::http::StatusCode::BAD_REQUEST, "Username and password are required").into_response();
+    }
+
+    let role = match payload.role.as_str() {
+        "Artist" => "Artist",
+        "Admin" => "Admin",
+        _ => "Client",
+    };
+
     let res = sqlx::query(
-        "INSERT INTO users (username, display_name, role) VALUES (?, ?, ?)"
+        "INSERT INTO users (username, display_name, role, password_hash) VALUES (?, ?, ?, ?)"
     )
-    .bind(&payload.username)
+    .bind(&clean_user)
     .bind(&payload.display_name)
-    .bind(&payload.role)
+    .bind(role)
+    .bind(&payload.password)
     .execute(&state.db)
     .await;
 
@@ -331,13 +415,117 @@ async fn create_user(
             let id = r.last_insert_rowid();
             let _ = state.tx.send(WsEvent {
                 event_type: "PERSONA_CREATED".into(),
-                message: format!("New persona registered: {} (@{})", payload.display_name, payload.role),
-                payload: serde_json::json!({ "id": id, "username": payload.username }),
+                message: format!("New {} registered: {} (@{})", role, payload.display_name, clean_user),
+                payload: serde_json::json!({ "id": id, "username": clean_user, "role": role }),
             });
-            Json(serde_json::json!({ "id": id, "status": "ok" })).into_response()
+            Json(serde_json::json!({
+                "status": "ok",
+                "user": {
+                    "id": id,
+                    "username": clean_user,
+                    "display_name": payload.display_name,
+                    "role": role
+                }
+            })).into_response()
         }
-        Err(e) => (axum::http::StatusCode::BAD_REQUEST, e.to_string()).into_response(),
+        Err(e) => (axum::http::StatusCode::CONFLICT, format!("Username already taken or database error: {}", e)).into_response(),
     }
+}
+
+// Auth: Login
+async fn login_user(
+    State(state): State<AppState>,
+    Json(payload): Json<LoginReq>,
+) -> Response {
+    let clean_user = payload.username.trim().to_lowercase();
+    let user_opt = sqlx::query_as::<_, User>(
+        "SELECT id, username, display_name, role, password_hash, created_at FROM users WHERE LOWER(username) = ?"
+    )
+    .bind(&clean_user)
+    .fetch_optional(&state.db)
+    .await
+    .unwrap_or(None);
+
+    match user_opt {
+        Some(user) => {
+            if user.password_hash == payload.password {
+                let safe = SafeUser::from(user);
+                Json(serde_json::json!({
+                    "status": "ok",
+                    "user": safe
+                })).into_response()
+            } else {
+                (axum::http::StatusCode::UNAUTHORIZED, "Invalid username or password").into_response()
+            }
+        }
+        None => (axum::http::StatusCode::UNAUTHORIZED, "Invalid username or password").into_response(),
+    }
+}
+
+// Auth: /api/auth/me?user_id=1
+async fn get_current_user(
+    State(state): State<AppState>,
+    Query(q): Query<UserQuery>,
+) -> Response {
+    let user_id = match q.user_id {
+        Some(id) => id,
+        None => return (axum::http::StatusCode::BAD_REQUEST, "Missing user_id query parameter").into_response(),
+    };
+
+    let user_opt = sqlx::query_as::<_, User>(
+        "SELECT id, username, display_name, role, password_hash, created_at FROM users WHERE id = ?"
+    )
+    .bind(user_id)
+    .fetch_optional(&state.db)
+    .await
+    .unwrap_or(None);
+
+    match user_opt {
+        Some(u) => Json(SafeUser::from(u)).into_response(),
+        None => (axum::http::StatusCode::NOT_FOUND, "User not found").into_response(),
+    }
+}
+
+async fn list_users(
+    State(state): State<AppState>,
+    Query(q): Query<UserQuery>,
+) -> Response {
+    // Only Admin can view the full persona directory
+    if let Some(uid) = q.user_id {
+        let role: Option<(String,)> = sqlx::query_as("SELECT role FROM users WHERE id = ?")
+            .bind(uid)
+            .fetch_optional(&state.db)
+            .await
+            .unwrap_or(None);
+        
+        if let Some((r,)) = role {
+            if r == "Admin" {
+                let users = sqlx::query_as::<_, User>(
+                    "SELECT id, username, display_name, role, password_hash, created_at FROM users ORDER BY id ASC"
+                )
+                .fetch_all(&state.db)
+                .await
+                .unwrap_or_default();
+                let safe_users: Vec<SafeUser> = users.into_iter().map(SafeUser::from).collect();
+                return Json(safe_users).into_response();
+            }
+        }
+    }
+
+    (axum::http::StatusCode::FORBIDDEN, "Access denied: Persona directory restricted to Admin").into_response()
+}
+
+// Public artist listing so clients can choose an artist when commissioning
+async fn list_artists(State(state): State<AppState>) -> Json<Vec<SafeUser>> {
+    let artists = sqlx::query_as::<_, User>(
+        "SELECT id, username, display_name, role, password_hash, created_at FROM users WHERE role = 'Artist' ORDER BY display_name ASC"
+    )
+    .fetch_all(&state.db)
+    .await
+    .unwrap_or_default();
+
+    let safe: Vec<SafeUser> = artists.into_iter().map(SafeUser::from).collect();
+    Json(safe)
 }
 
 async fn delete_user(State(state): State<AppState>, Path(id): Path<i64>) -> Response {
@@ -355,14 +543,74 @@ async fn delete_user(State(state): State<AppState>, Path(id): Path<i64>) -> Resp
     Json(serde_json::json!({ "status": "deleted" })).into_response()
 }
 
-async fn list_commissions(State(state): State<AppState>) -> Json<Vec<Commission>> {
-    let comms = sqlx::query_as::<_, Commission>(
-        "SELECT id, title, client_id, artist_id, status, price, brief, created_at, updated_at FROM commissions ORDER BY id DESC"
+// Role-Scoped Commissions Listing
+async fn list_commissions(
+    State(state): State<AppState>,
+    Query(q): Query<UserQuery>,
+) -> Response {
+    let user_id = match q.user_id {
+        Some(uid) => uid,
+        None => return (axum::http::StatusCode::BAD_REQUEST, "Missing user_id parameter").into_response(),
+    };
+
+    let user_opt = sqlx::query_as::<_, User>(
+        "SELECT id, username, display_name, role, password_hash, created_at FROM users WHERE id = ?"
     )
+    .bind(user_id)
+    .fetch_optional(&state.db)
+    .await
+    .unwrap_or(None);
+
+    let role = match user_opt {
+        Some(u) => u.role,
+        None => return (axum::http::StatusCode::UNAUTHORIZED, "Invalid user session").into_response(),
+    };
+
+    let comms = if role == "Admin" {
+        // Admin sees all commissions across the system
+        sqlx::query_as::<_, Commission>(
+            "SELECT id, title, client_id, artist_id, status, price, brief, created_at, updated_at FROM commissions ORDER BY id DESC"
+        )
+        .fetch_all(&state.db)
+        .await
+        .unwrap_or_default()
+    } else if role == "Artist" {
+        // Artists only see what THEY receive / put out
+        sqlx::query_as::<_, Commission>(
+            "SELECT id, title, client_id, artist_id, status, price, brief, created_at, updated_at FROM commissions WHERE artist_id = ? ORDER BY id DESC"
+        )
+        .bind(user_id)
+        .fetch_all(&state.db)
+        .await
+        .unwrap_or_default()
+    } else {
+        // Clients only see what THEY request
+        sqlx::query_as::<_, Commission>(
+            "SELECT id, title, client_id, artist_id, status, price, brief, created_at, updated_at FROM commissions WHERE client_id = ? ORDER BY id DESC"
+        )
+        .bind(user_id)
+        .fetch_all(&state.db)
+        .await
+        .unwrap_or_default()
+    };
+
+    Json(comms).into_response()
+}
+
+// Fetch in-depth milestone history for a specific commission
+async fn get_commission_milestones(
+    State(state): State<AppState>,
+    Path(id): Path<i64>,
+) -> Json<Vec<CommissionMilestone>> {
+    let milestones = sqlx::query_as::<_, CommissionMilestone>(
+        "SELECT id, commission_id, stage_name, note, created_at FROM commission_milestones WHERE commission_id = ? ORDER BY id ASC"
+    )
+    .bind(id)
     .fetch_all(&state.db)
     .await
     .unwrap_or_default();
-    Json(comms)
+
+    Json(milestones)
 }
 
 async fn create_commission(
@@ -401,6 +649,14 @@ async fn create_commission(
     .execute(&mut *tx)
     .await;
 
+    // Record first milestone
+    let _ = sqlx::query(
+        "INSERT INTO commission_milestones (commission_id, stage_name, note) VALUES (?, 'REQUESTED', 'Brief launched by client and funds held in safe escrow.')"
+    )
+    .bind(comm_id)
+    .execute(&mut *tx)
+    .await;
+
     if let Err(e) = tx.commit().await {
         return (axum::http::StatusCode::INTERNAL_SERVER_ERROR, e.to_string()).into_response();
     }
@@ -408,7 +664,12 @@ async fn create_commission(
     let _ = state.tx.send(WsEvent {
         event_type: "COMMISSION_CREATED".into(),
         message: format!("New brief '#{} - {}' placed into escrow (${:.2})", comm_id, payload.title, payload.price),
-        payload: serde_json::json!({ "id": comm_id, "title": payload.title }),
+        payload: serde_json::json!({
+            "id": comm_id,
+            "title": payload.title,
+            "client_id": payload.client_id,
+            "artist_id": payload.artist_id
+        }),
     });
 
     Json(serde_json::json!({ "id": comm_id, "status": "created" })).into_response()
@@ -419,16 +680,42 @@ async fn update_commission_status(
     Path(id): Path<i64>,
     Json(payload): Json<UpdateStatusReq>,
 ) -> Response {
+    let mut tx = match state.db.begin().await {
+        Ok(t) => t,
+        Err(e) => return (axum::http::StatusCode::INTERNAL_SERVER_ERROR, e.to_string()).into_response(),
+    };
+
     let _ = sqlx::query("UPDATE commissions SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?")
         .bind(&payload.status)
         .bind(id)
-        .execute(&state.db)
+        .execute(&mut *tx)
         .await;
+
+    let note_text = payload.note.unwrap_or_else(|| match payload.status.as_str() {
+        "IN_PROGRESS" => "Artist accepted the brief and began creative production.",
+        "IN_REVIEW" => "Artist submitted milestone drafts and previews for client feedback.",
+        "COMPLETED" => "Client approved all deliverables and closed the request.",
+        "CANCELLED" => "Commission was cancelled.",
+        _ => "Status updated.",
+    }.to_string());
+
+    let _ = sqlx::query(
+        "INSERT INTO commission_milestones (commission_id, stage_name, note) VALUES (?, ?, ?)"
+    )
+    .bind(id)
+    .bind(&payload.status)
+    .bind(&note_text)
+    .execute(&mut *tx)
+    .await;
+
+    if let Err(e) = tx.commit().await {
+        return (axum::http::StatusCode::INTERNAL_SERVER_ERROR, e.to_string()).into_response();
+    }
 
     let _ = state.tx.send(WsEvent {
         event_type: "STATUS_SHIFT".into(),
         message: format!("Commission #{} moved to {}", id, payload.status),
-        payload: serde_json::json!({ "id": id, "status": payload.status }),
+        payload: serde_json::json!({ "id": id, "status": payload.status, "note": note_text }),
     });
 
     Json(serde_json::json!({ "status": "updated" })).into_response()
@@ -488,6 +775,16 @@ async fn complete_commission(
     .execute(&mut *tx)
     .await;
 
+    // 5. Milestone log
+    let milestone_note = format!("Approved by client! IP Certificate '{}' registered and funds settled.", cert_hash);
+    let _ = sqlx::query(
+        "INSERT INTO commission_milestones (commission_id, stage_name, note) VALUES (?, 'COMPLETED', ?)"
+    )
+    .bind(id)
+    .bind(&milestone_note)
+    .execute(&mut *tx)
+    .await;
+
     if let Err(e) = tx.commit().await {
         return (axum::http::StatusCode::INTERNAL_SERVER_ERROR, e.to_string()).into_response();
     }
@@ -501,14 +798,48 @@ async fn complete_commission(
     Json(serde_json::json!({ "status": "completed", "certificate": cert_hash })).into_response()
 }
 
-async fn list_escrow(State(state): State<AppState>) -> Json<Vec<EscrowLedger>> {
-    let ledger = sqlx::query_as::<_, EscrowLedger>(
-        "SELECT id, commission_id, client_id, artist_id, amount, status, created_at FROM escrow_ledger ORDER BY id DESC"
+// Escrow listing scoped by user
+async fn list_escrow(
+    State(state): State<AppState>,
+    Query(q): Query<UserQuery>,
+) -> Response {
+    let user_id = match q.user_id {
+        Some(uid) => uid,
+        None => return (axum::http::StatusCode::BAD_REQUEST, "Missing user_id parameter").into_response(),
+    };
+
+    let user_opt = sqlx::query_as::<_, User>(
+        "SELECT id, username, display_name, role, password_hash, created_at FROM users WHERE id = ?"
     )
-    .fetch_all(&state.db)
+    .bind(user_id)
+    .fetch_optional(&state.db)
     .await
-    .unwrap_or_default();
-    Json(ledger)
+    .unwrap_or(None);
+
+    let role = match user_opt {
+        Some(u) => u.role,
+        None => return (axum::http::StatusCode::UNAUTHORIZED, "Invalid user session").into_response(),
+    };
+
+    let ledger = if role == "Admin" {
+        sqlx::query_as::<_, EscrowLedger>(
+            "SELECT id, commission_id, client_id, artist_id, amount, status, created_at FROM escrow_ledger ORDER BY id DESC"
+        )
+        .fetch_all(&state.db)
+        .await
+        .unwrap_or_default()
+    } else {
+        sqlx::query_as::<_, EscrowLedger>(
+            "SELECT id, commission_id, client_id, artist_id, amount, status, created_at FROM escrow_ledger WHERE client_id = ? OR artist_id = ? ORDER BY id DESC"
+        )
+        .bind(user_id)
+        .bind(user_id)
+        .fetch_all(&state.db)
+        .await
+        .unwrap_or_default()
+    };
+
+    Json(ledger).into_response()
 }
 
 async fn test_deposit(
@@ -547,14 +878,48 @@ async fn release_escrow(State(state): State<AppState>, Path(id): Path<i64>) -> R
     Json(serde_json::json!({ "status": "released" })).into_response()
 }
 
-async fn list_ownership(State(state): State<AppState>) -> Json<Vec<OwnershipLog>> {
-    let logs = sqlx::query_as::<_, OwnershipLog>(
-        "SELECT id, commission_id, character_name, owner_user_id, creator_user_id, license_type, certificate_hash, registered_at FROM ownership_logs ORDER BY id DESC"
+// Ownership listing scoped by user
+async fn list_ownership(
+    State(state): State<AppState>,
+    Query(q): Query<UserQuery>,
+) -> Response {
+    let user_id = match q.user_id {
+        Some(uid) => uid,
+        None => return (axum::http::StatusCode::BAD_REQUEST, "Missing user_id parameter").into_response(),
+    };
+
+    let user_opt = sqlx::query_as::<_, User>(
+        "SELECT id, username, display_name, role, password_hash, created_at FROM users WHERE id = ?"
     )
-    .fetch_all(&state.db)
+    .bind(user_id)
+    .fetch_optional(&state.db)
     .await
-    .unwrap_or_default();
-    Json(logs)
+    .unwrap_or(None);
+
+    let role = match user_opt {
+        Some(u) => u.role,
+        None => return (axum::http::StatusCode::UNAUTHORIZED, "Invalid user session").into_response(),
+    };
+
+    let logs = if role == "Admin" {
+        sqlx::query_as::<_, OwnershipLog>(
+            "SELECT id, commission_id, character_name, owner_user_id, creator_user_id, license_type, certificate_hash, registered_at FROM ownership_logs ORDER BY id DESC"
+        )
+        .fetch_all(&state.db)
+        .await
+        .unwrap_or_default()
+    } else {
+        sqlx::query_as::<_, OwnershipLog>(
+            "SELECT id, commission_id, character_name, owner_user_id, creator_user_id, license_type, certificate_hash, registered_at FROM ownership_logs WHERE owner_user_id = ? OR creator_user_id = ? ORDER BY id DESC"
+        )
+        .bind(user_id)
+        .bind(user_id)
+        .fetch_all(&state.db)
+        .await
+        .unwrap_or_default()
+    };
+
+    Json(logs).into_response()
 }
 
 // ---------------------------------------------------------

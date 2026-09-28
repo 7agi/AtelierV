@@ -51,6 +51,111 @@
         radial-gradient(circle at 85% 85%, rgba(99, 102, 241, 0.1) 0%, transparent 45%);
     }
 
+    /* Auth Overlay Screen */
+    #authOverlay {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      background: rgba(10, 11, 16, 0.94);
+      backdrop-filter: blur(20px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+    }
+
+    .auth-card {
+      background: #151828;
+      border: 1px solid var(--border-accent);
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7);
+      border-radius: 20px;
+      width: 100%;
+      max-width: 440px;
+      padding: 2.5rem;
+      animation: modalFade 0.3s ease-out;
+    }
+
+    @keyframes modalFade {
+      from { opacity: 0; transform: scale(0.96) translateY(10px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    .auth-logo {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 1.6rem;
+      font-weight: 800;
+      margin-bottom: 0.5rem;
+      background: linear-gradient(135deg, #fff 30%, #c084fc 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .auth-subtitle {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 1.8rem;
+    }
+
+    .auth-toggle {
+      display: flex;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 10px;
+      padding: 3px;
+      margin-bottom: 1.5rem;
+    }
+
+    .auth-toggle-btn {
+      flex: 1;
+      padding: 0.6rem;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      background: transparent;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .auth-toggle-btn.active {
+      background: var(--primary);
+      color: white;
+      box-shadow: 0 4px 12px var(--glow-purple);
+    }
+
+    .auth-demo-chips {
+      margin-top: 1.25rem;
+      padding-top: 1.25rem;
+      border-top: 1px solid var(--border);
+      font-size: 0.75rem;
+      color: var(--text-dim);
+    }
+
+    .demo-btn-group {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .demo-chip {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      font-size: 0.7rem;
+      padding: 4px 8px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .demo-chip:hover {
+      background: rgba(139, 92, 246, 0.2);
+      color: #fff;
+    }
+
     /* Top Navigation */
     header {
       height: 72px;
@@ -158,16 +263,42 @@
       box-shadow: 0 0 8px var(--accent-emerald);
     }
 
-    .persona-selector {
+    .user-pill {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
       background: var(--bg-surface);
-      color: var(--text-main);
       border: 1px solid var(--border-accent);
-      padding: 0.45rem 0.85rem;
+      padding: 0.4rem 0.8rem;
       border-radius: 10px;
-      font-size: 0.825rem;
-      font-weight: 600;
-      outline: none;
+    }
+
+    .user-role-tag {
+      font-size: 0.65rem;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .role-Admin { background: rgba(244, 63, 94, 0.2); color: #fb7185; }
+    .role-Artist { background: rgba(168, 85, 247, 0.2); color: #c084fc; }
+    .role-Client { background: rgba(56, 189, 248, 0.2); color: #38bdf8; }
+
+    .btn-logout {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-dim);
+      padding: 0.4rem 0.6rem;
+      border-radius: 8px;
+      font-size: 0.75rem;
       cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .btn-logout:hover {
+      color: var(--accent-rose);
+      border-color: var(--accent-rose);
     }
 
     /* Main Container */
@@ -276,6 +407,7 @@
       gap: 1.5rem;
     }
 
+    /* Commission Card & In-Element Progress Accordion */
     .comm-card {
       background: var(--bg-card);
       border: 1px solid var(--border);
@@ -286,11 +418,17 @@
       gap: 1rem;
       position: relative;
       transition: all 0.2s ease;
+      cursor: pointer;
     }
 
     .comm-card:hover {
       border-color: rgba(139, 92, 246, 0.5);
       background: var(--bg-card-hover);
+    }
+
+    .comm-card.expanded {
+      border-color: var(--primary);
+      box-shadow: 0 8px 30px rgba(139, 92, 246, 0.15);
     }
 
     .comm-header {
@@ -325,10 +463,6 @@
       font-size: 0.875rem;
       color: var(--text-muted);
       line-height: 1.5;
-      display: -webkit-box;
-      -webkit-line-clamp: 3;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
     }
 
     .comm-meta {
@@ -355,7 +489,7 @@
 
     .btn-action {
       flex: 1;
-      padding: 0.45rem;
+      padding: 0.55rem;
       font-size: 0.775rem;
       font-weight: 600;
       border-radius: 8px;
@@ -377,6 +511,97 @@
     }
     .btn-action.success:hover {
       background: rgba(16, 185, 129, 0.3);
+    }
+
+    /* Within-Element Progress Timeline */
+    .click-hint {
+      font-size: 0.72rem;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      margin-top: 0.25rem;
+      font-weight: 600;
+    }
+
+    .progress-drawer {
+      display: none;
+      background: rgba(0, 0, 0, 0.35);
+      border-radius: 12px;
+      padding: 1rem;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      margin-top: 0.5rem;
+      animation: fadeIn 0.2s ease-out;
+    }
+
+    .progress-drawer.open {
+      display: block;
+    }
+
+    .timeline-title {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: var(--text-dim);
+      letter-spacing: 0.05em;
+      margin-bottom: 0.75rem;
+    }
+
+    .timeline-step {
+      display: flex;
+      gap: 0.75rem;
+      position: relative;
+      padding-bottom: 0.85rem;
+    }
+
+    .timeline-step:last-child {
+      padding-bottom: 0;
+    }
+
+    .timeline-step:not(:last-child)::before {
+      content: '';
+      position: absolute;
+      left: 7px;
+      top: 14px;
+      bottom: 0;
+      width: 2px;
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .timeline-dot {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--bg-surface);
+      border: 2px solid var(--primary);
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .timeline-dot.done {
+      background: var(--accent-emerald);
+      border-color: var(--accent-emerald);
+    }
+
+    .timeline-content {
+      font-size: 0.8rem;
+    }
+
+    .timeline-stage {
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .timeline-note {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .timeline-time {
+      font-size: 0.68rem;
+      color: var(--text-dim);
+      font-family: 'JetBrains Mono', monospace;
     }
 
     /* Live Feed / Realtime Chat */
@@ -428,19 +653,11 @@
     .feed-entry.ownership {
       border-left-color: var(--accent-pink);
     }
-    .feed-entry.chat {
-      border-left-color: var(--accent-cyan);
-    }
 
     .feed-time {
       font-size: 0.7rem;
       color: var(--text-dim);
       margin-bottom: 0.25rem;
-    }
-
-    .chat-sender {
-      color: #c084fc;
-      font-weight: 700;
     }
 
     /* Escrow & Ledger Table */
@@ -470,7 +687,7 @@
       inset: 0;
       background: rgba(0, 0, 0, 0.75);
       backdrop-filter: blur(8px);
-      z-index: 100;
+      z-index: 200;
       align-items: center;
       justify-content: center;
     }
@@ -559,6 +776,75 @@
 </head>
 <body>
 
+  <!-- AUTHENTICATION OVERLAY (Shown if not logged in) -->
+  <div id="authOverlay">
+    <div class="auth-card">
+      <div class="auth-logo">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color: #a855f7;">
+          <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+          <polyline points="2 17 12 22 22 17"></polyline>
+          <polyline points="2 12 12 17 22 12"></polyline>
+        </svg>
+        AtelierV
+      </div>
+      <div class="auth-subtitle">Creative Commission Hub & Safe Escrow Vault</div>
+
+      <div class="auth-toggle">
+        <button type="button" class="auth-toggle-btn active" id="btnAuthTabLogin" onclick="switchAuthMode('login')">Sign In</button>
+        <button type="button" class="auth-toggle-btn" id="btnAuthTabSignup" onclick="switchAuthMode('signup')">Sign Up</button>
+      </div>
+
+      <!-- Login Form -->
+      <form id="formLogin" onsubmit="handleAuthLogin(event)">
+        <div class="form-group">
+          <label>Username</label>
+          <input type="text" id="loginUsername" placeholder="e.g. kuro" required autocomplete="username">
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="loginPassword" placeholder="••••••••" required autocomplete="current-password">
+        </div>
+        <button type="submit" class="btn-create" style="width: 100%; margin-top: 0.5rem;">Sign In to Atelier</button>
+      </form>
+
+      <!-- Signup Form -->
+      <form id="formSignup" style="display: none;" onsubmit="handleAuthSignup(event)">
+        <div class="form-group">
+          <label>Desired Handle / Username</label>
+          <input type="text" id="signupUsername" placeholder="e.g. nova_art" required autocomplete="username">
+        </div>
+        <div class="form-group">
+          <label>Display Name</label>
+          <input type="text" id="signupDisplayName" placeholder="e.g. Nova Rigging Studio" required>
+        </div>
+        <div class="form-group">
+          <label>I am joining as a:</label>
+          <select id="signupRole" required>
+            <option value="Client">Client (Commissioning Art / Assets)</option>
+            <option value="Artist">Artist (Fulfilling Deliverables)</option>
+            <option value="Admin">Admin (Platform Director)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="signupPassword" placeholder="••••••••" required autocomplete="new-password">
+        </div>
+        <button type="submit" class="btn-create" style="width: 100%; margin-top: 0.5rem;">Create Account & Sign In</button>
+      </form>
+
+      <div id="authErrorMsg" style="color: var(--accent-rose); font-size: 0.8rem; margin-top: 0.75rem; text-align: center;"></div>
+
+      <div class="auth-demo-chips">
+        <div>Quick Seed Accounts:</div>
+        <div class="demo-btn-group">
+          <button type="button" class="demo-chip" onclick="quickFillLogin('client', 'client123')">Client (kuro)</button>
+          <button type="button" class="demo-chip" onclick="quickFillLogin('artist', 'artist123')">Artist (lyra)</button>
+          <button type="button" class="demo-chip" onclick="quickFillLogin('admin', 'admin123')">Admin (admin)</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Top Navbar -->
   <header>
     <div style="display: flex; align-items: center; gap: 1rem;">
@@ -575,30 +861,34 @@
 
     <!-- Tab navigation -->
     <div class="nav-tabs">
-      <button class="nav-btn active" onclick="switchTab('commissions')">
+      <button class="nav-btn active" id="navBtnCommissions" onclick="switchTab('commissions')">
         <span>🎨</span> Commissions
       </button>
-      <button class="nav-btn" onclick="switchTab('escrow')">
+      <button class="nav-btn" id="navBtnEscrow" onclick="switchTab('escrow')">
         <span>🔒</span> Escrow & Ledger
       </button>
-      <button class="nav-btn" onclick="switchTab('ownership')">
-        <span>📜</span> Ownership Registry
+      <button class="nav-btn" id="navBtnOwnership" onclick="switchTab('ownership')">
+        <span>📜</span> Ownership
       </button>
-      <button class="nav-btn" onclick="switchTab('admin')">
-        <span>⚙️</span> Admin & Personas
+      <button class="nav-btn" id="navBtnAdmin" style="display: none;" onclick="switchTab('admin')">
+        <span>⚙️</span> Admin Directory
       </button>
     </div>
 
-    <!-- Active Persona Switcher & Live indicator -->
+    <!-- Active User & Live indicator -->
     <div class="user-profile-bar">
       <div class="ws-indicator" id="wsIndicator">
         <span class="status-dot" id="wsDot"></span>
-        <span id="wsText">Connecting...</span>
+        <span id="wsText">Syncing</span>
       </div>
-      <label style="font-size: 0.75rem; color: var(--text-dim); margin-left: 0.5rem;">Persona:</label>
-      <select class="persona-selector" id="currentPersonaSelect" onchange="onPersonaChanged()">
-        <!-- Filled dynamically -->
-      </select>
+
+      <div class="user-pill" id="userPill">
+        <div>
+          <span style="font-weight: 700; font-size: 0.85rem;" id="navUserDisplayName">User</span>
+          <span class="user-role-tag" id="navUserRole">Client</span>
+        </div>
+        <button class="btn-logout" title="Log Out" onclick="handleLogout()">Sign Out</button>
+      </div>
     </div>
   </header>
 
@@ -608,11 +898,11 @@
     <section class="hero-stats">
       <div class="stat-card">
         <div class="stat-title">
-          <span>Active Escrow</span>
+          <span id="statTitleEscrow">Safe Escrow</span>
           <span>💎</span>
         </div>
         <div class="stat-value" id="statEscrowBalance">$0.00</div>
-        <div class="stat-detail">Locked in milestone safety</div>
+        <div class="stat-detail" id="statEscrowSub">Held safely for your milestones</div>
       </div>
       <div class="stat-card">
         <div class="stat-title">
@@ -620,7 +910,7 @@
           <span>⚡</span>
         </div>
         <div class="stat-value" id="statActiveComms">0</div>
-        <div class="stat-detail">Briefs in progress / review</div>
+        <div class="stat-detail" id="statActiveCommsSub">Your briefs in motion</div>
       </div>
       <div class="stat-card">
         <div class="stat-title">
@@ -628,15 +918,15 @@
           <span>🛡️</span>
         </div>
         <div class="stat-value" id="statCertTitles">0</div>
-        <div class="stat-detail">Permanent ownership registries</div>
+        <div class="stat-detail">Registered ownership certificates</div>
       </div>
       <div class="stat-card">
         <div class="stat-title">
-          <span>Registered Personas</span>
+          <span>Your Account Role</span>
           <span>👥</span>
         </div>
-        <div class="stat-value" id="statTotalUsers">0</div>
-        <div class="stat-detail">Admins, Artists & Clients</div>
+        <div class="stat-value" id="statUserRoleText" style="font-size: 1.5rem; text-transform: capitalize;">Client</div>
+        <div class="stat-detail" id="statUserRoleDetail">Scoped permissions active</div>
       </div>
     </section>
 
@@ -644,10 +934,10 @@
     <section id="tab-commissions" class="tab-content active">
       <div class="board-header">
         <div>
-          <h2 style="font-size: 1.4rem; font-weight: 800;">Creative Workstation</h2>
-          <p style="color: var(--text-muted); font-size: 0.85rem;">Manage milestone stages, review briefs, and advance artist workflows.</p>
+          <h2 style="font-size: 1.4rem; font-weight: 800;" id="commViewHeading">Your Creative Requests</h2>
+          <p style="color: var(--text-muted); font-size: 0.85rem;" id="commViewSubtitle">Click on any request card to expand its complete milestone history and progress logs.</p>
         </div>
-        <button class="btn-create" onclick="openNewCommModal()">+ Create Brief</button>
+        <button class="btn-create" id="btnOpenNewBrief" onclick="openNewCommModal()">+ Create New Brief</button>
       </div>
 
       <div class="commissions-grid" id="commissionsContainer">
@@ -660,12 +950,12 @@
       <div class="board-header">
         <div>
           <h2 style="font-size: 1.4rem; font-weight: 800;">Simulated Escrow & Safe Payouts</h2>
-          <p style="color: var(--text-muted); font-size: 0.85rem;">All financial movements are protected and audited through local cryptographically-stamped ledger entries.</p>
+          <p style="color: var(--text-muted); font-size: 0.85rem;">All financial movements are cryptographically logged and locked until client approvals.</p>
         </div>
-        <button class="btn-create" style="background: rgba(16, 185, 129, 0.2); border: 1px solid rgba(16, 185, 129, 0.4); color: #34d399;" onclick="openDepositModal()">+ Test Deposit</button>
+        <button class="btn-create" id="btnTestDeposit" style="background: rgba(16, 185, 129, 0.2); border: 1px solid rgba(16, 185, 129, 0.4); color: #34d399;" onclick="openDepositModal()">+ Test Deposit</button>
       </div>
 
-      <div class="feed-panel" style="height: auto; min-height: 400px;">
+      <div class="feed-panel" style="height: auto; min-height: 380px;">
         <table class="ledger-table">
           <thead>
             <tr>
@@ -690,7 +980,7 @@
       <div class="board-header">
         <div>
           <h2 style="font-size: 1.4rem; font-weight: 800;">Character & IP Copyright Registry</h2>
-          <p style="color: var(--text-muted); font-size: 0.85rem;">Permanently certificates completed deliverables to their respective client owners with hash verification.</p>
+          <p style="color: var(--text-muted); font-size: 0.85rem;">Certified IP registrations and character ownership hashes.</p>
         </div>
       </div>
       <div class="feed-panel" style="height: auto;">
@@ -698,7 +988,7 @@
           <thead>
             <tr>
               <th>Asset / Character</th>
-              <th>Current Legal Owner</th>
+              <th>Legal Owner</th>
               <th>Original Creator</th>
               <th>Commission Ref</th>
               <th>License Terms</th>
@@ -712,14 +1002,14 @@
       </div>
     </section>
 
-    <!-- TAB 4: ADMIN & LIVE EVENTS -->
+    <!-- TAB 4: ADMIN DIRECTORY & LIVE EVENTS (Only visible to Admin) -->
     <section id="tab-admin" class="tab-content">
       <div class="admin-grid">
         <!-- Persona Management -->
         <div class="feed-panel" style="height: 520px;">
           <div class="panel-header">
-            <span>🎭 Persona Directory</span>
-            <button class="btn-action" style="max-width: 130px;" onclick="openCreateUserModal()">+ Add Persona</button>
+            <span>🎭 System Personas Directory</span>
+            <span class="brand-badge">Admin View Only</span>
           </div>
           <div style="overflow-y: auto; flex: 1; padding: 1rem;">
             <table class="ledger-table">
@@ -765,7 +1055,7 @@
           <input type="text" id="commInputTitle" placeholder="e.g. Vtuber 2.0 Full Body Rig" required>
         </div>
         <div class="form-group">
-          <label>Artist</label>
+          <label>Select Target Artist</label>
           <select id="commInputArtist" required></select>
         </div>
         <div class="form-group">
@@ -784,43 +1074,148 @@
     </div>
   </div>
 
-  <!-- Modal: Add Persona -->
-  <div class="modal-backdrop" id="modalNewUser">
-    <div class="modal-box">
-      <div class="modal-title">Create System Persona</div>
-      <form id="userForm" onsubmit="handleCreateUser(event)">
-        <div class="form-group">
-          <label>Unique Handle</label>
-          <input type="text" id="userInputUsername" placeholder="e.g. nova_art" required>
-        </div>
-        <div class="form-group">
-          <label>Display Name</label>
-          <input type="text" id="userInputDisplayName" placeholder="e.g. Nova Live2D" required>
-        </div>
-        <div class="form-group">
-          <label>Persona Role</label>
-          <select id="userInputRole">
-            <option value="Artist">Artist</option>
-            <option value="Client">Client</option>
-            <option value="Admin">Admin</option>
-          </select>
-        </div>
-        <div class="modal-actions">
-          <button type="button" class="btn-secondary" onclick="closeModal('modalNewUser')">Cancel</button>
-          <button type="submit" class="btn-create">Save Persona</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
   <script>
-    // State
-    let users = [];
+    // App State
+    let currentUser = null;
+    let availableArtists = [];
     let commissions = [];
     let escrowLedger = [];
     let ownershipLogs = [];
-    let currentUserId = null;
+    let adminUsers = [];
     let ws = null;
+    let activeExpandedCommId = null;
+
+    // Local Storage Session Persistence Key
+    const SESSION_STORAGE_KEY = 'atelierv_session_user';
+
+    // Auth Switcher
+    function switchAuthMode(mode) {
+      document.getElementById('authErrorMsg').textContent = '';
+      if (mode === 'login') {
+        document.getElementById('formLogin').style.display = 'block';
+        document.getElementById('formSignup').style.display = 'none';
+        document.getElementById('btnAuthTabLogin').classList.add('active');
+        document.getElementById('btnAuthTabSignup').classList.remove('active');
+      } else {
+        document.getElementById('formLogin').style.display = 'none';
+        document.getElementById('formSignup').style.display = 'block';
+        document.getElementById('btnAuthTabLogin').classList.remove('active');
+        document.getElementById('btnAuthTabSignup').classList.add('active');
+      }
+    }
+
+    function quickFillLogin(username, password) {
+      switchAuthMode('login');
+      document.getElementById('loginUsername').value = username;
+      document.getElementById('loginPassword').value = password;
+    }
+
+    async function handleAuthLogin(e) {
+      e.preventDefault();
+      const errEl = document.getElementById('authErrorMsg');
+      errEl.textContent = '';
+
+      const u = document.getElementById('loginUsername').value.trim();
+      const p = document.getElementById('loginPassword').value;
+
+      try {
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username: u, password: p })
+        });
+
+        if (!res.ok) {
+          const txt = await res.text();
+          errEl.textContent = txt || 'Invalid username or password';
+          return;
+        }
+
+        const data = await res.json();
+        setAuthenticatedUser(data.user);
+      } catch (err) {
+        errEl.textContent = 'Server connection error. Please try again.';
+      }
+    }
+
+    async function handleAuthSignup(e) {
+      e.preventDefault();
+      const errEl = document.getElementById('authErrorMsg');
+      errEl.textContent = '';
+
+      const payload = {
+        username: document.getElementById('signupUsername').value.trim(),
+        display_name: document.getElementById('signupDisplayName').value.trim(),
+        role: document.getElementById('signupRole').value,
+        password: document.getElementById('signupPassword').value
+      };
+
+      try {
+        const res = await fetch('/api/auth/signup', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        if (!res.ok) {
+          const txt = await res.text();
+          errEl.textContent = txt || 'Registration failed';
+          return;
+        }
+
+        const data = await res.json();
+        setAuthenticatedUser(data.user);
+      } catch (err) {
+        errEl.textContent = 'Server connection error. Please try again.';
+      }
+    }
+
+    function setAuthenticatedUser(user) {
+      currentUser = user;
+      localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(user));
+
+      // Hide auth overlay
+      document.getElementById('authOverlay').style.display = 'none';
+
+      // Update Nav profile badge
+      document.getElementById('navUserDisplayName').textContent = user.display_name;
+      const roleTag = document.getElementById('navUserRole');
+      roleTag.textContent = user.role;
+      roleTag.className = `user-role-tag role-${user.role}`;
+
+      // Update Stat card
+      document.getElementById('statUserRoleText').textContent = user.role;
+      document.getElementById('statUserRoleDetail').textContent = `@${user.username} (${user.role} View)`;
+
+      // Admin tab visibility
+      const adminTabBtn = document.getElementById('navBtnAdmin');
+      if (user.role === 'Admin') {
+        adminTabBtn.style.display = 'flex';
+        document.getElementById('commViewHeading').textContent = 'Global Commission Directory';
+        document.getElementById('commViewSubtitle').textContent = 'Admin master overview across all system clients and artists.';
+      } else {
+        adminTabBtn.style.display = 'none';
+        if (user.role === 'Artist') {
+          document.getElementById('commViewHeading').textContent = 'Your Artist Workstation';
+          document.getElementById('commViewSubtitle').textContent = 'Deliverables and briefs assigned to you. Click any card to inspect milestones.';
+        } else {
+          document.getElementById('commViewHeading').textContent = 'Your Commission Briefs';
+          document.getElementById('commViewSubtitle').textContent = 'Track progress for your commissioned artists. Click any card for milestone logs.';
+        }
+      }
+
+      // Fetch scoped data
+      fetchAllData();
+    }
+
+    function handleLogout() {
+      localStorage.removeItem(SESSION_STORAGE_KEY);
+      currentUser = null;
+      document.getElementById('authOverlay').style.display = 'flex';
+      switchAuthMode('login');
+      document.getElementById('formLogin').reset();
+      document.getElementById('formSignup').reset();
+    }
 
     // Tab switching
     function switchTab(tabName) {
@@ -838,18 +1233,22 @@
     function openModal(id) { document.getElementById(id).classList.add('open'); }
     function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 
-    function openNewCommModal() {
-      // populate artist select
-      const artistSelect = document.getElementById('commInputArtist');
-      artistSelect.innerHTML = users
-        .filter(u => u.role === 'Artist')
-        .map(u => `<option value="${u.id}">${u.display_name} (@${u.username})</option>`)
-        .join('');
+    async function openNewCommModal() {
+      try {
+        const res = await fetch('/api/users/artists');
+        availableArtists = await res.json();
+        const artistSelect = document.getElementById('commInputArtist');
+        if (availableArtists.length === 0) {
+          artistSelect.innerHTML = `<option value="">No artists registered yet</option>`;
+        } else {
+          artistSelect.innerHTML = availableArtists.map(u => `
+            <option value="${u.id}">${escapeHtml(u.display_name)} (@${escapeHtml(u.username)})</option>
+          `).join('');
+        }
+      } catch (e) {
+        console.error('Failed to load artists:', e);
+      }
       openModal('modalNewComm');
-    }
-
-    function openCreateUserModal() {
-      openModal('modalNewUser');
     }
 
     // WebSocket init
@@ -885,65 +1284,59 @@
 
     function handleLiveEvent(event) {
       const feed = document.getElementById('realtimeFeed');
-      const item = document.createElement('div');
-      item.className = `feed-entry ${event.event_type.toLowerCase()}`;
-      
-      const timeStr = new Date().toLocaleTimeString();
-      item.innerHTML = `
-        <div class="feed-time">${timeStr} &bull; <strong>${event.event_type}</strong></div>
-        <div>${event.message}</div>
-      `;
-      feed.prepend(item);
+      if (feed) {
+        const item = document.createElement('div');
+        item.className = `feed-entry ${event.event_type.toLowerCase()}`;
+        const timeStr = new Date().toLocaleTimeString();
+        item.innerHTML = `
+          <div class="feed-time">${timeStr} &bull; <strong>${event.event_type}</strong></div>
+          <div>${event.message}</div>
+        `;
+        feed.prepend(item);
+      }
 
-      // Re-fetch affected collections
-      fetchAllData();
+      // Re-fetch scoped data if user logged in
+      if (currentUser) {
+        fetchAllData();
+      }
     }
 
     // API Calls
     async function fetchAllData() {
+      if (!currentUser) return;
       try {
-        const [uRes, cRes, eRes, oRes] = await Promise.all([
-          fetch('/api/users'),
-          fetch('/api/commissions'),
-          fetch('/api/escrow'),
-          fetch('/api/ownership')
+        const uid = currentUser.id;
+        const [cRes, eRes, oRes, artistsRes] = await Promise.all([
+          fetch(`/api/commissions?user_id=${uid}`),
+          fetch(`/api/escrow?user_id=${uid}`),
+          fetch(`/api/ownership?user_id=${uid}`),
+          fetch('/api/users/artists')
         ]);
 
-        users = await uRes.json();
         commissions = await cRes.json();
         escrowLedger = await eRes.json();
         ownershipLogs = await oRes.json();
+        availableArtists = await artistsRes.json();
 
-        renderPersonaDropdown();
+        // If Admin, also fetch persona directory
+        if (currentUser.role === 'Admin') {
+          const adminRes = await fetch(`/api/users?user_id=${uid}`);
+          if (adminRes.ok) {
+            adminUsers = await adminRes.json();
+            renderAdminUsers();
+          }
+        }
+
         renderCommissions();
         renderLedger();
         renderOwnership();
-        renderAdminUsers();
         updateStats();
       } catch (e) {
         console.error('Fetch error:', e);
       }
     }
 
-    function renderPersonaDropdown() {
-      const sel = document.getElementById('currentPersonaSelect');
-      if (!currentUserId && users.length > 0) {
-        currentUserId = users[0].id;
-      }
-      sel.innerHTML = users.map(u => `
-        <option value="${u.id}" ${u.id === currentUserId ? 'selected' : ''}>
-          ${u.display_name} (${u.role})
-        </option>
-      `).join('');
-    }
-
-    function onPersonaChanged() {
-      currentUserId = parseInt(document.getElementById('currentPersonaSelect').value);
-      renderCommissions();
-    }
-
     function updateStats() {
-      // Active Escrow balance
       const totalEscrow = escrowLedger
         .filter(l => l.status === 'HELD_IN_ESCROW')
         .reduce((sum, l) => sum + l.amount, 0);
@@ -953,47 +1346,143 @@
       document.getElementById('statActiveComms').textContent = activeComms;
 
       document.getElementById('statCertTitles').textContent = ownershipLogs.length;
-      document.getElementById('statTotalUsers').textContent = users.length;
+    }
+
+    // Toggle In-Card Milestone Drawer
+    async function toggleMilestones(commId, event) {
+      // Don't toggle if user clicked an action button
+      if (event && event.target.closest('button')) {
+        return;
+      }
+
+      const drawer = document.getElementById(`drawer-comm-${commId}`);
+      const card = document.getElementById(`card-comm-${commId}`);
+      if (!drawer) return;
+
+      if (drawer.classList.contains('open')) {
+        drawer.classList.remove('open');
+        card.classList.remove('expanded');
+        activeExpandedCommId = null;
+        return;
+      }
+
+      // Close previous
+      if (activeExpandedCommId && activeExpandedCommId !== commId) {
+        const prevDrawer = document.getElementById(`drawer-comm-${activeExpandedCommId}`);
+        const prevCard = document.getElementById(`card-comm-${activeExpandedCommId}`);
+        if (prevDrawer) prevDrawer.classList.remove('open');
+        if (prevCard) prevCard.classList.remove('expanded');
+      }
+
+      drawer.classList.add('open');
+      card.classList.add('expanded');
+      activeExpandedCommId = commId;
+
+      // Load milestones
+      drawer.innerHTML = `<div style="font-size:0.75rem; color:var(--text-dim); text-align:center;">Loading milestone audit trail...</div>`;
+      try {
+        const res = await fetch(`/api/commissions/${commId}/milestones`);
+        const milestones = await res.json();
+        renderDrawerMilestones(commId, milestones);
+      } catch (e) {
+        drawer.innerHTML = `<div style="color:var(--accent-rose); font-size:0.75rem;">Failed to load milestones</div>`;
+      }
+    }
+
+    function renderDrawerMilestones(commId, milestones) {
+      const drawer = document.getElementById(`drawer-comm-${commId}`);
+      if (!drawer) return;
+
+      if (milestones.length === 0) {
+        drawer.innerHTML = `
+          <div class="timeline-title">Stage & Milestone History</div>
+          <div style="font-size: 0.75rem; color: var(--text-dim);">No milestone logs recorded yet.</div>
+        `;
+        return;
+      }
+
+      const stepsHtml = milestones.map(m => `
+        <div class="timeline-step">
+          <div class="timeline-dot ${m.stage_name === 'COMPLETED' ? 'done' : ''}"></div>
+          <div class="timeline-content">
+            <div class="timeline-stage">${escapeHtml(m.stage_name)}</div>
+            <div class="timeline-note">${escapeHtml(m.note)}</div>
+            <div class="timeline-time">${escapeHtml(m.created_at)}</div>
+          </div>
+        </div>
+      `).join('');
+
+      drawer.innerHTML = `
+        <div class="timeline-title">Stage & Milestone Progress</div>
+        <div style="display: flex; flex-direction: column;">
+          ${stepsHtml}
+        </div>
+      `;
     }
 
     function renderCommissions() {
       const container = document.getElementById('commissionsContainer');
       if (commissions.length === 0) {
-        container.innerHTML = `<div style="color: var(--text-dim); grid-column: 1/-1; padding: 2rem; text-align: center;">No active commission briefs. Click '+ Create Brief' to launch your first local request.</div>`;
+        const emptyMsg = currentUser.role === 'Artist'
+          ? "No commissions assigned to your artist profile yet."
+          : "No active commission briefs. Click '+ Create New Brief' to place a request.";
+        container.innerHTML = `<div style="color: var(--text-dim); grid-column: 1/-1; padding: 2rem; text-align: center;">${emptyMsg}</div>`;
         return;
       }
 
       container.innerHTML = commissions.map(c => {
-        const client = users.find(u => u.id === c.client_id) || { display_name: 'Unknown Client' };
-        const artist = users.find(u => u.id === c.artist_id) || { display_name: 'Unknown Artist' };
         const badgeClass = `badge-${c.status.toLowerCase()}`;
+        const isClient = currentUser.role === 'Client' || (currentUser.role === 'Admin' && c.client_id === currentUser.id);
+        const isArtist = currentUser.role === 'Artist' || (currentUser.role === 'Admin' && c.artist_id === currentUser.id);
+        const isAdmin = currentUser.role === 'Admin';
 
-        // Next Action logic based on status
+        // Contextual buttons based on role and stage
         let actionButtons = '';
         if (c.status === 'REQUESTED') {
-          actionButtons = `<button class="btn-action success" onclick="updateCommStatus(${c.id}, 'IN_PROGRESS')">Accept & Begin</button>`;
+          if (isArtist || isAdmin) {
+            actionButtons = `<button class="btn-action success" onclick="updateCommStatus(${c.id}, 'IN_PROGRESS', 'Artist accepted request and began preliminary sketches')">Accept & Begin</button>`;
+          } else {
+            actionButtons = `<span style="font-size: 0.75rem; color: #60a5fa;">Awaiting Artist Acceptance...</span>`;
+          }
         } else if (c.status === 'IN_PROGRESS') {
-          actionButtons = `<button class="btn-action success" onclick="updateCommStatus(${c.id}, 'IN_REVIEW')">Submit for Review</button>`;
+          if (isArtist || isAdmin) {
+            actionButtons = `<button class="btn-action success" onclick="updateCommStatus(${c.id}, 'IN_REVIEW', 'Artist submitted milestone draft and renders for client review')">Submit for Review</button>`;
+          } else {
+            actionButtons = `<span style="font-size: 0.75rem; color: #fbbf24;">Artist is actively drafting deliverables...</span>`;
+          }
         } else if (c.status === 'IN_REVIEW') {
-          actionButtons = `
-            <button class="btn-action success" onclick="completeCommission(${c.id})">Approve & Release Funds</button>
-            <button class="btn-action" onclick="updateCommStatus(${c.id}, 'IN_PROGRESS')">Request Revisions</button>
-          `;
+          if (isClient || isAdmin) {
+            actionButtons = `
+              <button class="btn-action success" onclick="completeCommission(${c.id})">Approve & Release Funds</button>
+              <button class="btn-action" onclick="updateCommStatus(${c.id}, 'IN_PROGRESS', 'Client requested revisions on current draft')">Request Revisions</button>
+            `;
+          } else {
+            actionButtons = `<span style="font-size: 0.75rem; color: #c084fc;">Awaiting Client Review & Approval</span>`;
+          }
         } else if (c.status === 'COMPLETED') {
-          actionButtons = `<span style="font-size: 0.75rem; color: var(--accent-emerald);">✓ Milestone Complete & Certified</span>`;
+          actionButtons = `<span style="font-size: 0.75rem; color: var(--accent-emerald);">✓ Milestone Complete & Rights Certified</span>`;
         }
 
         return `
-          <div class="comm-card">
+          <div class="comm-card" id="card-comm-${c.id}" onclick="toggleMilestones(${c.id}, event)">
             <div class="comm-header">
               <div class="comm-title">${escapeHtml(c.title)}</div>
               <span class="comm-badge ${badgeClass}">${c.status}</span>
             </div>
             <div class="comm-brief">${escapeHtml(c.brief)}</div>
+            
+            <div class="click-hint">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+              Click card to inspect milestone progress
+            </div>
+
+            <!-- In-Element Progress Accordion -->
+            <div class="progress-drawer" id="drawer-comm-${c.id}"></div>
+
             <div class="comm-meta">
               <div>
-                <div>Client: <strong>${escapeHtml(client.display_name)}</strong></div>
-                <div>Artist: <strong>${escapeHtml(artist.display_name)}</strong></div>
+                <div>Client ID: <strong>#${c.client_id}</strong></div>
+                <div>Artist ID: <strong>#${c.artist_id}</strong></div>
               </div>
               <div class="comm-price">$${c.price.toFixed(2)}</div>
             </div>
@@ -1008,20 +1497,19 @@
     function renderLedger() {
       const tbody = document.getElementById('ledgerTableBody');
       if (escrowLedger.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--text-dim);">No transactions recorded yet.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--text-dim);">No transactions recorded in your scope.</td></tr>`;
         return;
       }
 
       tbody.innerHTML = escrowLedger.map(l => {
-        const client = users.find(u => u.id === l.client_id) || { display_name: 'System' };
-        const artist = users.find(u => u.id === l.artist_id) || { display_name: 'System' };
         const isHeld = l.status === 'HELD_IN_ESCROW';
+        const canForceRelease = currentUser.role === 'Admin' || currentUser.id === l.client_id;
 
         return `
           <tr>
             <td style="font-family: 'JetBrains Mono', monospace; font-size: 0.75rem;">#${l.id}</td>
             <td>Ref Comm #${l.commission_id || 'N/A'}</td>
-            <td>${escapeHtml(client.display_name)} &rarr; ${escapeHtml(artist.display_name)}</td>
+            <td>User #${l.client_id} &rarr; Artist #${l.artist_id}</td>
             <td style="font-family: 'JetBrains Mono', monospace; font-weight: 700; color: #38bdf8;">$${l.amount.toFixed(2)}</td>
             <td>
               <span class="comm-badge ${isHeld ? 'badge-in_progress' : 'badge-completed'}">
@@ -1030,7 +1518,7 @@
             </td>
             <td style="color: var(--text-dim); font-size: 0.75rem;">${l.created_at}</td>
             <td>
-              ${isHeld ? `<button class="btn-action success" style="padding: 2px 8px;" onclick="releaseEscrow(${l.id})">Force Release</button>` : `<span style="color: var(--text-dim); font-size: 0.75rem;">Settled</span>`}
+              ${isHeld && canForceRelease ? `<button class="btn-action success" style="padding: 2px 8px;" onclick="releaseEscrow(${l.id})">Release</button>` : `<span style="color: var(--text-dim); font-size: 0.75rem;">Settled</span>`}
             </td>
           </tr>
         `;
@@ -1040,36 +1528,32 @@
     function renderOwnership() {
       const tbody = document.getElementById('ownershipTableBody');
       if (ownershipLogs.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-dim);">No completed copyright certificates. Complete a commission to register full rights.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-dim);">No completed copyright certificates in your scope yet.</td></tr>`;
         return;
       }
 
-      tbody.innerHTML = ownershipLogs.map(o => {
-        const owner = users.find(u => u.id === o.owner_user_id) || { display_name: 'Unknown' };
-        const creator = users.find(u => u.id === o.creator_user_id) || { display_name: 'Unknown' };
-
-        return `
-          <tr>
-            <td><strong>${escapeHtml(o.character_name)}</strong></td>
-            <td>${escapeHtml(owner.display_name)}</td>
-            <td>${escapeHtml(creator.display_name)}</td>
-            <td>#${o.commission_id}</td>
-            <td><span class="brand-badge">${escapeHtml(o.license_type)}</span></td>
-            <td style="font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: #c084fc;">${o.certificate_hash.substring(0, 16)}...</td>
-          </tr>
-        `;
-      }).join('');
+      tbody.innerHTML = ownershipLogs.map(o => `
+        <tr>
+          <td><strong>${escapeHtml(o.character_name)}</strong></td>
+          <td>User #${o.owner_user_id}</td>
+          <td>Artist #${o.creator_user_id}</td>
+          <td>#${o.commission_id}</td>
+          <td><span class="brand-badge">${escapeHtml(o.license_type)}</span></td>
+          <td style="font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: #c084fc;">${o.certificate_hash.substring(0, 18)}...</td>
+        </tr>
+      `).join('');
     }
 
     function renderAdminUsers() {
       const tbody = document.getElementById('adminUsersTableBody');
-      tbody.innerHTML = users.map(u => `
+      if (!tbody) return;
+      tbody.innerHTML = adminUsers.map(u => `
         <tr>
           <td style="font-family: 'JetBrains Mono', monospace;">@${escapeHtml(u.username)}</td>
-          <td><span class="brand-badge">${u.role}</span></td>
+          <td><span class="user-role-tag role-${u.role}">${u.role}</span></td>
           <td>${escapeHtml(u.display_name)}</td>
           <td>
-            <button class="btn-action" style="padding: 2px 8px; color: var(--accent-rose);" onclick="deleteUser(${u.id})">Delete</button>
+            ${u.id !== currentUser.id ? `<button class="btn-action" style="padding: 2px 8px; color: var(--accent-rose);" onclick="deleteUser(${u.id})">Delete</button>` : `<span style="font-size:0.7rem; color:var(--text-dim);">You</span>`}
           </td>
         </tr>
       `).join('');
@@ -1078,9 +1562,11 @@
     // Actions
     async function handleCreateCommission(e) {
       e.preventDefault();
+      if (!currentUser) return;
+
       const payload = {
         title: document.getElementById('commInputTitle').value,
-        client_id: currentUserId,
+        client_id: currentUser.id,
         artist_id: parseInt(document.getElementById('commInputArtist').value),
         price: parseFloat(document.getElementById('commInputPrice').value),
         brief: document.getElementById('commInputBrief').value
@@ -1095,39 +1581,21 @@
       if (res.ok) {
         closeModal('modalNewComm');
         document.getElementById('commForm').reset();
+        fetchAllData();
       }
     }
 
-    async function handleCreateUser(e) {
-      e.preventDefault();
-      const payload = {
-        username: document.getElementById('userInputUsername').value,
-        display_name: document.getElementById('userInputDisplayName').value,
-        role: document.getElementById('userInputRole').value
-      };
-
-      const res = await fetch('/api/users', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-
-      if (res.ok) {
-        closeModal('modalNewUser');
-        document.getElementById('userForm').reset();
-      }
-    }
-
-    async function updateCommStatus(commId, nextStatus) {
+    async function updateCommStatus(commId, nextStatus, note) {
       await fetch(`/api/commissions/${commId}/status`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: nextStatus })
+        body: JSON.stringify({ status: nextStatus, note: note })
       });
+      fetchAllData();
     }
 
     async function completeCommission(commId) {
-      const charName = prompt('Enter Character/Asset Name for Legal IP Certificate:', 'Vtuber Character Rights');
+      const charName = prompt('Enter Asset/Character Name for Legal IP Certificate:', 'Vtuber Character Rights');
       if (!charName) return;
 
       await fetch(`/api/commissions/${commId}/complete`, {
@@ -1135,28 +1603,32 @@
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ character_name: charName, license_type: 'Full Commercial & Streaming' })
       });
+      fetchAllData();
     }
 
     async function releaseEscrow(ledgerId) {
       await fetch(`/api/escrow/${ledgerId}/release`, { method: 'POST' });
+      fetchAllData();
     }
 
     async function deleteUser(userId) {
       if (!confirm('Are you sure you want to remove this persona?')) return;
       await fetch(`/api/users/${userId}`, { method: 'DELETE' });
+      fetchAllData();
     }
 
     function openDepositModal() {
+      if (!currentUser) return;
       const amt = prompt('Simulated Test Deposit Amount ($):', '250.00');
       if (!amt) return;
       fetch('/api/escrow/deposit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          client_id: currentUserId,
+          client_id: currentUser.id,
           amount: parseFloat(amt)
         })
-      });
+      }).then(() => fetchAllData());
     }
 
     function escapeHtml(str) {
@@ -1166,10 +1638,35 @@
       }[m]));
     }
 
-    // Startup
+    // Startup Session Checking
     window.addEventListener('DOMContentLoaded', () => {
       initWebSocket();
-      fetchAllData();
+
+      // Check saved login from localStorage
+      const saved = localStorage.getItem(SESSION_STORAGE_KEY);
+      if (saved) {
+        try {
+          const userObj = JSON.parse(saved);
+          // Verify with server
+          fetch(`/api/auth/me?user_id=${userObj.id}`)
+            .then(res => {
+              if (res.ok) return res.json();
+              throw new Error('Session expired');
+            })
+            .then(freshUser => {
+              setAuthenticatedUser(freshUser);
+            })
+            .catch(() => {
+              localStorage.removeItem(SESSION_STORAGE_KEY);
+              document.getElementById('authOverlay').style.display = 'flex';
+            });
+        } catch (e) {
+          localStorage.removeItem(SESSION_STORAGE_KEY);
+          document.getElementById('authOverlay').style.display = 'flex';
+        }
+      } else {
+        document.getElementById('authOverlay').style.display = 'flex';
+      }
     });
   </script>
 </body>
