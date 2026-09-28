@@ -364,22 +364,19 @@
       box-shadow: var(--shadow-md);
     }
 
-    /* Product Cards - natural aspect ratio images */
+    /* Product Cards - square 1:1 thumbnail */
     .product-media-wrap {
       width: 100%;
+      aspect-ratio: 1 / 1;
       background: #1a1721;
       position: relative;
       overflow: hidden;
-      display: flex;
-      align-items: center;
-      justify-content: center;
     }
 
     .product-media {
       width: 100%;
-      max-height: 320px;
-      min-height: 130px;
-      object-fit: contain;
+      height: 100%;
+      object-fit: cover;
       display: block;
     }
 

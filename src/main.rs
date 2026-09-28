@@ -1,7 +1,7 @@
 use axum::{
     extract::{
         ws::{Message, WebSocket, WebSocketUpgrade},
-        Path, Query, State,
+        DefaultBodyLimit, Path, Query, State,
     },
     response::{Html, IntoResponse, Response},
     routing::{delete, get, post, put},
@@ -307,6 +307,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .route("/api/escrow/:id/release", post(release_escrow))
         .route("/api/ownership", get(list_ownership))
         .layer(CorsLayer::permissive())
+        // Allow up to 32 MB request bodies so base64/data-URL images can be submitted
+        .layer(DefaultBodyLimit::max(32 * 1024 * 1024))
         .with_state(state);
 
     let addr = SocketAddr::from(([127, 0, 0, 1], 7860));
