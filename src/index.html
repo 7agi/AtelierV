@@ -1578,7 +1578,7 @@
             <input type="url" id="pubMediaUrl" placeholder="https://... (or direct .gif / .png link)">
           </div>
 
-          <input type="hidden" id="pubFinalMediaUrl" required>
+          <input type="hidden" id="pubFinalMediaUrl">
 
           <div class="upload-preview-wrap" id="mediaPreviewWrap" style="display: none; margin-top: 0.5rem;">
             <img class="upload-preview-thumb" id="mediaPreviewImg" src="" alt="Preview">
@@ -1667,7 +1667,7 @@
 
         <div class="modal-actions">
           <button type="button" class="btn-secondary" onclick="closeModal('modalPublishProduct')">Cancel</button>
-          <button type="submit" class="btn-create">Publish to Market</button>
+          <button type="button" class="btn-create" onclick="handlePublishProduct()">Publish to Market</button>
         </div>
       </form>
     </div>
@@ -2502,63 +2502,78 @@
       fetchAllData();
     }
 
-    async function handlePublishProduct(e) {
-      e.preventDefault();
+    async function handlePublishProduct() {
+      try {
+        const title = document.getElementById('pubTitle').value.trim();
+        const minPrice = document.getElementById('pubMinPrice').value;
+        const description = document.getElementById('pubDescription').value.trim();
+        const finalMedia = document.getElementById('pubFinalMediaUrl').value.trim();
 
-      const finalMedia = document.getElementById('pubFinalMediaUrl').value.trim();
-      if (!finalMedia) {
-        alert('Please select an image or GIF file from your device, or supply a media URL.');
-        return;
-      }
+        if (!title) { alert('Please enter a product title.'); return; }
+        if (!minPrice || isNaN(parseFloat(minPrice))) { alert('Please enter a valid base price.'); return; }
+        if (!description) { alert('Please enter a short product overview.'); return; }
+        if (!finalMedia) { alert('Please upload an image/GIF or supply a media URL.'); return; }
 
-      // Collect structured vendor info
-      const desc = document.getElementById('pubVendorDesc').value.trim();
-      const bullets = Array.from(document.querySelectorAll('.pub-bullet-item'))
-        .map(i => i.value.trim())
-        .filter(Boolean);
-      const kv = Array.from(document.querySelectorAll('.kv-row'))
-        .map(row => ({
-          key: row.querySelector('.kv-k').value.trim(),
-          value: row.querySelector('.kv-v').value.trim()
-        }))
-        .filter(r => r.key.length > 0);
+        // Collect structured vendor info
+        const desc = document.getElementById('pubVendorDesc').value.trim();
+        const bullets = Array.from(document.querySelectorAll('.pub-bullet-item'))
+          .map(i => i.value.trim())
+          .filter(Boolean);
+        const kv = Array.from(document.querySelectorAll('.kv-row'))
+          .map(row => ({
+            key: row.querySelector('.kv-k').value.trim(),
+            value: row.querySelector('.kv-v').value.trim()
+          }))
+          .filter(r => r.key.length > 0);
 
-      const thumbPos = document.getElementById('pubThumbObjectPosition').value || '50% 50%';
-      const thumbZoom = document.getElementById('pubThumbZoom').value || '1';
+        const thumbPos = document.getElementById('pubThumbObjectPosition').value || '50% 50%';
+        const thumbZoom = document.getElementById('pubThumbZoom').value || '1';
 
-      const structuredVendorInfo = JSON.stringify({
-        description: desc,
-        bullets: bullets,
-        kv: kv,
-        thumb_pos: thumbPos,
-        thumb_zoom: thumbZoom
-      });
+        const structuredVendorInfo = JSON.stringify({
+          description: desc,
+          bullets: bullets,
+          kv: kv,
+          thumb_pos: thumbPos,
+          thumb_zoom: thumbZoom
+        });
 
-      const payload = {
-        artist_id: currentUser.id,
-        title: document.getElementById('pubTitle').value.trim(),
-        media_url: finalMedia,
-        min_price: parseFloat(document.getElementById('pubMinPrice').value),
-        vendor_info: structuredVendorInfo,
-        description: document.getElementById('pubDescription').value.trim(),
-        file_download_url: document.getElementById('pubDownloadUrl').value.trim() || undefined
-      };
+        const payload = {
+          artist_id: currentUser.id,
+          title: title,
+          media_url: finalMedia,
+          min_price: parseFloat(minPrice),
+          vendor_info: structuredVendorInfo,
+          description: description,
+          file_download_url: document.getElementById('pubDownloadUrl').value.trim() || undefined
+        };
 
-      const res = await fetch('/api/products', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
+        const btn = document.querySelector('#modalPublishProduct .btn-create');
+        if (btn) { btn.disabled = true; btn.textContent = 'Publishing...'; }
 
-      if (res.ok) {
-        closeModal('modalPublishProduct');
-        document.getElementById('formPublish').reset();
-        clearMediaSelection();
-        document.getElementById('pubBulletContainer').innerHTML = '';
-        document.getElementById('pubKvContainer').innerHTML = '';
-        fetchAllData();
-      } else {
-        alert(await res.text() || 'Failed to publish product');
+        const res = await fetch('/api/products', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        if (btn) { btn.disabled = false; btn.textContent = 'Publish to Market'; }
+
+        if (res.ok) {
+          closeModal('modalPublishProduct');
+          document.getElementById('formPublish').reset();
+          clearMediaSelection();
+          document.getElementById('pubBulletContainer').innerHTML = '';
+          document.getElementById('pubKvContainer').innerHTML = '';
+          fetchAllData();
+        } else {
+          const errText = await res.text();
+          alert('Failed to publish: ' + (errText || res.status));
+        }
+      } catch (err) {
+        console.error('Publish error:', err);
+        alert('Unexpected error publishing product: ' + err.message);
+        const btn = document.querySelector('#modalPublishProduct .btn-create');
+        if (btn) { btn.disabled = false; btn.textContent = 'Publish to Market'; }
       }
     }
 
