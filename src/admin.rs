@@ -37,6 +37,7 @@ pub struct AdminUser {
     pub username: String,
     pub display_name: String,
     pub role: String,
+    pub all_download_access: i64,
     pub created_at: String,
 }
 
@@ -45,6 +46,7 @@ pub struct CreateAdminUserReq {
     pub username: String,
     pub display_name: String,
     pub role: String,
+    pub all_download_access: Option<bool>,
     pub password: Option<String>,
 }
 
@@ -102,6 +104,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .route("/ws", get(admin_ws_handler))
         .route("/admin/api/users", get(list_users).post(create_user))
         .route("/admin/api/users/:id", delete(delete_user))
+        .route("/admin/api/users/:id/toggle-access", post(toggle_user_access))
         .route("/admin/api/commissions", get(list_commissions))
         .route("/admin/api/commissions/:id/cancel", post(cancel_commission))
         .route("/admin/api/products", get(list_products))
@@ -132,7 +135,7 @@ async fn serve_admin_ui() -> impl IntoResponse {
 
 async fn list_users(State(state): State<AdminState>) -> Json<Vec<AdminUser>> {
     let users = sqlx::query_as::<_, AdminUser>(
-        "SELECT id, username, display_name, role, created_at FROM users ORDER BY id ASC"
+        "SELECT id, username, display_name, role, all_download_access, created_at FROM users ORDER BY id ASC"
     )
     .fetch_all(&state.db)
     .await
@@ -145,18 +148,28 @@ async fn create_user(
     Json(p): Json<CreateAdminUserReq>,
 ) -> Response {
     let pass = p.password.unwrap_or_else(|| "password123".into());
+    let all_access = if p.all_download_access.unwrap_or(false) { 1 } else { 0 };
+
     let res = sqlx::query(
-        "INSERT INTO users (username, display_name, role, password_hash) VALUES (?, ?, ?, ?)"
+        "INSERT INTO users (username, display_name, role, password_hash, all_download_access) VALUES (?, ?, ?, ?, ?)"
     )
     .bind(p.username.trim().to_lowercase())
     .bind(&p.display_name)
     .bind(&p.role)
     .bind(&pass)
+    .bind(all_access)
     .execute(&state.db)
     .await;
 
     match res {
-        Ok(_) => Json(serde_json::json!({ "status": "ok" })).into_response(),
+        Ok(_) => {
+            let _ = state.tx.send(WsEvent {
+                event_type: "PERSONA_CREATED".into(),
+                message: format!("Admin created account: {} (all_access: {})", p.username, all_access == 1),
+                payload: serde_json::json!({ "username": p.username }),
+            });
+            Json(serde_json::json!({ "status": "ok" })).into_response()
+        }
         Err(e) => (axum::http::StatusCode::BAD_REQUEST, e.to_string()).into_response(),
     }
 }
@@ -164,6 +177,32 @@ async fn create_user(
 async fn delete_user(State(state): State<AdminState>, Path(id): Path<i64>) -> Response {
     let _ = sqlx::query("DELETE FROM users WHERE id = ?").bind(id).execute(&state.db).await;
     Json(serde_json::json!({ "status": "deleted" })).into_response()
+}
+
+async fn toggle_user_access(State(state): State<AdminState>, Path(id): Path<i64>) -> Response {
+    let current: Option<(i64,)> = sqlx::query_as("SELECT all_download_access FROM users WHERE id = ?")
+        .bind(id)
+        .fetch_optional(&state.db)
+        .await
+        .unwrap_or(None);
+
+    match current {
+        Some((val,)) => {
+            let next = if val == 1 { 0i64 } else { 1i64 };
+            let _ = sqlx::query("UPDATE users SET all_download_access = ? WHERE id = ?")
+                .bind(next)
+                .bind(id)
+                .execute(&state.db)
+                .await;
+            let _ = state.tx.send(WsEvent {
+                event_type: "ACCESS_TOGGLED".into(),
+                message: format!("Admin {} All-Download Pass for user #{}", if next == 1 { "GRANTED" } else { "REVOKED" }, id),
+                payload: serde_json::json!({ "user_id": id, "all_download_access": next == 1 }),
+            });
+            Json(serde_json::json!({ "status": "toggled", "all_download_access": next == 1 })).into_response()
+        }
+        None => (axum::http::StatusCode::NOT_FOUND, "User not found").into_response(),
+    }
 }
 
 async fn list_commissions(State(state): State<AdminState>) -> Json<Vec<AdminCommission>> {

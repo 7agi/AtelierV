@@ -44,6 +44,7 @@ pub struct User {
     pub role: String, // Artist, Client, Admin
     #[serde(skip_serializing)]
     pub password_hash: String,
+    pub all_download_access: i64, // 1 if tester account with instant download access
     pub created_at: String,
 }
 
@@ -53,6 +54,7 @@ pub struct SafeUser {
     pub username: String,
     pub display_name: String,
     pub role: String,
+    pub all_download_access: bool,
     pub created_at: String,
 }
 
@@ -63,6 +65,7 @@ impl From<User> for SafeUser {
             username: u.username,
             display_name: u.display_name,
             role: u.role,
+            all_download_access: u.all_download_access == 1,
             created_at: u.created_at,
         }
     }
@@ -327,6 +330,7 @@ pub async fn run_migrations(pool: &SqlitePool) -> Result<(), sqlx::Error> {
             display_name TEXT NOT NULL,
             role TEXT NOT NULL,
             password_hash TEXT NOT NULL DEFAULT 'password',
+            all_download_access INTEGER NOT NULL DEFAULT 0,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP
         );
 
@@ -424,6 +428,10 @@ pub async fn run_migrations(pool: &SqlitePool) -> Result<(), sqlx::Error> {
         .execute(pool)
         .await;
 
+    let _ = sqlx::query("ALTER TABLE users ADD COLUMN all_download_access INTEGER NOT NULL DEFAULT 0")
+        .execute(pool)
+        .await;
+
     tracing::info!("Database schema validated.");
     Ok(())
 }
@@ -437,10 +445,11 @@ pub async fn seed_database(pool: &SqlitePool) -> Result<(), sqlx::Error> {
         tracing::info!("Seeding initial personas and demo digital products...");
         sqlx::query(
             r#"
-            INSERT INTO users (username, display_name, role, password_hash) VALUES 
-            ('admin', 'Atelier Director (Admin)', 'Admin', 'admin123'),
-            ('lyra', 'Lyra - 2D Live Rigging (Artist)', 'Artist', 'artist123'),
-            ('kuro', 'Kuro Ch. (Client)', 'Client', 'client123');
+            INSERT INTO users (username, display_name, role, password_hash, all_download_access) VALUES 
+            ('admin', 'Atelier Director (Admin)', 'Admin', 'admin123', 1),
+            ('lyra', 'Lyra - 2D Live Rigging (Artist)', 'Artist', 'artist123', 0),
+            ('kuro', 'Kuro Ch. (Client)', 'Client', 'client123', 0),
+            ('tester', 'QA Tester (All Access)', 'Client', 'tester123', 1);
             "#,
         )
         .execute(pool)
@@ -527,7 +536,7 @@ async fn signup_user(
     };
 
     let res = sqlx::query(
-        "INSERT INTO users (username, display_name, role, password_hash) VALUES (?, ?, ?, ?)"
+        "INSERT INTO users (username, display_name, role, password_hash, all_download_access) VALUES (?, ?, ?, ?, 0)"
     )
     .bind(&clean_user)
     .bind(&payload.display_name)
@@ -550,7 +559,8 @@ async fn signup_user(
                     "id": id,
                     "username": clean_user,
                     "display_name": payload.display_name,
-                    "role": role
+                    "role": role,
+                    "all_download_access": false
                 }
             })).into_response()
         }
@@ -564,7 +574,7 @@ async fn login_user(
 ) -> Response {
     let clean_user = payload.username.trim().to_lowercase();
     let user_opt = sqlx::query_as::<_, User>(
-        "SELECT id, username, display_name, role, password_hash, created_at FROM users WHERE LOWER(username) = ?"
+        "SELECT id, username, display_name, role, password_hash, all_download_access, created_at FROM users WHERE LOWER(username) = ?"
     )
     .bind(&clean_user)
     .fetch_optional(&state.db)
@@ -597,7 +607,7 @@ async fn get_current_user(
     };
 
     let user_opt = sqlx::query_as::<_, User>(
-        "SELECT id, username, display_name, role, password_hash, created_at FROM users WHERE id = ?"
+        "SELECT id, username, display_name, role, password_hash, all_download_access, created_at FROM users WHERE id = ?"
     )
     .bind(user_id)
     .fetch_optional(&state.db)
@@ -612,7 +622,7 @@ async fn get_current_user(
 
 async fn list_artists(State(state): State<AppState>) -> Json<Vec<SafeUser>> {
     let artists = sqlx::query_as::<_, User>(
-        "SELECT id, username, display_name, role, password_hash, created_at FROM users WHERE role = 'Artist' ORDER BY display_name ASC"
+        "SELECT id, username, display_name, role, password_hash, all_download_access, created_at FROM users WHERE role = 'Artist' ORDER BY display_name ASC"
     )
     .fetch_all(&state.db)
     .await
@@ -626,8 +636,6 @@ async fn list_artists(State(state): State<AppState>) -> Json<Vec<SafeUser>> {
 // DIGITAL PRODUCTS & MARKETPLACE
 // ---------------------------------------------------------
 
-// Curated Discovery Algorithm: Not simple first-to-post.
-// Weighted by: (Average Rating * Review Count) + internal discovery score + recency jitter
 async fn list_products(State(state): State<AppState>) -> Json<Vec<DigitalProductWithStats>> {
     let rows: Vec<(i64, i64, String, String, String, String, String, String, f64, String, Option<f64>, i64)> = sqlx::query_as(
         r#"
@@ -718,7 +726,6 @@ async fn create_product(
     Json(payload): Json<CreateProductReq>,
 ) -> Response {
     let file_url = payload.file_download_url.unwrap_or_else(|| "https://example.com/asset_vault_download.zip".into());
-    // Give each product a randomized curated discovery weight so home page isn't purely chronological
     let jitter_weight = 1.0 + (payload.title.len() % 5) as f64 * 0.15;
 
     let res = sqlx::query(
@@ -822,13 +829,24 @@ async fn purchase_product(
         None => return (axum::http::StatusCode::NOT_FOUND, "Product not found").into_response(),
     };
 
-    // Client can pay whatever price they want, but NOT below min_price
-    if payload.offered_price < prod.min_price {
+    // Check if the purchasing user has `all_download_access` (test account)
+    let user_access: Option<(i64,)> = sqlx::query_as("SELECT all_download_access FROM users WHERE id = ?")
+        .bind(payload.client_id)
+        .fetch_optional(&state.db)
+        .await
+        .unwrap_or(None);
+
+    let is_tester = user_access.map(|u| u.0 == 1).unwrap_or(false);
+
+    // If not a tester account, enforce minimum price
+    if !is_tester && payload.offered_price < prod.min_price {
         return (
             axum::http::StatusCode::BAD_REQUEST,
             format!("Offered price (${:.2}) cannot be lower than the fixed base price (${:.2})", payload.offered_price, prod.min_price),
         ).into_response();
     }
+
+    let effective_price = if is_tester { 0.0 } else { payload.offered_price };
 
     let mut tx = match state.db.begin().await {
         Ok(t) => t,
@@ -841,19 +859,21 @@ async fn purchase_product(
     )
     .bind(id)
     .bind(payload.client_id)
-    .bind(payload.offered_price)
+    .bind(effective_price)
     .execute(&mut *tx)
     .await;
 
-    // 2. Direct ledger entry for digital product sale
-    let _ = sqlx::query(
-        "INSERT INTO escrow_ledger (commission_id, client_id, artist_id, amount, status) VALUES (NULL, ?, ?, ?, 'RELEASED_TO_ARTIST')"
-    )
-    .bind(payload.client_id)
-    .bind(prod.artist_id)
-    .bind(payload.offered_price)
-    .execute(&mut *tx)
-    .await;
+    // 2. Direct ledger entry for digital product sale (only if paid)
+    if effective_price > 0.0 {
+        let _ = sqlx::query(
+            "INSERT INTO escrow_ledger (commission_id, client_id, artist_id, amount, status) VALUES (NULL, ?, ?, ?, 'RELEASED_TO_ARTIST')"
+        )
+        .bind(payload.client_id)
+        .bind(prod.artist_id)
+        .bind(effective_price)
+        .execute(&mut *tx)
+        .await;
+    }
 
     if let Err(e) = tx.commit().await {
         return (axum::http::StatusCode::INTERNAL_SERVER_ERROR, e.to_string()).into_response();
@@ -861,14 +881,15 @@ async fn purchase_product(
 
     let _ = state.tx.send(WsEvent {
         event_type: "PRODUCT_PURCHASED".into(),
-        message: format!("Digital Product '{}' bought for ${:.2}!", prod.title, payload.offered_price),
-        payload: serde_json::json!({ "product_id": id, "amount": payload.offered_price }),
+        message: format!("Digital Product '{}' claimed by user #{} (${:.2})", prod.title, payload.client_id, effective_price),
+        payload: serde_json::json!({ "product_id": id, "amount": effective_price }),
     });
 
     Json(serde_json::json!({
         "status": "success",
         "download_url": prod.file_download_url,
-        "amount_paid": payload.offered_price
+        "amount_paid": effective_price,
+        "is_tester": is_tester
     })).into_response()
 }
 
@@ -880,6 +901,40 @@ async fn list_user_purchases(
         Some(id) => id,
         None => return (axum::http::StatusCode::BAD_REQUEST, "Missing user_id").into_response(),
     };
+
+    // Check if tester with all_download_access
+    let user_access: Option<(i64,)> = sqlx::query_as("SELECT all_download_access FROM users WHERE id = ?")
+        .bind(uid)
+        .fetch_optional(&state.db)
+        .await
+        .unwrap_or(None);
+
+    let is_tester = user_access.map(|u| u.0 == 1).unwrap_or(false);
+
+    if is_tester {
+        // Tester accounts automatically have all listed products accessible in their downloads!
+        let all_prods: Vec<(i64, String, String, String)> = sqlx::query_as(
+            "SELECT id, title, file_download_url, created_at FROM digital_products ORDER BY id DESC"
+        )
+        .fetch_all(&state.db)
+        .await
+        .unwrap_or_default();
+
+        let purchases: Vec<ProductPurchase> = all_prods
+            .into_iter()
+            .map(|r| ProductPurchase {
+                id: r.0,
+                product_id: r.0,
+                client_id: uid,
+                amount_paid: 0.0,
+                product_title: format!("{} [All-Access Pass]", r.1),
+                file_download_url: r.2,
+                purchased_at: r.3,
+            })
+            .collect();
+
+        return Json(purchases).into_response();
+    }
 
     let rows: Vec<(i64, i64, i64, f64, String, String, String)> = sqlx::query_as(
         r#"
@@ -925,7 +980,7 @@ async fn list_commissions(
     };
 
     let user_opt = sqlx::query_as::<_, User>(
-        "SELECT id, username, display_name, role, password_hash, created_at FROM users WHERE id = ?"
+        "SELECT id, username, display_name, role, password_hash, all_download_access, created_at FROM users WHERE id = ?"
     )
     .bind(user_id)
     .fetch_optional(&state.db)

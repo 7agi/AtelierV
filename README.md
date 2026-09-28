@@ -1,40 +1,47 @@
-# AtelierV: Full Creative Commissions, Escrow & Digital Goods Suite
+# AtelierV: VGen-Style Single-Binary Creative Hub
 
-A dual-binary Windows application written in **Rust**, sharing a single embedded **SQLite database (`vgen_local.db`)**:
-- **`atelierv.exe`** &rarr; User & Artist Portal (`http://localhost:7860`)
-- **`atelierv-admin.exe`** &rarr; Dedicated Admin Command Center (`http://localhost:7861`)
-
-Both executables run out of the same directory, meaning any commission created, product purchased, review left, or persona added by the user is **instantly reflected in real-time** inside the Admin Command Center!
+A full-stack commission, escrow, and digital marketplace platform built with **Rust**, **Axum**, **SQLite (SQLx)**, and **WebSockets**.
 
 ---
 
-## ☁️ Zero-Local-Install (Single Download Package)
+## Three Binaries, One Shared Database
 
-GitHub Actions builds both executables and packages them into **one unified artifact zip**:
+| Executable | Port | Purpose |
+|---|---|---|
+| `atelierv.exe` | 7860 | User Portal � Client/Artist login, digital market, commissions |
+| `atelierv-admin.exe` | 7861 | Web Admin � Full user management, commission oversight, live events |
+| `atelierv-admin-cli.exe` | N/A | Terminal Admin CLI � Non-web, direct DB access for power users |
 
-### 1. Push Code to GitHub
-```powershell
-git add .
-git commit -m "Bundle admin and user executables in one artifact"
-git push
-```
+All three connect to the same `vgen_local.db` SQLite file in the same folder.
 
-### 2. Download the Unified Suite
-1. Go to your GitHub repository &rarr; **Actions** tab.
-2. Select the latest run of **`Build & Release AtelierV Suite`**.
-3. Under **Artifacts** at the bottom, download:
-   👉 **`atelierv-suite-windows-x64.zip`**
-4. Extract the zip into your folder. It contains:
-   ```
-   ├── atelierv.exe           # User / Artist portal
-   ├── atelierv-admin.exe     # Admin Command Center
-   ├── run.bat                # 1-click launcher for User portal (:7860)
-   ├── run-admin.bat          # 1-click launcher for Admin portal (:7861)
-   └── vgen_local.db          # Auto-generated shared SQLite database
-   ```
+---
 
-### 3. Launching
-- **Double-click [run.bat](file:///d:/Storage%20Directories/IDE%20Directories/AtelierV/run.bat)** &rarr; opens `http://localhost:7860` (Home digital marketplace, pay-what-you-want pricing, in-element milestone timelines).
-- **Double-click [run-admin.bat](file:///d:/Storage%20Directories/IDE%20Directories/AtelierV/run-admin.bat)** &rarr; opens `http://localhost:7861` (Admin persona control, emergency overrides, live global event bus).
+## Cloud Build via GitHub Actions (No Local Rust Required)
 
-Because both `.exe` files run in the same folder, they read and write to the same `vgen_local.db` database automatically!
+1. **Push this folder** to a GitHub repository
+2. Go to **Actions** tab ? click the latest **"Build & Release AtelierV Suite"** run
+3. Scroll to **Artifacts** section ? download **`atelierv-suite-windows-x64`**
+4. Unzip � you get all three `.exe` files plus the launch scripts
+
+## Running
+
+- **User portal:** double-click `run.bat` ? opens `http://localhost:7860`
+- **Web admin:** double-click `run-admin.bat` ? opens `http://localhost:7861`
+- **Terminal admin:** double-click `run-admin-cli.bat` ? interactive console menu
+
+> Run the user portal **first** so the database tables are created, then launch admin in a second terminal.
+
+---
+
+## Features
+
+- **Login / Signup** with persistent session (localStorage) � no re-login needed
+- **Role-based views:** Client, Artist, Admin scopes
+- **Digital Marketplace:** Artists publish products with image/GIF previews, fixed base price, pay-what-you-want for clients, 5-star reviews
+- **Product Detail Modal:** product media ? vendor info box ? star reviews/comments on left; purchase panel on right
+- **Custom Commissions:** briefs, milestone audit trail per card, escrow locking
+- **In-card Progress Drawer:** click any commission card to expand its timeline
+- **Tester Accounts:** admin can grant All-Download Pass � no purchase popup, instant vault access
+- **Admin Toggle Access:** grant/revoke All-Download Pass per user without deleting account
+- **WebSocket Real-time Sync:** live events pushed to all connected browsers
+- **Admin 4-second auto-poll:** stays in sync with user portal DB changes even across processes

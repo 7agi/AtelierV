@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AtelierV Admin Command Center (Port 7861)</title>
+  <title>AtelierV Admin Command Center</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -11,13 +11,14 @@
     :root {
       --bg-base: #07090e;
       --bg-surface: #0e121e;
-      --bg-card: rgba(18, 22, 38, 0.85);
-      --border: rgba(255, 255, 255, 0.08);
+      --bg-card: rgba(18, 22, 38, 0.9);
+      --border: rgba(255, 255, 255, 0.07);
       --border-accent: rgba(244, 63, 94, 0.4);
       --primary: #f43f5e;
       --primary-gradient: linear-gradient(135deg, #f43f5e 0%, #a855f7 100%);
       --accent-cyan: #06b6d4;
       --accent-emerald: #10b981;
+      --accent-amber: #f59e0b;
       --text-main: #f8fafc;
       --text-muted: #94a3b8;
       --text-dim: #64748b;
@@ -26,17 +27,17 @@
     body {
       background-color: var(--bg-base);
       color: var(--text-main);
-      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-family: "Plus Jakarta Sans", sans-serif;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
-      background-image: radial-gradient(circle at 10% 10%, rgba(244, 63, 94, 0.12) 0%, transparent 40%);
+      background-image: radial-gradient(circle at 5% 5%, rgba(244,63,94,0.1) 0%,transparent 35%), radial-gradient(circle at 90% 80%, rgba(168,85,247,0.07) 0%,transparent 40%);
     }
     header {
       height: 72px;
       border-bottom: 1px solid var(--border);
       backdrop-filter: blur(16px);
-      background: rgba(7, 9, 14, 0.85);
+      background: rgba(7,9,14,0.85);
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -45,152 +46,116 @@
       top: 0;
       z-index: 50;
     }
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      font-weight: 800;
-      font-size: 1.3rem;
-      color: #fff;
-    }
-    .admin-badge {
-      font-size: 0.7rem;
-      padding: 3px 8px;
-      border-radius: 999px;
-      background: rgba(244, 63, 94, 0.2);
-      border: 1px solid rgba(244, 63, 94, 0.4);
-      color: #fb7185;
-      font-weight: 700;
-      text-transform: uppercase;
-    }
-    main {
-      flex: 1;
-      max-width: 1400px;
-      width: 100%;
-      margin: 0 auto;
-      padding: 2rem;
-      display: flex;
-      flex-direction: column;
-      gap: 2rem;
-    }
-    .admin-stats {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 1.25rem;
-    }
-    .stat-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 1.25rem;
-    }
-    .stat-val { font-size: 1.8rem; font-weight: 800; margin-top: 0.5rem; font-family: 'JetBrains Mono', monospace; }
-    .grid-2 {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1.5rem;
-    }
-    .panel {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      display: flex;
-      flex-direction: column;
-      height: 480px;
-      overflow: hidden;
-    }
-    .panel-hdr {
-      padding: 1rem 1.25rem;
-      border-bottom: 1px solid var(--border);
-      font-weight: 700;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: rgba(0,0,0,0.2);
-    }
-    .panel-body {
-      flex: 1;
-      overflow-y: auto;
-      padding: 1rem;
-    }
-    .ledger-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.85rem; }
-    .ledger-table th, .ledger-table td { padding: 0.75rem 1rem; border-bottom: 1px solid var(--border); }
-    .ledger-table th { color: var(--text-dim); text-transform: uppercase; font-size: 0.75rem; }
-    .btn-del {
-      background: rgba(244, 63, 94, 0.2);
-      border: 1px solid rgba(244, 63, 94, 0.4);
-      color: #fb7185;
-      padding: 3px 8px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 0.75rem;
-    }
-    .btn-act {
-      background: var(--primary-gradient);
-      color: white;
-      border: none;
-      padding: 0.45rem 0.9rem;
-      border-radius: 8px;
-      font-weight: 700;
-      font-size: 0.8rem;
-      cursor: pointer;
-    }
-    .event-item {
-      padding: 0.6rem;
-      background: rgba(0,0,0,0.3);
-      border-radius: 6px;
-      border-left: 3px solid var(--primary);
-      margin-bottom: 0.5rem;
-      font-size: 0.8rem;
-      font-family: 'JetBrains Mono', monospace;
-    }
+    .brand { display: flex; align-items: center; gap: 0.75rem; font-weight: 800; font-size: 1.3rem; }
+    .admin-badge { font-size: 0.65rem; padding: 3px 8px; border-radius: 999px; background: rgba(244,63,94,0.15); border: 1px solid rgba(244,63,94,0.4); color: #fb7185; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; }
+    .pass-badge { background: rgba(16,185,129,0.2); border: 1px solid rgba(16,185,129,0.4); color: #34d399; font-size: 0.65rem; padding: 2px 7px; border-radius: 4px; font-weight: 700; }
+    .sync-indicator { display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; color: var(--text-dim); padding: 4px 12px; background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 20px; }
+    .sync-dot { width: 7px; height: 7px; border-radius: 50%; background-color: var(--accent-emerald); box-shadow: 0 0 8px var(--accent-emerald); animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+    main { flex: 1; max-width: 1500px; width: 100%; margin: 0 auto; padding: 2rem; display: flex; flex-direction: column; gap: 1.75rem; }
+    .admin-stats { display: grid; grid-template-columns: repeat(auto-fit,minmax(200px,1fr)); gap: 1.25rem; }
+    .stat-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 1.25rem 1.5rem; transition: border-color 0.2s; }
+    .stat-card:hover { border-color: rgba(244,63,94,0.3); }
+    .stat-label { color: var(--text-dim); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.4rem; }
+    .stat-val { font-size: 2rem; font-weight: 800; font-family: "JetBrains Mono", monospace; }
+    .grid-main { display: grid; grid-template-columns: 1.6fr 1fr; gap: 1.5rem; }
+    .panel { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; display: flex; flex-direction: column; overflow: hidden; }
+    .panel-hdr { padding: 1rem 1.25rem; border-bottom: 1px solid var(--border); font-weight: 700; display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.2); flex-shrink: 0; }
+    .panel-body { flex: 1; overflow-y: auto; padding: 1rem; min-height: 280px; max-height: 400px; }
+    .ledger-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.82rem; }
+    .ledger-table th, .ledger-table td { padding: 0.65rem 0.85rem; border-bottom: 1px solid var(--border); vertical-align: middle; }
+    .ledger-table th { color: var(--text-dim); text-transform: uppercase; font-size: 0.68rem; letter-spacing: 0.07em; }
+    .ledger-table tr:last-child td { border-bottom: none; }
+    .ledger-table tr:hover td { background: rgba(255,255,255,0.02); }
+    .btn-del { background: rgba(244,63,94,0.15); border: 1px solid rgba(244,63,94,0.35); color: #fb7185; padding: 3px 8px; border-radius: 6px; cursor: pointer; font-size: 0.72rem; font-weight: 600; transition: all 0.15s; }
+    .btn-del:hover { background: rgba(244,63,94,0.3); }
+    .btn-toggle-access { background: rgba(245,158,11,0.15); border: 1px solid rgba(245,158,11,0.35); color: #fbbf24; padding: 3px 8px; border-radius: 6px; cursor: pointer; font-size: 0.72rem; font-weight: 600; transition: all 0.15s; margin-right: 4px; }
+    .btn-toggle-access:hover { background: rgba(245,158,11,0.3); }
+    .btn-grant-access { background: rgba(16,185,129,0.15); border: 1px solid rgba(16,185,129,0.35); color: #34d399; padding: 3px 8px; border-radius: 6px; cursor: pointer; font-size: 0.72rem; font-weight: 600; margin-right: 4px; }
+    .btn-act { background: var(--primary-gradient); color: white; border: none; padding: 0.45rem 0.9rem; border-radius: 8px; font-weight: 700; font-size: 0.8rem; cursor: pointer; }
+    .btn-tester { background: rgba(16,185,129,0.15); border: 1px solid rgba(16,185,129,0.4); color: #34d399; padding: 0.45rem 0.9rem; border-radius: 8px; font-weight: 700; font-size: 0.8rem; cursor: pointer; }
+    .btn-cancel-comm { background: rgba(245,158,11,0.15); border: 1px solid rgba(245,158,11,0.35); color: #fbbf24; padding: 3px 8px; border-radius: 6px; cursor: pointer; font-size: 0.72rem; font-weight: 600; }
+    .event-item { padding: 0.55rem 0.75rem; background: rgba(0,0,0,0.3); border-radius: 8px; border-left: 3px solid var(--primary); font-size: 0.75rem; font-family: "JetBrains Mono", monospace; animation: slideIn 0.2s ease-out; }
+    .event-item.green { border-left-color: var(--accent-emerald); }
+    .event-item.blue { border-left-color: var(--accent-cyan); }
+    .event-item.amber { border-left-color: var(--accent-amber); }
+    @keyframes slideIn { from { opacity: 0; transform: translateX(-6px); } to { opacity: 1; transform: translateX(0); } }
+    .event-type { font-weight: 700; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.05em; }
+    .event-msg { color: var(--text-muted); margin-top: 2px; }
+    .comm-badge { font-size: 0.65rem; padding: 2px 7px; border-radius: 5px; font-weight: 700; text-transform: uppercase; }
+    .badge-requested { background: rgba(59,130,246,0.15); color: #60a5fa; }
+    .badge-in_progress { background: rgba(245,158,11,0.15); color: #fbbf24; }
+    .badge-in_review { background: rgba(168,85,247,0.15); color: #c084fc; }
+    .badge-completed { background: rgba(16,185,129,0.15); color: #34d399; }
+    .badge-cancelled { background: rgba(100,116,139,0.15); color: #94a3b8; }
+    .modal-backdrop { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.82); backdrop-filter: blur(8px); z-index: 200; align-items: center; justify-content: center; }
+    .modal-backdrop.open { display: flex; }
+    .modal-box { background: #111827; border: 1px solid var(--border-accent); border-radius: 18px; width: 90%; max-width: 480px; padding: 2rem; }
+    .modal-title { font-size: 1.1rem; font-weight: 800; margin-bottom: 1.25rem; }
+    .form-group { margin-bottom: 1rem; }
+    .form-group label { display: block; font-size: 0.78rem; font-weight: 600; color: var(--text-muted); margin-bottom: 0.4rem; }
+    .form-group input, .form-group select { width: 100%; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: #fff; padding: 0.6rem 0.85rem; font-family: inherit; font-size: 0.875rem; outline: none; }
+    .form-group select option { background: #1a1f2e; }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem; }
+    .btn-secondary { background: transparent; border: 1px solid var(--border); color: var(--text-muted); padding: 0.6rem 1.1rem; border-radius: 8px; cursor: pointer; font-size: 0.875rem; }
+    .tester-callout { background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.3); border-radius: 8px; padding: 0.7rem 0.9rem; font-size: 0.8rem; color: #34d399; margin-top: 0.5rem; display: none; }
   </style>
 </head>
 <body>
   <header>
     <div class="brand">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color: #f43f5e;"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color:#f43f5e;">
+        <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+        <polyline points="2 17 12 22 22 17"></polyline>
+        <polyline points="2 12 12 17 22 12"></polyline>
+      </svg>
       AtelierV Master Command
-      <span class="admin-badge">Admin Dedicated Server (Port 7861)</span>
+      <span class="admin-badge">Admin :7861</span>
     </div>
-    <div style="font-size: 0.8rem; color: var(--accent-emerald);">● System Controller Online</div>
+    <div class="sync-indicator">
+      <div class="sync-dot" id="syncDot"></div>
+      <span id="syncText">DB Auto-Sync Active</span>
+    </div>
   </header>
 
   <main>
     <section class="admin-stats">
       <div class="stat-card">
-        <div style="color: var(--text-dim); font-size: 0.75rem; text-transform: uppercase;">Total System Users</div>
-        <div class="stat-val" id="statUsers">0</div>
+        <div class="stat-label">Total Users</div>
+        <div class="stat-val" id="statUsers">-</div>
       </div>
       <div class="stat-card">
-        <div style="color: var(--text-dim); font-size: 0.75rem; text-transform: uppercase;">Digital Products Listed</div>
-        <div class="stat-val" id="statProducts">0</div>
+        <div class="stat-label">Tester Accounts</div>
+        <div class="stat-val" style="color:#c084fc;" id="statTesters">-</div>
       </div>
       <div class="stat-card">
-        <div style="color: var(--text-dim); font-size: 0.75rem; text-transform: uppercase;">Commissions Tracked</div>
-        <div class="stat-val" id="statComms">0</div>
+        <div class="stat-label">Digital Products</div>
+        <div class="stat-val" style="color:#38bdf8;" id="statProducts">-</div>
       </div>
       <div class="stat-card">
-        <div style="color: var(--text-dim); font-size: 0.75rem; text-transform: uppercase;">Global Escrow Balance</div>
-        <div class="stat-val" id="statEscrow">$0.00</div>
+        <div class="stat-label">Commissions</div>
+        <div class="stat-val" style="color:#f59e0b;" id="statComms">-</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Escrow Held</div>
+        <div class="stat-val" style="color:#34d399;" id="statEscrow">-</div>
       </div>
     </section>
 
-    <div class="grid-2">
-      <!-- Persona Directory Panel -->
+    <div class="grid-main">
       <div class="panel">
         <div class="panel-hdr">
-          <span>👥 User Persona Control</span>
-          <button class="btn-act" onclick="promptCreateUser()">+ Add Persona</button>
+          <span>&#128101; User Persona Control</span>
+          <div style="display:flex;gap:0.5rem;">
+            <button class="btn-tester" onclick="openAddModal(true)">+ Add Tester (All-Download)</button>
+            <button class="btn-act" onclick="openAddModal(false)">+ Add Persona</button>
+          </div>
         </div>
         <div class="panel-body">
           <table class="ledger-table">
             <thead>
               <tr>
-                <th>Username</th>
-                <th>Display Name</th>
-                <th>Role</th>
-                <th>Action</th>
+                <th>ID</th><th>Username</th><th>Display Name</th><th>Role</th><th>Access Pass</th><th>Actions</th>
               </tr>
             </thead>
             <tbody id="tbUsers"></tbody>
@@ -198,41 +163,140 @@
         </div>
       </div>
 
-      <!-- Live Broadcast Monitor -->
       <div class="panel">
         <div class="panel-hdr">
-          <span>⚡ Real-Time System Event Bus</span>
-          <span style="font-size: 0.75rem; color: var(--text-dim);">WebSocket :7861/ws</span>
+          <span>&#9889; Live DB Event Bus</span>
+          <span style="font-size:0.72rem;color:var(--text-dim);">WS + polls every 4s</span>
         </div>
-        <div class="panel-body" id="eventFeed"></div>
+        <div class="panel-body" id="eventFeed" style="display:flex;flex-direction:column;gap:0.4rem;"></div>
       </div>
     </div>
 
-    <!-- Global Commissions Table -->
-    <div class="panel" style="height: 380px;">
+    <div class="panel">
       <div class="panel-hdr">
-        <span>🎨 Global Commissions Lifecycle (Admin View)</span>
+        <span>&#127912; All Commissions - Global Lifecycle View</span>
       </div>
-      <div class="panel-body">
+      <div class="panel-body" style="max-height:360px;">
         <table class="ledger-table">
           <thead>
-            <tr>
-              <th>ID</th>
-              <th>Title</th>
-              <th>Client</th>
-              <th>Artist</th>
-              <th>Price</th>
-              <th>Status</th>
-              <th>Action</th>
-            </tr>
+            <tr><th>#</th><th>Title</th><th>Client</th><th>Artist</th><th>Price</th><th>Status</th><th>Action</th></tr>
           </thead>
           <tbody id="tbComms"></tbody>
         </table>
       </div>
     </div>
+
+    <div class="panel">
+      <div class="panel-hdr">
+        <span>&#128230; Digital Products - Admin Oversight</span>
+      </div>
+      <div class="panel-body" style="max-height:300px;">
+        <table class="ledger-table">
+          <thead>
+            <tr><th>#</th><th>Title</th><th>Artist</th><th>Min Price</th><th>Listed</th></tr>
+          </thead>
+          <tbody id="tbProducts"></tbody>
+        </table>
+      </div>
+    </div>
   </main>
 
+  <div class="modal-backdrop" id="modalAddUser">
+    <div class="modal-box">
+      <div class="modal-title" id="modalAddTitle">Add Persona</div>
+      <form id="formAddUser" onsubmit="handleCreateUser(event)">
+        <div class="form-group">
+          <label>Username (lowercase)</label>
+          <input type="text" id="newUsername" placeholder="e.g. momo_artist" required autocomplete="off">
+        </div>
+        <div class="form-group">
+          <label>Display Name</label>
+          <input type="text" id="newDisplayName" placeholder="e.g. Momo Live2D Studio" required>
+        </div>
+        <div class="form-group" id="roleGroup">
+          <label>Account Role</label>
+          <select id="newRole">
+            <option value="Client">Client</option>
+            <option value="Artist">Artist</option>
+            <option value="Admin">Admin</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Password (default: password123)</label>
+          <input type="text" id="newPassword" placeholder="password123">
+        </div>
+        <input type="hidden" id="newAllAccess" value="0">
+        <div class="tester-callout" id="testerCallout">
+          This account gets All-Download Pass - no purchase dialogs, every product is instantly in their vault.
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" onclick="closeModal('modalAddUser')">Cancel</button>
+          <button type="submit" class="btn-act" id="modalSubmitBtn">Create Account</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <script>
+    let allUsers = [];
+
+    function openAddModal(isTester) {
+      document.getElementById('modalAddUser').classList.add('open');
+      document.getElementById('testerCallout').style.display = isTester ? 'block' : 'none';
+      document.getElementById('roleGroup').style.display = isTester ? 'none' : 'block';
+      document.getElementById('newAllAccess').value = isTester ? '1' : '0';
+      document.getElementById('modalAddTitle').textContent = isTester ? 'Add Tester (All-Download Pass)' : 'Add Persona';
+      document.getElementById('modalSubmitBtn').textContent = isTester ? 'Create Tester Account' : 'Create Account';
+      if (isTester) document.getElementById('newRole').value = 'Client';
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.remove('open');
+      document.getElementById('formAddUser').reset();
+    }
+
+    async function handleCreateUser(e) {
+      e.preventDefault();
+      const username = document.getElementById('newUsername').value.trim().toLowerCase();
+      const display_name = document.getElementById('newDisplayName').value.trim();
+      const role = document.getElementById('newRole').value;
+      const password = document.getElementById('newPassword').value.trim() || 'password123';
+      const all_access = document.getElementById('newAllAccess').value === '1';
+      const res = await fetch('/admin/api/users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, display_name, role, password, all_download_access: all_access })
+      });
+      if (res.ok) {
+        closeModal('modalAddUser');
+        addEvent('USER_CREATED', (all_access ? 'Tester @' : role + ' @') + username + ' created', all_access ? 'green' : 'blue');
+        loadData();
+      } else {
+        alert('Error: ' + await res.text());
+      }
+    }
+
+    async function deleteUser(id, uname) {
+      if (!confirm('Delete user @' + uname + ' (#' + id + ')?')) return;
+      await fetch('/admin/api/users/' + id, { method: 'DELETE' });
+      addEvent('USER_DELETED', 'Deleted @' + uname + ' (#' + id + ')');
+      loadData();
+    }
+
+    async function toggleDownloadAccess(id, uname, cur) {
+      await fetch('/admin/api/users/' + id + '/toggle-access', { method: 'POST' });
+      const next = cur === 1 ? 0 : 1;
+      addEvent('ACCESS_TOGGLED', (next === 1 ? 'GRANTED' : 'REVOKED') + ' All-Download Pass for @' + uname, next === 1 ? 'green' : 'amber');
+      loadData();
+    }
+
+    async function cancelComm(id, title) {
+      if (!confirm('Force cancel commission #' + id + '?')) return;
+      await fetch('/admin/api/commissions/' + id + '/cancel', { method: 'POST' });
+      addEvent('COMM_CANCELLED', 'Force-cancelled commission #' + id + ': ' + title, 'amber');
+      loadData();
+    }
+
     async function loadData() {
       try {
         const [uRes, cRes, pRes, eRes] = await Promise.all([
@@ -241,87 +305,105 @@
           fetch('/admin/api/products'),
           fetch('/admin/api/escrow')
         ]);
-        const users = await uRes.json();
+        allUsers = await uRes.json();
         const comms = await cRes.json();
         const prods = await pRes.json();
         const escrow = await eRes.json();
 
-        document.getElementById('statUsers').textContent = users.length;
-        document.getElementById('statComms').textContent = comms.length;
+        const userMap = {};
+        allUsers.forEach(u => { userMap[u.id] = u; });
+
+        const testers = allUsers.filter(u => u.all_download_access === 1).length;
+        document.getElementById('statUsers').textContent = allUsers.length;
+        document.getElementById('statTesters').textContent = testers;
         document.getElementById('statProducts').textContent = prods.length;
-        const total = escrow.filter(x => x.status === 'HELD_IN_ESCROW').reduce((a, b) => a + b.amount, 0);
-        document.getElementById('statEscrow').textContent = `$${total.toFixed(2)}`;
+        document.getElementById('statComms').textContent = comms.length;
+        const held = escrow.filter(x => x.status === 'HELD_IN_ESCROW').reduce((a, b) => a + b.amount, 0);
+        document.getElementById('statEscrow').textContent = '$' + held.toFixed(2);
 
-        // Render Users
-        document.getElementById('tbUsers').innerHTML = users.map(u => `
-          <tr>
-            <td>@${u.username}</td>
-            <td>${u.display_name}</td>
-            <td><span class="admin-badge">${u.role}</span></td>
-            <td><button class="btn-del" onclick="deleteUser(${u.id})">Delete</button></td>
-          </tr>
-        `).join('');
+        document.getElementById('tbUsers').innerHTML = allUsers.map(u => {
+          const accessBtn = u.all_download_access === 1
+            ? '<button class="btn-toggle-access" onclick="toggleDownloadAccess(' + u.id + ',\'' + esc(u.username) + '\',' + u.all_download_access + ')">Revoke Pass</button>'
+            : '<button class="btn-grant-access" onclick="toggleDownloadAccess(' + u.id + ',\'' + esc(u.username) + '\',' + u.all_download_access + ')">Grant Pass</button>';
+          return '<tr>' +
+            '<td style="font-family:monospace;color:var(--text-dim);font-size:0.75rem;">#' + u.id + '</td>' +
+            '<td style="font-weight:700;">@' + esc(u.username) + '</td>' +
+            '<td>' + esc(u.display_name) + '</td>' +
+            '<td><span class="admin-badge">' + u.role + '</span></td>' +
+            '<td>' + (u.all_download_access === 1 ? '<span class="pass-badge">ALL-DOWNLOAD</span>' : '<span style="color:var(--text-dim);font-size:0.75rem;">Standard</span>') + '</td>' +
+            '<td>' + accessBtn + '<button class="btn-del" onclick="deleteUser(' + u.id + ',\'' + esc(u.username) + '\')">Delete</button></td>' +
+            '</tr>';
+        }).join('');
 
-        // Render Comms
-        document.getElementById('tbComms').innerHTML = comms.map(c => `
-          <tr>
-            <td>#${c.id}</td>
-            <td><strong>${c.title}</strong></td>
-            <td>User #${c.client_id}</td>
-            <td>Artist #${c.artist_id}</td>
-            <td>$${c.price.toFixed(2)}</td>
-            <td><span class="admin-badge">${c.status}</span></td>
-            <td><button class="btn-del" style="background:rgba(245,158,11,0.2); border-color:rgba(245,158,11,0.4); color:#fbbf24;" onclick="cancelComm(${c.id})">Force Cancel</button></td>
-          </tr>
-        `).join('');
-      } catch (e) {
-        console.error('Admin load error:', e);
+        document.getElementById('tbComms').innerHTML = comms.map(c => {
+          const cl = userMap[c.client_id];
+          const ar = userMap[c.artist_id];
+          const clStr = cl ? '@' + esc(cl.username) : '#' + c.client_id;
+          const arStr = ar ? '@' + esc(ar.username) : '#' + c.artist_id;
+          const canCancel = c.status !== 'COMPLETED' && c.status !== 'CANCELLED';
+          return '<tr>' +
+            '<td style="font-family:monospace;color:var(--text-dim);font-size:0.75rem;">#' + c.id + '</td>' +
+            '<td><strong>' + esc(c.title) + '</strong></td>' +
+            '<td style="color:#38bdf8;">' + clStr + '</td>' +
+            '<td style="color:#c084fc;">' + arStr + '</td>' +
+            '<td style="font-family:monospace;color:#38bdf8;font-weight:700;">$' + c.price.toFixed(2) + '</td>' +
+            '<td><span class="comm-badge badge-' + c.status.toLowerCase() + '">' + c.status + '</span></td>' +
+            '<td>' + (canCancel ? '<button class="btn-cancel-comm" onclick="cancelComm(' + c.id + ',\'' + esc(c.title) + '\')">Force Cancel</button>' : '<span style="color:var(--text-dim);font-size:0.72rem;">-</span>') + '</td>' +
+            '</tr>';
+        }).join('');
+
+        document.getElementById('tbProducts').innerHTML = prods.map(p => {
+          const ar = userMap[p.artist_id];
+          const arStr = ar ? '@' + esc(ar.username) : '#' + p.artist_id;
+          const date = p.created_at ? p.created_at.split('T')[0] : '-';
+          return '<tr>' +
+            '<td style="font-family:monospace;color:var(--text-dim);font-size:0.75rem;">#' + p.id + '</td>' +
+            '<td><strong>' + esc(p.title) + '</strong></td>' +
+            '<td style="color:#c084fc;">' + arStr + '</td>' +
+            '<td style="font-family:monospace;color:#38bdf8;font-weight:700;">$' + p.min_price.toFixed(2) + '</td>' +
+            '<td style="font-size:0.72rem;color:var(--text-dim);">' + date + '</td>' +
+            '</tr>';
+        }).join('');
+
+      } catch(err) {
+        console.error('Admin load error:', err);
       }
     }
 
-    async function promptCreateUser() {
-      const u = prompt('Username:');
-      if (!u) return;
-      const d = prompt('Display Name:');
-      const r = prompt('Role (Artist, Client, Admin):', 'Artist');
-      await fetch('/admin/api/users', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username: u, display_name: d, role: r, password: 'password123' })
-      });
-      loadData();
+    function addEvent(type, msg, color) {
+      const feed = document.getElementById('eventFeed');
+      const d = document.createElement('div');
+      d.className = 'event-item' + (color ? ' ' + color : '');
+      const now = new Date().toLocaleTimeString();
+      d.innerHTML = '<div class="event-type">' + type + '</div><div class="event-msg">' + esc(msg) + '</div><div style="font-size:0.65rem;color:var(--text-dim);margin-top:2px;">' + now + '</div>';
+      feed.prepend(d);
+      while (feed.children.length > 30) feed.removeChild(feed.lastChild);
     }
 
-    async function deleteUser(id) {
-      if (!confirm('Remove user #' + id + '?')) return;
-      await fetch('/admin/api/users/' + id, { method: 'DELETE' });
-      loadData();
-    }
-
-    async function cancelComm(id) {
-      await fetch('/admin/api/commissions/' + id + '/cancel', { method: 'POST' });
-      loadData();
+    function esc(s) {
+      if (!s) return '';
+      return s.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
     }
 
     function initWs() {
       const loc = window.location;
       const ws = new WebSocket((loc.protocol === 'https:' ? 'wss://' : 'ws://') + loc.host + '/ws');
+      ws.onopen = () => { document.getElementById('syncText').textContent = 'WS Connected + DB Polling'; };
       ws.onmessage = (e) => {
         try {
           const ev = JSON.parse(e.data);
-          const f = document.getElementById('eventFeed');
-          const d = document.createElement('div');
-          d.className = 'event-item';
-          d.innerHTML = `<strong>${ev.event_type}</strong> &bull; ${ev.message}`;
-          f.prepend(d);
+          const colorMap = { 'PRODUCT_PURCHASED':'green','PRODUCT_PUBLISHED':'blue','COMMISSION_CREATED':'amber','ESCROW_PAYOUT':'green','PERSONA_CREATED':'blue' };
+          addEvent(ev.event_type, ev.message, colorMap[ev.event_type] || '');
           loadData();
         } catch {}
       };
+      ws.onclose = () => { document.getElementById('syncText').textContent = 'WS Reconnecting...'; setTimeout(initWs, 2500); };
     }
 
     window.addEventListener('DOMContentLoaded', () => {
       initWs();
       loadData();
+      setInterval(loadData, 4000);
     });
   </script>
 </body>

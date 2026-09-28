@@ -1,5 +1,5 @@
 @echo off
-setlocal
+setlocal enabledelayedexpansion
 title AtelierV - Admin Command Center (Port 7861)
 
 echo =====================================================================

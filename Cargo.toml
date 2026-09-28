@@ -12,6 +12,10 @@ path = "src/main.rs"
 name = "atelierv-admin"
 path = "src/admin.rs"
 
+[[bin]]
+name = "atelierv-admin-cli"
+path = "src/admin_cli.rs"
+
 [dependencies]
 axum = { version = "0.7", features = ["ws"] }
 tokio = { version = "1.38", features = ["full"] }
