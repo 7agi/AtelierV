@@ -11,17 +11,15 @@
     href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap"
     rel="stylesheet">
   <style>
-    /* Light Theme (Default) */
+    /* Light Theme (Default) - Clean, minimalist, borderless surfaces */
     :root, [data-theme="light"] {
       --bg-base: #f7f6f9;
       --bg-surface: #ffffff;
-      --bg-card: #ffffff;
-      --bg-card-hover: #fcfbfe;
-      --border: #e3deea;
-      --border-accent: #ba87d4;
+      --bg-subtle: #eeebf3;
+      --bg-subtle-hover: #e5e0ed;
       --primary: #ba87d4;
       --primary-hover: #a86ec6;
-      --primary-light: rgba(186, 135, 212, 0.15);
+      --primary-light: rgba(186, 135, 212, 0.16);
       
       --accent-pink: #d977a8;
       --accent-cyan: #3ba8bf;
@@ -32,19 +30,17 @@
       --text-main: #232029;
       --text-muted: #645f70;
       --text-dim: #908b9c;
-      --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
-      --shadow-md: 0 4px 14px rgba(0,0,0,0.07);
-      --shadow-lg: 0 12px 28px rgba(0,0,0,0.09);
+      --shadow-sm: 0 2px 8px rgba(0,0,0,0.04);
+      --shadow-md: 0 4px 16px rgba(0,0,0,0.06);
+      --shadow-lg: 0 12px 32px rgba(0,0,0,0.08);
     }
 
-    /* Dark Theme */
+    /* Dark Theme - Flat #ba87d4, #2d2a36 background */
     [data-theme="dark"] {
       --bg-base: #2d2a36;
       --bg-surface: #24212c;
-      --bg-card: #24212c;
-      --bg-card-hover: #292633;
-      --border: #3d394a;
-      --border-accent: #ba87d4;
+      --bg-subtle: #1c1a23;
+      --bg-subtle-hover: #373343;
       --primary: #ba87d4;
       --primary-hover: #ca9be2;
       --primary-light: rgba(186, 135, 212, 0.18);
@@ -58,15 +54,17 @@
       --text-main: #f5f3f7;
       --text-muted: #b8b3c4;
       --text-dim: #847e93;
-      --shadow-sm: 0 1px 3px rgba(0,0,0,0.25);
-      --shadow-md: 0 4px 14px rgba(0,0,0,0.3);
-      --shadow-lg: 0 12px 28px rgba(0,0,0,0.4);
+      --shadow-sm: 0 2px 8px rgba(0,0,0,0.25);
+      --shadow-md: 0 4px 16px rgba(0,0,0,0.3);
+      --shadow-lg: 0 12px 32px rgba(0,0,0,0.4);
     }
 
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
+      border: none;
+      outline: none;
     }
 
     body {
@@ -95,7 +93,6 @@
 
     .auth-card {
       background: var(--bg-surface);
-      border: 1px solid var(--border);
       box-shadow: var(--shadow-lg);
       border-radius: 16px;
       width: 100%;
@@ -121,10 +118,9 @@
 
     .auth-toggle {
       display: flex;
-      background: var(--bg-base);
-      border: 1px solid var(--border);
+      background: var(--bg-subtle);
       border-radius: 8px;
-      padding: 3px;
+      padding: 4px;
       margin-bottom: 1.4rem;
     }
 
@@ -133,7 +129,6 @@
       padding: 0.55rem;
       font-size: 0.85rem;
       font-weight: 700;
-      border: none;
       border-radius: 6px;
       cursor: pointer;
       background: transparent;
@@ -149,7 +144,6 @@
     /* Header & Navigation */
     header {
       height: 68px;
-      border-bottom: 1px solid var(--border);
       background: var(--bg-surface);
       display: flex;
       align-items: center;
@@ -169,22 +163,21 @@
       font-size: 1.35rem;
       color: var(--primary);
       text-decoration: none;
+      cursor: pointer;
     }
 
     .nav-tabs {
       display: flex;
       gap: 0.35rem;
-      background: var(--bg-base);
+      background: var(--bg-subtle);
       padding: 4px;
       border-radius: 10px;
-      border: 1px solid var(--border);
     }
 
     .nav-btn {
       background: transparent;
-      border: none;
       color: var(--text-muted);
-      padding: 0.45rem 0.85rem;
+      padding: 0.45rem 0.95rem;
       border-radius: 7px;
       font-size: 0.85rem;
       font-weight: 600;
@@ -197,7 +190,7 @@
 
     .nav-btn:hover {
       color: var(--text-main);
-      background: rgba(186, 135, 212, 0.08);
+      background: rgba(186, 135, 212, 0.1);
     }
 
     .nav-btn.active {
@@ -211,10 +204,8 @@
       gap: 0.75rem;
     }
 
-    /* Theme Switcher Button */
     .theme-toggle-btn {
-      background: var(--bg-base);
-      border: 1px solid var(--border);
+      background: var(--bg-subtle);
       color: var(--text-main);
       width: 36px;
       height: 36px;
@@ -228,7 +219,7 @@
     }
 
     .theme-toggle-btn:hover {
-      border-color: var(--primary);
+      background: var(--primary-light);
       color: var(--primary);
     }
 
@@ -238,10 +229,9 @@
       gap: 0.4rem;
       font-size: 0.72rem;
       color: var(--text-dim);
-      padding: 4px 9px;
+      padding: 4px 10px;
       border-radius: 16px;
-      background: var(--bg-base);
-      border: 1px solid var(--border);
+      background: var(--bg-subtle);
     }
 
     .status-dot {
@@ -259,8 +249,7 @@
       display: flex;
       align-items: center;
       gap: 0.6rem;
-      background: var(--bg-base);
-      border: 1px solid var(--border);
+      background: var(--bg-subtle);
       padding: 0.35rem 0.75rem;
       border-radius: 8px;
     }
@@ -279,7 +268,7 @@
     }
 
     .role-Client {
-      background: rgba(59, 168, 191, 0.12);
+      background: rgba(59, 168, 191, 0.14);
       color: var(--accent-cyan);
     }
 
@@ -294,7 +283,6 @@
 
     .btn-logout {
       background: transparent;
-      border: 1px solid var(--border);
       color: var(--text-dim);
       padding: 0.3rem 0.55rem;
       border-radius: 6px;
@@ -304,7 +292,7 @@
 
     .btn-logout:hover {
       color: var(--accent-rose);
-      border-color: var(--accent-rose);
+      background: rgba(225, 29, 72, 0.1);
     }
 
     /* Main Container */
@@ -330,9 +318,7 @@
     /* Market Banner */
     .market-banner {
       background: var(--bg-surface);
-      border: 1px solid var(--border);
-      border-left: 4px solid var(--primary);
-      border-radius: 12px;
+      border-radius: 14px;
       padding: 1.6rem 2rem;
       display: flex;
       justify-content: space-between;
@@ -364,19 +350,17 @@
     /* Product Cards */
     .product-card {
       background: var(--bg-surface);
-      border: 1px solid var(--border);
-      border-radius: 12px;
+      border-radius: 14px;
       overflow: hidden;
       display: flex;
       flex-direction: column;
       cursor: pointer;
       box-shadow: var(--shadow-sm);
-      transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
     }
 
     .product-card:hover {
-      transform: translateY(-2px);
-      border-color: var(--border-accent);
+      transform: translateY(-3px);
       box-shadow: var(--shadow-md);
     }
 
@@ -402,7 +386,6 @@
       bottom: 10px;
       right: 10px;
       background: var(--bg-surface);
-      border: 1px solid var(--border);
       padding: 4px 10px;
       border-radius: 6px;
       font-weight: 800;
@@ -476,10 +459,9 @@
     .detail-media-wrap {
       width: 100%;
       height: 230px;
-      border-radius: 10px;
+      border-radius: 12px;
       overflow: hidden;
       background: #1a1721;
-      border: 1px solid var(--border);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -492,23 +474,71 @@
     }
 
     .product-vendor-box {
-      background: var(--bg-base);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 0.85rem;
+      background: var(--bg-subtle);
+      border-radius: 10px;
+      padding: 0.95rem;
       font-size: 0.825rem;
       color: var(--text-main);
       line-height: 1.5;
     }
 
     .detail-right-checkout {
-      background: var(--bg-base);
-      border: 1px solid var(--border);
-      border-radius: 12px;
+      background: var(--bg-subtle);
+      border-radius: 14px;
       padding: 1.4rem;
       display: flex;
       flex-direction: column;
       gap: 1.1rem;
+    }
+
+    /* Creator Profile Card (Very Top of Right Column in Product Modal) */
+    .creator-profile-card {
+      background: var(--bg-surface);
+      border-radius: 10px;
+      padding: 0.85rem 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .creator-profile-meta {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      min-width: 0;
+    }
+
+    .creator-avatar-badge {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: #ffffff;
+      font-weight: 800;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .btn-visit-profile {
+      background: var(--primary-light);
+      color: var(--primary);
+      padding: 0.4rem 0.75rem;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: 0.15s;
+    }
+
+    .btn-visit-profile:hover {
+      background: var(--primary);
+      color: #ffffff;
     }
 
     .checkout-price-callout {
@@ -519,7 +549,6 @@
     }
 
     .reviews-section {
-      border-top: 1px solid var(--border);
       padding-top: 0.9rem;
       display: flex;
       flex-direction: column;
@@ -536,17 +565,16 @@
 
     .review-bubble {
       background: var(--bg-surface);
-      border: 1px solid var(--border);
       border-radius: 8px;
       padding: 0.65rem 0.8rem;
       font-size: 0.8rem;
+      box-shadow: var(--shadow-sm);
     }
 
     .btn-buy {
       width: 100%;
       padding: 0.75rem;
       border-radius: 8px;
-      border: none;
       background: var(--primary);
       color: #ffffff;
       font-weight: 700;
@@ -559,6 +587,40 @@
       background: var(--primary-hover);
     }
 
+    /* Artist Profile Page Styles */
+    .profile-banner {
+      background: var(--bg-surface);
+      border-radius: 14px;
+      padding: 1.8rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1.5rem;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 1.5rem;
+    }
+
+    .profile-hero {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+    }
+
+    .profile-avatar-large {
+      width: 68px;
+      height: 68px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: #ffffff;
+      font-weight: 800;
+      font-size: 1.6rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      box-shadow: var(--shadow-sm);
+    }
+
     /* Commission Cards */
     .commissions-grid {
       display: grid;
@@ -568,7 +630,6 @@
 
     .comm-card {
       background: var(--bg-surface);
-      border: 1px solid var(--border);
       border-radius: 12px;
       padding: 1.3rem;
       display: flex;
@@ -576,16 +637,12 @@
       gap: 0.85rem;
       cursor: pointer;
       box-shadow: var(--shadow-sm);
-      transition: 0.15s;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
     }
 
     .comm-card:hover {
-      border-color: var(--border-accent);
+      transform: translateY(-2px);
       box-shadow: var(--shadow-md);
-    }
-
-    .comm-card.expanded {
-      border-color: var(--primary);
     }
 
     .comm-badge {
@@ -618,10 +675,9 @@
 
     .progress-drawer {
       display: none;
-      background: var(--bg-base);
+      background: var(--bg-subtle);
       border-radius: 8px;
       padding: 0.9rem;
-      border: 1px solid var(--border);
       margin-top: 0.4rem;
     }
 
@@ -640,34 +696,21 @@
       padding-bottom: 0;
     }
 
-    .timeline-step:not(:last-child)::before {
-      content: "";
-      position: absolute;
-      left: 7px;
-      top: 14px;
-      bottom: 0;
-      width: 2px;
-      background: var(--border);
-    }
-
     .timeline-dot {
-      width: 16px;
-      height: 16px;
+      width: 14px;
+      height: 14px;
       border-radius: 50%;
-      border: 2px solid var(--primary);
       margin-top: 2px;
-      background: var(--bg-surface);
+      background: var(--primary);
     }
 
     .timeline-dot.done {
       background: var(--accent-emerald);
-      border-color: var(--accent-emerald);
     }
 
     .btn-create {
       background: var(--primary);
       color: #ffffff;
-      border: none;
       padding: 0.6rem 1.15rem;
       border-radius: 8px;
       font-weight: 700;
@@ -686,16 +729,14 @@
       font-size: 0.775rem;
       font-weight: 600;
       border-radius: 6px;
-      border: 1px solid var(--border);
-      background: var(--bg-base);
+      background: var(--bg-subtle);
       color: var(--text-main);
       cursor: pointer;
     }
 
     .btn-action.success {
-      background: rgba(16, 185, 129, 0.12);
+      background: rgba(16, 185, 129, 0.14);
       color: var(--accent-emerald);
-      border-color: rgba(16, 185, 129, 0.3);
     }
 
     /* Modals */
@@ -716,7 +757,6 @@
 
     .modal-box {
       background: var(--bg-surface);
-      border: 1px solid var(--border);
       box-shadow: var(--shadow-lg);
       border-radius: 14px;
       width: 90%;
@@ -747,21 +787,19 @@
     .form-group textarea,
     .form-group select {
       width: 100%;
-      background: var(--bg-base);
-      border: 1px solid var(--border);
+      background: var(--bg-subtle);
       border-radius: 6px;
       color: var(--text-main);
       padding: 0.6rem 0.8rem;
       font-family: inherit;
       font-size: 0.85rem;
-      outline: none;
-      transition: border-color 0.15s;
+      transition: background 0.15s;
     }
 
     .form-group input:focus,
     .form-group textarea:focus,
     .form-group select:focus {
-      border-color: var(--primary);
+      background: var(--bg-subtle-hover);
     }
 
     .modal-actions {
@@ -772,8 +810,7 @@
     }
 
     .btn-secondary {
-      background: transparent;
-      border: 1px solid var(--border);
+      background: var(--bg-subtle);
       color: var(--text-muted);
       padding: 0.55rem 1rem;
       border-radius: 6px;
@@ -783,13 +820,12 @@
 
     .btn-secondary:hover {
       color: var(--text-main);
-      border-color: var(--text-muted);
+      background: var(--bg-subtle-hover);
     }
 
     /* Tables */
     .feed-panel {
       background: var(--bg-surface);
-      border: 1px solid var(--border);
       border-radius: 12px;
       overflow: hidden;
       box-shadow: var(--shadow-sm);
@@ -805,20 +841,22 @@
     .ledger-table th,
     .ledger-table td {
       padding: 0.8rem 1.1rem;
-      border-bottom: 1px solid var(--border);
     }
 
     .ledger-table th {
       color: var(--text-dim);
       text-transform: uppercase;
       font-size: 0.72rem;
-      background: var(--bg-base);
+      background: var(--bg-subtle);
+    }
+
+    .ledger-table tr:nth-child(even) td {
+      background: rgba(0, 0, 0, 0.015);
     }
 
     /* Vendor Info Composer */
     .vendor-composer {
-      background: var(--bg-base);
-      border: 1px solid var(--border);
+      background: var(--bg-subtle);
       border-radius: 8px;
       padding: 0.85rem;
       display: flex;
@@ -838,12 +876,11 @@
 
     .composer-mini-btn {
       background: var(--primary-light);
-      border: 1px solid var(--border-accent);
       color: var(--primary);
       border-radius: 5px;
       font-size: 0.7rem;
       font-weight: 600;
-      padding: 2px 7px;
+      padding: 3px 8px;
       cursor: pointer;
       transition: 0.15s;
     }
@@ -874,11 +911,10 @@
 
     .btn-row-del {
       background: rgba(225, 29, 72, 0.1);
-      border: 1px solid rgba(225, 29, 72, 0.25);
       color: var(--accent-rose);
       border-radius: 6px;
-      width: 28px;
-      height: 28px;
+      width: 26px;
+      height: 26px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -898,14 +934,6 @@
       border-collapse: collapse;
       margin-top: 0.5rem;
       font-size: 0.8rem;
-    }
-
-    .product-spec-table tr {
-      border-bottom: 1px solid var(--border);
-    }
-
-    .product-spec-table tr:last-child {
-      border-bottom: none;
     }
 
     .product-spec-table td {
@@ -936,7 +964,6 @@
 
     /* Upload Zone */
     .upload-zone {
-      border: 1.5px dashed var(--border-accent);
       border-radius: 8px;
       padding: 0.85rem;
       text-align: center;
@@ -947,7 +974,7 @@
     }
 
     .upload-zone:hover {
-      border-color: var(--primary-hover);
+      background: rgba(186, 135, 212, 0.25);
     }
 
     .upload-zone input[type="file"] {
@@ -965,10 +992,9 @@
       display: none;
       align-items: center;
       gap: 0.75rem;
-      background: var(--bg-base);
+      background: var(--bg-subtle);
       padding: 0.4rem 0.6rem;
       border-radius: 8px;
-      border: 1px solid var(--border);
     }
 
     .upload-preview-thumb {
@@ -976,7 +1002,6 @@
       max-width: 100px;
       border-radius: 6px;
       object-fit: cover;
-      border: 1px solid var(--border-accent);
     }
   </style>
 </head>
@@ -1045,7 +1070,7 @@
   <!-- Header -->
   <header>
     <div style="display: flex; align-items: center; gap: 1rem;">
-      <a href="#" class="brand-logo" onclick="switchTab('marketplace')">
+      <a class="brand-logo" onclick="switchTab('marketplace')">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
           <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
           <polyline points="2 17 12 22 22 17"></polyline>
@@ -1053,7 +1078,7 @@
         </svg>
         AtelierV
       </a>
-      <span class="user-role-tag role-Client">User Portal</span>
+      <span class="user-role-tag role-Client" id="navRoleBadge">User Portal</span>
     </div>
 
     <!-- Main Navigation Tabs -->
@@ -1072,6 +1097,9 @@
       </button>
       <button class="nav-btn" id="tabBtnOwnership" onclick="switchTab('ownership')">
         <span>📜</span> Copyright Registry
+      </button>
+      <button class="nav-btn" id="tabBtnProfile" style="display: none;" onclick="switchTab('profile')">
+        <span>👤</span> Creator Profile
       </button>
     </div>
 
@@ -1113,6 +1141,34 @@
       </div>
     </section>
 
+    <!-- TAB: DEDICATED ARTIST PROFILE PAGE -->
+    <section id="tab-profile" class="tab-content">
+      <div class="profile-banner">
+        <div class="profile-hero">
+          <div class="profile-avatar-large" id="profAvatar">?</div>
+          <div>
+            <div style="display: flex; align-items: center; gap: 0.6rem;">
+              <h1 style="font-size: 1.55rem; font-weight: 800;" id="profDisplayName">Artist Name</h1>
+              <span class="user-role-tag role-Artist">Verified Creator</span>
+            </div>
+            <div style="font-size: 0.85rem; color: var(--text-dim); margin-top: 2px;" id="profUsername">@artist</div>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 6px;" id="profStats">Digital Assets • Available for Custom Briefs</p>
+          </div>
+        </div>
+        <div style="display: flex; gap: 0.75rem;">
+          <button class="btn-secondary" onclick="switchTab('marketplace')">← Back to Market</button>
+          <button class="btn-create" id="btnProfileCommissionRequest" onclick="openCommissionForCurrentProfile()">Request Custom Work</button>
+        </div>
+      </div>
+
+      <div>
+        <h3 style="font-size: 1.15rem; font-weight: 800; margin-bottom: 1rem;">Products by this Creator</h3>
+        <div class="products-grid" id="profileProductsContainer">
+          <!-- Injected via JavaScript -->
+        </div>
+      </div>
+    </section>
+
     <!-- TAB 2: COMMISSIONS -->
     <section id="tab-commissions" class="tab-content">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
@@ -1150,14 +1206,14 @@
       </div>
     </section>
 
-    <!-- TAB 4: ESCROW -->
+    <!-- TAB 4: ESCROW (Client & Artist's Own Records Only) -->
     <section id="tab-escrow" class="tab-content">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
         <div>
-          <h2 style="font-size: 1.4rem; font-weight: 800;">Simulated Milestone Escrow</h2>
-          <p style="color: var(--text-muted); font-size: 0.85rem;">Funds securely audited and locked until client acceptance.</p>
+          <h2 style="font-size: 1.4rem; font-weight: 800;">Your Milestone Escrow Records</h2>
+          <p style="color: var(--text-muted); font-size: 0.85rem;">Secure escrow settlements for your own projects only.</p>
         </div>
-        <button class="btn-create" style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.4); color: var(--accent-emerald);" onclick="testDeposit()">+ Deposit Funds</button>
+        <button class="btn-create" style="background: rgba(16, 185, 129, 0.15); color: var(--accent-emerald);" onclick="testDeposit()">+ Deposit Funds</button>
       </div>
       <div class="feed-panel" style="height: auto; min-height: 250px;">
         <table class="ledger-table">
@@ -1183,7 +1239,7 @@
     <section id="tab-ownership" class="tab-content">
       <div style="margin-bottom: 1.5rem;">
         <h2 style="font-size: 1.4rem; font-weight: 800;">Character & IP Copyright Registry</h2>
-        <p style="color: var(--text-muted); font-size: 0.85rem;">Permanently certified ownership hashes for completed projects.</p>
+        <p style="color: var(--text-muted); font-size: 0.85rem;">Permanently certified ownership hashes for your completed projects.</p>
       </div>
       <div class="feed-panel" style="height: auto; min-height: 250px;">
         <table class="ledger-table">
@@ -1240,7 +1296,7 @@
             <div class="reviews-list" id="detailReviewsList"></div>
 
             <!-- Add Review Input -->
-            <form id="formAddReview" onsubmit="handleAddReview(event)" style="background: var(--bg-surface); border: 1px solid var(--border); padding: 0.75rem; border-radius: 8px;">
+            <form id="formAddReview" onsubmit="handleAddReview(event)" style="background: var(--bg-surface); padding: 0.75rem; border-radius: 8px;">
               <input type="hidden" id="detailModalProductId">
               <div style="display: flex; gap: 0.75rem; margin-bottom: 0.5rem; align-items: center;">
                 <label style="font-size: 0.75rem; color: var(--text-dim); white-space: nowrap;">Your Rating:</label>
@@ -1260,8 +1316,22 @@
           </div>
         </div>
 
-        <!-- Right Side: Purchase / Unlock Column -->
+        <!-- Right Side: Creator Profile at Very Top, then Purchase/Unlock -->
         <div class="detail-right-checkout">
+          <!-- Artist Profile Button at the very top of right section -->
+          <div class="creator-profile-card">
+            <div class="creator-profile-meta">
+              <div class="creator-avatar-badge" id="modalCreatorAvatar">A</div>
+              <div>
+                <div style="font-size: 0.85rem; font-weight: 800; color: var(--text-main);" id="modalCreatorName">Artist Name</div>
+                <div style="font-size: 0.75rem; color: var(--text-dim);" id="modalCreatorHandle">@artist</div>
+              </div>
+            </div>
+            <button type="button" class="btn-visit-profile" onclick="viewCurrentProductArtistProfile()">
+              Visit Profile ➔
+            </button>
+          </div>
+
           <div style="font-size: 0.82rem; color: var(--text-dim); text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em;">
             Unlock Deliverable
           </div>
@@ -1271,7 +1341,7 @@
             <div class="checkout-price-callout" id="detailModalBasePrice">$0.00</div>
           </div>
 
-          <div id="testerInstantUnlockBanner" style="display: none; background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.3); color: var(--accent-emerald); padding: 0.75rem; border-radius: 8px; font-size: 0.8rem;">
+          <div id="testerInstantUnlockBanner" style="display: none; background: rgba(16, 185, 129, 0.12); color: var(--accent-emerald); padding: 0.75rem; border-radius: 8px; font-size: 0.8rem;">
             ⚡ <strong>All-Download Testing Pass Active</strong><br>
             No purchase popup or fee required. Click below to add directly to your downloads.
           </div>
@@ -1292,7 +1362,7 @@
             </button>
           </form>
 
-          <div style="font-size: 0.72rem; color: var(--text-dim); line-height: 1.4; border-top: 1px solid var(--border); padding-top: 0.75rem;">
+          <div style="font-size: 0.72rem; color: var(--text-dim); line-height: 1.4; padding-top: 0.75rem;">
             ✓ Instant delivery to 'My Downloads'<br>
             ✓ Lifetime download link access<br>
             ✓ Cryptographic purchase receipt
@@ -1368,11 +1438,14 @@
               <textarea id="pubVendorDesc" rows="2" placeholder="e.g. Transparent animated GIF + APNG files. Permitted for commercial VTuber streams and Twitch emotes."></textarea>
             </div>
 
-            <!-- Bullet Points -->
+            <!-- Bullet Points (Multiple bullet points can be added dynamically or pasted) -->
             <div>
               <div class="composer-sublabel">
-                <span>• What's Included / Bullet Points</span>
-                <button type="button" class="composer-mini-btn" onclick="addVendorBulletRow()">+ Add Bullet</button>
+                <span>• Bullet Points (Add as many as you need)</span>
+                <div style="display:flex; gap:0.4rem;">
+                  <button type="button" class="composer-mini-btn" onclick="addVendorBulletRow()">+ Add Single Bullet</button>
+                  <button type="button" class="composer-mini-btn" onclick="addMultipleBulletRowsPrompt()">+ Add Multiple Bullets</button>
+                </div>
               </div>
               <div id="pubBulletContainer"></div>
             </div>
@@ -1445,6 +1518,7 @@
     let availableArtists = [];
     let ws = null;
     let currentDetailProduct = null;
+    let activeProfileArtist = null;
 
     const STORAGE_KEY = 'atelierv_user_session';
     const THEME_KEY = 'atelierv_theme';
@@ -1574,6 +1648,10 @@
 
       const btn = Array.from(document.querySelectorAll('.nav-btn')).find(b => b.onclick && b.onclick.toString().includes(tab));
       if (btn) btn.classList.add('active');
+
+      if (tab !== 'profile') {
+        document.getElementById('tabBtnProfile').style.display = 'none';
+      }
     }
 
     function openModal(id) { document.getElementById(id).classList.add('open'); }
@@ -1585,6 +1663,7 @@
       if (bContainer && bContainer.children.length === 0) {
         addVendorBulletRow('Original high-res deliverable files included');
         addVendorBulletRow('Commercial broadcast & streaming rights granted');
+        addVendorBulletRow('Clean transparent alpha backgrounds included');
       }
       const kContainer = document.getElementById('pubKvContainer');
       if (kContainer && kContainer.children.length === 0) {
@@ -1595,12 +1674,91 @@
       openModal('modalPublishProduct');
     }
 
-    async function openNewCommModal() {
+    async function openNewCommModal(preselectedArtistId = null) {
       const res = await fetch('/api/users/artists');
       availableArtists = await res.json();
       const sel = document.getElementById('commInputArtist');
       sel.innerHTML = availableArtists.map(a => `<option value="${a.id}">${escapeHtml(a.display_name)} (@${escapeHtml(a.username)})</option>`).join('');
+      if (preselectedArtistId) {
+        sel.value = preselectedArtistId;
+      }
       openModal('modalNewComm');
+    }
+
+    // Artist Profile Navigation & Render
+    function viewArtistProfile(artistId, artistName, artistUsername) {
+      activeProfileArtist = {
+        id: artistId,
+        display_name: artistName,
+        username: artistUsername
+      };
+
+      document.getElementById('profDisplayName').textContent = artistName;
+      document.getElementById('profUsername').textContent = `@${artistUsername}`;
+      document.getElementById('profAvatar').textContent = (artistName || 'A').charAt(0).toUpperCase();
+
+      const profileTabBtn = document.getElementById('tabBtnProfile');
+      profileTabBtn.style.display = 'flex';
+      profileTabBtn.innerHTML = `<span>👤</span> ${escapeHtml(artistName)}`;
+
+      renderArtistProfileProducts();
+      closeModal('modalProductDetail');
+      switchTab('profile');
+    }
+
+    function viewCurrentProductArtistProfile() {
+      if (!currentDetailProduct) return;
+      viewArtistProfile(
+        currentDetailProduct.artist_id,
+        currentDetailProduct.artist_name,
+        currentDetailProduct.artist_username
+      );
+    }
+
+    function renderArtistProfileProducts() {
+      if (!activeProfileArtist) return;
+      const c = document.getElementById('profileProductsContainer');
+      const filtered = products.filter(p => p.artist_id === activeProfileArtist.id);
+
+      document.getElementById('profStats').textContent = `${filtered.length} Digital Asset(s) Listed • Available for Custom Briefs`;
+
+      if (filtered.length === 0) {
+        c.innerHTML = `<div style="grid-column: 1/-1; color: var(--text-dim); text-align: center; padding: 3rem;">No products listed yet by this artist.</div>`;
+        return;
+      }
+
+      c.innerHTML = filtered.map(p => {
+        const fullStars = Math.round(p.average_rating);
+        const starStr = '★'.repeat(fullStars) + '☆'.repeat(5 - fullStars);
+
+        return `
+          <div class="product-card" onclick="openProductDetailModal(${p.id})">
+            <div class="product-media-wrap">
+              <img class="product-media" src="${escapeHtml(p.media_url)}" alt="${escapeHtml(p.title)}" loading="lazy">
+              <div class="product-price-tag">From $${p.min_price.toFixed(2)}</div>
+            </div>
+            <div class="product-body">
+              <div class="product-card-title">${escapeHtml(p.title)}</div>
+              
+              <div class="product-rating-bar">
+                <span class="stars">${starStr}</span>
+                <span style="font-weight: 700;">${p.average_rating.toFixed(1)}</span>
+                <span style="color: var(--text-dim);">(${p.review_count} reviews)</span>
+              </div>
+
+              <div class="click-view-hint">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><polyline points="12 16 16 12 12 8"></polyline><line x1="8" y1="12" x2="16" y2="12"></line></svg>
+                View specs & unlock
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function openCommissionForCurrentProfile() {
+      if (!activeProfileArtist) return;
+      openNewCommModal(activeProfileArtist.id);
     }
 
     // Live WebSockets
@@ -1644,6 +1802,9 @@
         ownershipLogs = await oRes.json();
 
         renderProducts();
+        if (activeProfileArtist) {
+          renderArtistProfileProducts();
+        }
         renderCommissions();
         renderPurchases();
         renderLedger();
@@ -1700,6 +1861,11 @@
       document.getElementById('checkoutProductId').value = p.id;
       document.getElementById('detailModalProductId').value = p.id;
 
+      // Populate Creator Profile in Top Right
+      document.getElementById('modalCreatorName').textContent = p.artist_name;
+      document.getElementById('modalCreatorHandle').textContent = `@${p.artist_username}`;
+      document.getElementById('modalCreatorAvatar').textContent = (p.artist_name || 'A').charAt(0).toUpperCase();
+
       // Populate Left Column
       document.getElementById('detailModalImg').src = p.media_url;
       document.getElementById('detailModalTitle').textContent = p.title;
@@ -1714,7 +1880,7 @@
         <span style="color: var(--text-dim);">(${p.review_count} reviews)</span>
       `;
 
-      // Populate Right Column
+      // Populate Right Column Price
       document.getElementById('detailModalBasePrice').textContent = `$${p.min_price.toFixed(2)}`;
 
       const isTester = currentUser && currentUser.all_download_access;
@@ -1865,11 +2031,19 @@
       row.className = 'bullet-row';
       row.innerHTML = `
         <span style="color: var(--primary); font-weight: bold;">•</span>
-        <input type="text" class="pub-bullet-item" placeholder="e.g. Includes 3 color variants + animated loop" value="${escapeHtml(val)}">
+        <input type="text" class="pub-bullet-item" placeholder="e.g. Includes transparent APNG, GIF & 3 color variants" value="${escapeHtml(val)}">
         <button type="button" class="btn-row-del" onclick="this.parentElement.remove()" title="Delete">✕</button>
       `;
       container.appendChild(row);
       row.querySelector('input').focus();
+    }
+
+    // Prompt to add multiple bullet points at once
+    function addMultipleBulletRowsPrompt() {
+      const input = prompt("Paste or type multiple bullet items (separated by new line or commas):", "High-res PNG files (300 DPI)\nAnimated transparent GIF\nCommercial streaming license\nIncludes project source layered files");
+      if (!input) return;
+      const items = input.split(/[\n,]+/).map(s => s.trim()).filter(Boolean);
+      items.forEach(item => addVendorBulletRow(item));
     }
 
     // Dynamic Key-Value Spec Row Builder
@@ -2070,7 +2244,7 @@
               ${escapeHtml(comm.brief)}
             </div>
 
-            <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border); padding-top: 0.65rem;" onclick="event.stopPropagation()">
+            <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 0.65rem;" onclick="event.stopPropagation()">
               <div>${actionButtons}</div>
               <span style="font-size: 0.72rem; color: var(--primary); cursor: pointer;" onclick="toggleCommProgress(${comm.id})">
                 Audit Trail ▼
@@ -2098,10 +2272,8 @@
 
       if (isOpen) {
         drawer.classList.remove('open');
-        card.classList.remove('expanded');
       } else {
         drawer.classList.add('open');
-        card.classList.add('expanded');
         await loadMilestones(id);
       }
     }
@@ -2186,18 +2358,24 @@
       `).join('');
     }
 
+    // Escrow: Filtered strictly to current user's own involvement (as Client or Artist)
     function renderLedger() {
       const tb = document.getElementById('escrowTableBody');
-      if (escrowLedger.length === 0) {
-        tb.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--text-dim);">No escrow transaction records found.</td></tr>`;
+      if (!currentUser) return;
+      
+      const myEscrow = escrowLedger.filter(e => e.client_id === currentUser.id || e.artist_id === currentUser.id);
+
+      if (myEscrow.length === 0) {
+        tb.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--text-dim); padding: 2rem;">No escrow transactions found for your account.</td></tr>`;
         return;
       }
-      tb.innerHTML = escrowLedger.map(e => `
+
+      tb.innerHTML = myEscrow.map(e => `
         <tr>
           <td>#${e.id}</td>
           <td>${e.commission_id ? `Commission #${e.commission_id}` : 'Direct Deposit'}</td>
-          <td>User #${e.client_id}</td>
-          <td>Artist #${e.artist_id}</td>
+          <td>${e.client_id === currentUser.id ? '<strong>You (Client)</strong>' : `User #${e.client_id}`}</td>
+          <td>${e.artist_id === currentUser.id ? '<strong>You (Artist)</strong>' : `Artist #${e.artist_id}`}</td>
           <td style="font-weight: 700; color: var(--primary);">$${e.amount.toFixed(2)}</td>
           <td>
             <span class="comm-badge ${e.status === 'RELEASED' ? 'badge-completed' : 'badge-in_progress'}">
@@ -2205,7 +2383,7 @@
             </span>
           </td>
           <td>
-            ${e.status === 'HELD' && currentUser && currentUser.id === e.client_id ? 
+            ${e.status === 'HELD' && currentUser.id === e.client_id ? 
               `<button class="btn-action success" style="padding: 2px 6px;" onclick="releaseEscrow(${e.id})">Release</button>` : 
               '<span style="color: var(--text-dim); font-size: 0.75rem;">Audited</span>'}
           </td>
@@ -2221,14 +2399,14 @@
     function renderOwnership() {
       const tb = document.getElementById('ownershipTableBody');
       if (ownershipLogs.length === 0) {
-        tb.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--text-dim);">No certified ownership titles in your scope.</td></tr>`;
+        tb.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--text-dim); padding: 2rem;">No certified ownership titles in your scope.</td></tr>`;
         return;
       }
       tb.innerHTML = ownershipLogs.map(o => `
         <tr>
           <td><strong>${escapeHtml(o.character_name)}</strong></td>
-          <td>User #${o.owner_user_id}</td>
-          <td>Artist #${o.creator_user_id}</td>
+          <td>${o.owner_user_id === currentUser?.id ? '<strong>You (Owner)</strong>' : `User #${o.owner_user_id}`}</td>
+          <td>${o.creator_user_id === currentUser?.id ? '<strong>You (Creator)</strong>' : `Artist #${o.creator_user_id}`}</td>
           <td><span class="user-role-tag role-Client">${escapeHtml(o.license_type)}</span></td>
           <td style="font-family: monospace; font-size: 0.72rem; color: var(--primary);">${o.certificate_hash.substring(0, 18)}...</td>
         </tr>
