@@ -12,7 +12,8 @@
     rel="stylesheet">
   <style>
     /* Light Theme (Default) - Clean, minimalist, borderless surfaces */
-    :root, [data-theme="light"] {
+    :root,
+    [data-theme="light"] {
       --bg-base: #f7f6f9;
       --bg-surface: #ffffff;
       --bg-subtle: #eeebf3;
@@ -20,19 +21,19 @@
       --primary: #ba87d4;
       --primary-hover: #a86ec6;
       --primary-light: rgba(186, 135, 212, 0.16);
-      
+
       --accent-pink: #d977a8;
       --accent-cyan: #3ba8bf;
       --accent-emerald: #10b981;
       --accent-amber: #e69214;
       --accent-rose: #e11d48;
-      
+
       --text-main: #232029;
       --text-muted: #645f70;
       --text-dim: #908b9c;
-      --shadow-sm: 0 2px 8px rgba(0,0,0,0.04);
-      --shadow-md: 0 4px 16px rgba(0,0,0,0.06);
-      --shadow-lg: 0 12px 32px rgba(0,0,0,0.08);
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
+      --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.08);
     }
 
     /* Dark Theme - Flat #ba87d4, #2d2a36 background */
@@ -44,19 +45,19 @@
       --primary: #ba87d4;
       --primary-hover: #ca9be2;
       --primary-light: rgba(186, 135, 212, 0.18);
-      
+
       --accent-pink: #ec4899;
       --accent-cyan: #38bdf8;
       --accent-emerald: #34d399;
       --accent-amber: #fbbf24;
       --accent-rose: #f43f5e;
-      
+
       --text-main: #f5f3f7;
       --text-muted: #b8b3c4;
       --text-dim: #847e93;
-      --shadow-sm: 0 2px 8px rgba(0,0,0,0.25);
-      --shadow-md: 0 4px 16px rgba(0,0,0,0.3);
-      --shadow-lg: 0 12px 32px rgba(0,0,0,0.4);
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.25);
+      --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.3);
+      --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.4);
     }
 
     * {
@@ -78,7 +79,7 @@
       transition: background-color 0.2s ease, color 0.2s ease;
     }
 
-    /* Auth Overlay */
+    /* Auth Overlay - split layout from Figma "aV Website Design" */
     #authOverlay {
       position: fixed;
       inset: 0;
@@ -91,54 +92,220 @@
       padding: 1.5rem;
     }
 
-    .auth-card {
-      background: var(--bg-surface);
-      box-shadow: var(--shadow-lg);
-      border-radius: 16px;
+    .auth-shell {
+      --auth-field: #e0e0e0;
+      --auth-field-text: #bebebe;
+      --auth-divider: #d9d9d9;
+      display: flex;
       width: 100%;
-      max-width: 420px;
-      padding: 2.2rem;
+      max-width: 1040px;
+      height: min(600px, calc(100vh - 3rem));
+      min-height: 480px;
+      background: var(--bg-surface);
+      border-radius: 16px;
+      box-shadow: var(--shadow-lg);
+      overflow: hidden;
+    }
+
+    [data-theme="dark"] .auth-shell {
+      --auth-field: var(--bg-subtle);
+      --auth-field-text: var(--text-dim);
+      --auth-divider: var(--bg-subtle-hover);
+    }
+
+    .auth-panel {
+      flex: 0 0 35%;
+      min-width: 340px;
+      max-width: 400px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 2rem;
+      overflow-y: auto;
     }
 
     .auth-logo {
       display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      font-size: 1.55rem;
-      font-weight: 800;
-      margin-bottom: 0.35rem;
-      color: var(--primary);
+      justify-content: center;
+      margin-bottom: 1.5rem;
     }
 
-    .auth-subtitle {
-      font-size: 0.85rem;
-      color: var(--text-muted);
-      margin-bottom: 1.4rem;
+    .auth-logo svg {
+      width: 104px;
+      height: auto;
     }
 
     .auth-toggle {
       display: flex;
-      background: var(--bg-subtle);
-      border-radius: 8px;
-      padding: 4px;
-      margin-bottom: 1.4rem;
+      background: var(--auth-field);
+      border-radius: 6px;
+      padding: 3px;
+      margin-bottom: 0.75rem;
     }
 
     .auth-toggle-btn {
       flex: 1;
-      padding: 0.55rem;
-      font-size: 0.85rem;
+      padding: 0.5rem;
+      font-size: 0.8rem;
       font-weight: 700;
-      border-radius: 6px;
+      border-radius: 4px;
       cursor: pointer;
       background: transparent;
-      color: var(--text-muted);
+      color: var(--auth-field-text);
       transition: 0.15s;
     }
 
     .auth-toggle-btn.active {
       background: var(--primary);
       color: #ffffff;
+    }
+
+    /* Labels stay in the DOM for screen readers; the placeholder is the visible label (per Figma) */
+    .auth-panel .form-group {
+      margin-bottom: 0.75rem;
+    }
+
+    .auth-panel .form-group label {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+    }
+
+    .auth-panel .form-group input,
+    .auth-panel .form-group select {
+      height: 40px;
+      background: var(--auth-field);
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    .auth-panel .form-group input::placeholder {
+      color: var(--auth-field-text);
+      font-weight: 700;
+    }
+
+    .auth-panel .form-group input:focus,
+    .auth-panel .form-group select:focus {
+      background: var(--bg-subtle-hover);
+    }
+
+    .auth-submit {
+      height: 40px;
+      padding: 0;
+      border-radius: 6px;
+      font-size: 0.8rem;
+    }
+
+    .auth-divider {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      margin: 1rem 0 0.9rem;
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: var(--auth-field-text);
+    }
+
+    .auth-divider::before,
+    .auth-divider::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: var(--auth-divider);
+    }
+
+    .auth-social {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .auth-social-btn {
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--primary);
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .auth-social-btn:hover {
+      background: var(--primary-hover);
+    }
+
+    .auth-social-btn svg {
+      height: 16px;
+      width: auto;
+    }
+
+    /* SHADER SLOT: flat fill is the Figma "Temporary Fill for Shader".
+       Mount a <canvas> inside #authShader; it fills the panel. */
+    .auth-shader {
+      flex: 1;
+      margin: 12px 12px 12px 0;
+      border-radius: 12px;
+      background: var(--primary);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .auth-shader canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .auth-shader-overlay {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 1.4rem 1.6rem;
+      pointer-events: none;
+    }
+
+    .auth-shader-logo {
+      align-self: flex-end;
+      width: 72px;
+      height: auto;
+      color: #fff;
+      transition: color 0.1s linear;
+    }
+
+    .auth-shader-tagline {
+      font-size: clamp(1.1rem, 2.2vw, 1.45rem);
+      font-weight: 800;
+      line-height: 1.3;
+      color: #fff;
+      transition: color 0.1s linear;
+    }
+
+    @media (max-width: 760px) {
+      .auth-shell {
+        max-width: 440px;
+        height: auto;
+        min-height: 0;
+      }
+
+      .auth-panel {
+        flex: 1;
+        min-width: 0;
+        max-width: none;
+      }
+
+      .auth-shader {
+        display: none;
+      }
     }
 
     /* Header & Navigation */
@@ -891,14 +1058,16 @@
       color: #ffffff;
     }
 
-    .bullet-row, .kv-row {
+    .bullet-row,
+    .kv-row {
       display: flex;
       gap: 0.4rem;
       align-items: center;
       margin-bottom: 0.35rem;
     }
 
-    .bullet-row input, .kv-row .kv-k {
+    .bullet-row input,
+    .kv-row .kv-k {
       flex: 1;
       padding: 0.45rem 0.65rem;
       font-size: 0.8rem;
@@ -1141,60 +1310,136 @@
 
   <!-- Auth Overlay -->
   <div id="authOverlay">
-    <div class="auth-card">
-      <div class="auth-logo">
-        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-          <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
-          <polyline points="2 17 12 22 22 17"></polyline>
-          <polyline points="2 12 12 17 22 12"></polyline>
-        </svg>
-        AtelierV
+    <div class="auth-shell">
+      <div class="auth-panel">
+        <div class="auth-logo" role="img" aria-label="AtelierV">
+          <svg viewBox="17 25 62 45" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path
+              d="M43.1396 34.3262C49.1699 38.0371 51.9531 43.6035 52.6953 51.9531C53.623 58.4473 55.6641 64.0137 57.0557 65.4053C57.9834 66.1475 59.375 66.6113 60.3027 66.4258L54.7363 51.9531C53.3447 46.3867 51.0254 40.8203 43.1396 34.3262Z"
+              fill="#E5C1F5" />
+            <path
+              d="M42.2119 51.9531C41.748 59.375 39.8926 64.0137 34.3262 66.0547C36.6455 66.0547 39.8926 65.4053 42.2119 62.9004V51.9531Z"
+              fill="#E5C1F5" />
+            <path fill-rule="evenodd" clip-rule="evenodd"
+              d="M35.0684 35.0684C26.4404 35.0684 19.9463 41.5625 19.9463 50.5615C19.9463 59.8389 26.4404 66.4258 34.3262 66.4258C37.1094 66.4258 39.8926 65.6836 42.2119 64.0137V62.9004C43.6035 66.0547 44.5312 66.6113 46.1084 66.6113C48.2422 66.6113 49.8193 64.9414 49.8193 62.7148V49.6338C49.8193 40.8203 44.5312 35.0684 35.0684 35.0684ZM35.0684 42.6758C38.9648 42.6758 42.2119 45.9229 42.2119 50.5615C42.2119 55.6641 38.9648 58.6328 35.0684 58.6328C31.0791 58.6328 27.7393 55.6641 27.7393 50.5615C27.7393 45.9229 31.0791 42.6758 35.0684 42.6758Z"
+              fill="#BA87D4" />
+            <path
+              d="M46.8506 28.2959C44.5312 28.2959 42.8613 30.1514 42.8613 32.4707C42.8613 33.584 43.2324 34.5117 43.7891 35.2539L52.6787 60.7705C53.4223 62.905 54.5131 65.1126 56.6056 65.9673C57.6043 66.3752 58.6619 66.5199 59.8389 66.4258C61.6943 66.0547 62.9004 64.7559 63.3643 63.2715L74.6826 33.584C74.9609 32.6562 74.9609 31.9141 74.9609 31.543C74.9609 29.6875 73.291 28.2959 71.25 28.2959C69.3945 28.2959 67.9102 29.502 67.2607 31.3574L58.9111 53.623L50.5615 31.0791C49.9121 29.3164 48.7061 28.2959 46.8506 28.2959Z"
+              fill="#BA87D4" />
+          </svg>
+        </div>
+
+        <div class="auth-toggle">
+          <button type="button" class="auth-toggle-btn active" id="btnTabLogin" onclick="switchAuthMode('login')">Sign
+            in</button>
+          <button type="button" class="auth-toggle-btn" id="btnTabSignup" onclick="switchAuthMode('signup')">Sign
+            up</button>
+        </div>
+
+        <!-- Login -->
+        <form id="formLogin" onsubmit="handleAuthLogin(event)">
+          <div class="form-group">
+            <label for="loginUsername">Username</label>
+            <input type="text" id="loginUsername" placeholder="Username" required autocomplete="username">
+          </div>
+          <div class="form-group">
+            <label for="loginPassword">Password</label>
+            <input type="password" id="loginPassword" placeholder="Password" required autocomplete="current-password">
+          </div>
+          <button type="submit" class="btn-buy auth-submit">Log In</button>
+        </form>
+
+        <!-- Signup -->
+        <form id="formSignup" style="display: none;" onsubmit="handleAuthSignup(event)">
+          <div class="form-group">
+            <label for="signupUsername">Username</label>
+            <input type="text" id="signupUsername" placeholder="Username" required autocomplete="username">
+          </div>
+          <div class="form-group">
+            <label for="signupDisplayName">Display Name</label>
+            <input type="text" id="signupDisplayName" placeholder="Display name" required>
+          </div>
+          <div class="form-group">
+            <label for="signupRole">Account Role</label>
+            <select id="signupRole" required>
+              <option value="Client">Client</option>
+              <option value="Artist">Artist</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="signupPassword">Password</label>
+            <input type="password" id="signupPassword" placeholder="Password" required autocomplete="new-password">
+          </div>
+          <button type="submit" class="btn-buy auth-submit">Sign up</button>
+        </form>
+
+        <div class="auth-divider">or continue with</div>
+        <div class="auth-social">
+          <button type="button" class="auth-social-btn" aria-label="Continue with Google"
+            onclick="authSocialStub('Google')">
+            <svg viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path
+                d="M11.16 5.70401C11.16 5.24521 11.122 4.91041 11.0398 4.56322H5.69388V6.63399H8.83181C8.76857 7.14861 8.42694 7.92361 7.66774 8.44438L7.6571 8.51371L9.34738 9.79696L9.46449 9.80842C10.54 8.835 11.16 7.4028 11.16 5.70401Z"
+                fill="white" />
+              <path
+                d="M5.69388 11.16C7.23121 11.16 8.5218 10.664 9.46449 9.80841L7.66774 8.44438C7.18694 8.77298 6.54162 9.00238 5.69388 9.00238C4.18818 9.00238 2.91023 8.02901 2.45467 6.68361L2.3879 6.68917L0.630319 8.02217L0.607334 8.08478C1.54365 9.90757 3.46692 11.16 5.69388 11.16Z"
+                fill="white" />
+              <path
+                d="M2.45467 6.68359C2.33447 6.33639 2.2649 5.96437 2.2649 5.57998C2.2649 5.19556 2.33447 4.82358 2.44835 4.47638L2.44516 4.40244L0.665558 3.04802L0.607332 3.07516C0.221431 3.83157 0 4.68099 0 5.57998C0 6.47898 0.221431 7.32836 0.607332 8.08476L2.45467 6.68359Z"
+                fill="white" />
+              <path
+                d="M5.69388 2.15759C6.76305 2.15759 7.48426 2.61018 7.8955 2.98841L9.50243 1.4508C8.51552 0.551802 7.2312 0 5.69388 0C3.46692 0 1.54365 1.25239 0.607334 3.07518L2.44835 4.47639C2.91023 3.131 4.18817 2.15759 5.69388 2.15759Z"
+                fill="white" />
+            </svg>
+          </button>
+          <button type="button" class="auth-social-btn" aria-label="Continue with Facebook"
+            onclick="authSocialStub('Facebook')">
+            <svg viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path
+                d="M12.2827 13.0002C12.6789 13.0002 13.0001 12.6789 13.0001 12.2827V0.717485C13.0001 0.321139 12.6788 0 12.2827 0H0.717485C0.321139 0 0 0.321188 0 0.717485V12.2827C0 12.6789 0.321139 13.0002 0.717485 13.0002L12.2827 13.0002Z"
+                fill="white" />
+              <path
+                d="M8.96975 13.0001V7.96573H10.6596L10.9126 6.00373H8.9697V4.75108C8.9697 4.18304 9.12742 3.79594 9.94203 3.79594L10.9809 3.79546V2.04066C10.8013 2.0168 10.1845 1.96336 9.46707 1.96336C7.96912 1.96336 6.9436 2.87768 6.9436 4.55683V6.00373H5.24945V7.96573H6.9436V13.0001L8.96975 13.0001Z"
+                style="fill: var(--primary)" />
+            </svg>
+          </button>
+          <button type="button" class="auth-social-btn" aria-label="Continue with Discord"
+            onclick="authSocialStub('Discord')">
+            <svg viewBox="0 0 14 11" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path
+                d="M11.8401 0.905213C10.9349 0.485724 9.97084 0.176627 8.95524 0C8.83013 0.220784 8.68294 0.522521 8.58726 0.765383C7.51278 0.603475 6.44566 0.603475 5.39327 0.765383C5.29024 0.522521 5.14305 0.220784 5.01794 0C4.00233 0.176627 3.03825 0.485724 2.13303 0.905213C0.307889 3.65765 -0.185194 6.34387 0.0576678 8.98591C1.27198 9.89113 2.44213 10.4357 3.59756 10.7963C3.88458 10.4063 4.1348 9.9868 4.35559 9.55259C3.9361 9.39804 3.53869 9.19934 3.16336 8.97119C3.26639 8.8976 3.36206 8.81665 3.45773 8.74305C5.76123 9.81753 8.25609 9.81753 10.5302 8.74305C10.6258 8.82401 10.7215 8.8976 10.8245 8.97119C10.4492 9.19934 10.0444 9.39068 9.63231 9.55259C9.85309 9.9868 10.1033 10.4063 10.3903 10.7963C11.5458 10.4357 12.7233 9.89113 13.9302 8.98591C14.2172 5.91702 13.4371 3.26024 11.8549 0.905213H11.8401ZM4.66468 7.36683C3.9729 7.36683 3.40622 6.72656 3.40622 5.9391C3.40622 5.15164 3.95818 4.51137 4.66468 4.51137C5.37119 4.51137 5.9305 5.15164 5.92314 5.9391C5.92314 6.7192 5.37119 7.36683 4.66468 7.36683ZM9.30849 7.36683C8.6167 7.36683 8.05002 6.72656 8.05002 5.9391C8.05002 5.15164 8.60198 4.51137 9.30849 4.51137C10.015 4.51137 10.5743 5.15164 10.567 5.9391C10.567 6.7192 10.015 7.36683 9.30849 7.36683Z"
+                fill="white" />
+            </svg>
+          </button>
+        </div>
+
+        <div id="authErrorMsg"
+          style="color: var(--accent-rose); font-size: 0.8rem; margin-top: 0.75rem; text-align: center;"></div>
       </div>
-      <div class="auth-subtitle">Creative Commissions, Escrow & Digital Goods Hub</div>
 
-      <div class="auth-toggle">
-        <button type="button" class="auth-toggle-btn active" id="btnTabLogin" onclick="switchAuthMode('login')">Sign In</button>
-        <button type="button" class="auth-toggle-btn" id="btnTabSignup" onclick="switchAuthMode('signup')">Sign Up</button>
+      <!-- SHADER SLOT: canvas is injected by JS; logo + tagline sit above it -->
+      <div class="auth-shader" id="authShader">
+        <div class="auth-shader-overlay">
+          <div class="auth-shader-logo" id="authShaderLogo" aria-hidden="true">
+            <svg viewBox="17 25 62 45" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path
+                d="M43.1396 34.3262C49.1699 38.0371 51.9531 43.6035 52.6953 51.9531C53.623 58.4473 55.6641 64.0137 57.0557 65.4053C57.9834 66.1475 59.375 66.6113 60.3027 66.4258L54.7363 51.9531C53.3447 46.3867 51.0254 40.8203 43.1396 34.3262Z"
+                fill="currentColor" />
+              <path
+                d="M42.2119 51.9531C41.748 59.375 39.8926 64.0137 34.3262 66.0547C36.6455 66.0547 39.8926 65.4053 42.2119 62.9004V51.9531Z"
+                fill="currentColor" opacity="0.6" />
+              <path fill-rule="evenodd" clip-rule="evenodd"
+                d="M35.0684 35.0684C26.4404 35.0684 19.9463 41.5625 19.9463 50.5615C19.9463 59.8389 26.4404 66.4258 34.3262 66.4258C37.1094 66.4258 39.8926 65.6836 42.2119 64.0137V62.9004C43.6035 66.0547 44.5312 66.6113 46.1084 66.6113C48.2422 66.6113 49.8193 64.9414 49.8193 62.7148V49.6338C49.8193 40.8203 44.5312 35.0684 35.0684 35.0684ZM35.0684 42.6758C38.9648 42.6758 42.2119 45.9229 42.2119 50.5615C42.2119 55.6641 38.9648 58.6328 35.0684 58.6328C31.0791 58.6328 27.7393 55.6641 27.7393 50.5615C27.7393 45.9229 31.0791 42.6758 35.0684 42.6758Z"
+                fill="currentColor" />
+              <path
+                d="M46.8506 28.2959C44.5312 28.2959 42.8613 30.1514 42.8613 32.4707C42.8613 33.584 43.2324 34.5117 43.7891 35.2539L52.6787 60.7705C53.4223 62.905 54.5131 65.1126 56.6056 65.9673C57.6043 66.3752 58.6619 66.5199 59.8389 66.4258C61.6943 66.0547 62.9004 64.7559 63.3643 63.2715L74.6826 33.584C74.9609 32.6562 74.9609 31.9141 74.9609 31.543C74.9609 29.6875 73.291 28.2959 71.25 28.2959C69.3945 28.2959 67.9102 29.502 67.2607 31.3574L58.9111 53.623L50.5615 31.0791C49.9121 29.3164 48.7061 28.2959 46.8506 28.2959Z"
+                fill="currentColor" />
+            </svg>
+          </div>
+          <p class="auth-shader-tagline" id="authShaderTagline">Signing up makes it easier<br>to request and sell art.
+          </p>
+        </div>
       </div>
-
-      <!-- Login -->
-      <form id="formLogin" onsubmit="handleAuthLogin(event)">
-        <div class="form-group">
-          <label>Username</label>
-          <input type="text" id="loginUsername" placeholder="e.g. kuro" required autocomplete="username">
-        </div>
-        <div class="form-group">
-          <label>Password</label>
-          <input type="password" id="loginPassword" placeholder="••••••••" required autocomplete="current-password">
-        </div>
-        <button type="submit" class="btn-buy" style="margin-top: 0.5rem;">Sign In</button>
-      </form>
-
-      <!-- Signup -->
-      <form id="formSignup" style="display: none;" onsubmit="handleAuthSignup(event)">
-        <div class="form-group">
-          <label>Username</label>
-          <input type="text" id="signupUsername" placeholder="e.g. artist_momo" required autocomplete="username">
-        </div>
-        <div class="form-group">
-          <label>Display Name</label>
-          <input type="text" id="signupDisplayName" placeholder="e.g. Momo Live2D & 3D" required>
-        </div>
-        <div class="form-group">
-          <label>Account Role</label>
-          <select id="signupRole" required>
-            <option value="Client">Client (Buy assets & commission artists)</option>
-            <option value="Artist">Artist (Sell digital goods & accept briefs)</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>Password</label>
-          <input type="password" id="signupPassword" placeholder="••••••••" required autocomplete="new-password">
-        </div>
-        <button type="submit" class="btn-buy" style="margin-top: 0.5rem;">Create Account & Enter</button>
-      </form>
-
-      <div id="authErrorMsg" style="color: var(--accent-rose); font-size: 0.8rem; margin-top: 0.75rem; text-align: center;"></div>
     </div>
   </div>
 
@@ -1239,7 +1484,8 @@
 
     <div class="user-profile-bar">
       <!-- Dark / Light Theme Toggle Button -->
-      <button type="button" class="theme-toggle-btn" id="btnThemeToggle" onclick="toggleTheme()" title="Switch Light/Dark Mode">
+      <button type="button" class="theme-toggle-btn" id="btnThemeToggle" onclick="toggleTheme()"
+        title="Switch Light/Dark Mode">
         🌙
       </button>
 
@@ -1265,9 +1511,11 @@
       <div class="market-banner">
         <div>
           <h1 class="market-title">Curated Digital Assets & Creative Goods</h1>
-          <p class="market-desc">Explore models, animated GIFs, emote packs, overlays, and 3D rigs created by verified artists. Click any asset to inspect specs, licensing, reviews, and unlock.</p>
+          <p class="market-desc">Explore models, animated GIFs, emote packs, overlays, and 3D rigs created by verified
+            artists. Click any asset to inspect specs, licensing, reviews, and unlock.</p>
         </div>
-        <button class="btn-create" id="btnPublishProduct" style="display: none;" onclick="openPublishModal()">+ Put Out Digital Product</button>
+        <button class="btn-create" id="btnPublishProduct" style="display: none;" onclick="openPublishModal()">+ Put Out
+          Digital Product</button>
       </div>
 
       <div class="products-grid" id="productsContainer">
@@ -1283,19 +1531,22 @@
           <div>
             <div style="font-size: 1.4rem; font-weight: 800;" id="myProfDisplayName">Your Name</div>
             <div style="color: var(--text-dim); font-size: 0.85rem;" id="myProfUsername">@username</div>
-            <span class="user-role-tag role-Client" id="myProfRoleTag" style="margin-top: 4px; display: inline-block;">Client</span>
+            <span class="user-role-tag role-Client" id="myProfRoleTag"
+              style="margin-top: 4px; display: inline-block;">Client</span>
           </div>
         </div>
 
         <!-- Artist-only: Creator Categories -->
         <div id="artistCategoriesSection" style="display: none;">
           <div class="profile-field-label">🎨 Creator Specializations</div>
-          <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.6rem;">Select the categories that best describe your creative work. These appear on your public profile.</p>
+          <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.6rem;">Select the categories that best
+            describe your creative work. These appear on your public profile.</p>
           <div class="category-checkbox-grid" id="categoryCheckboxGrid">
             <!-- Injected by JS -->
           </div>
           <div style="margin-top: 1rem;">
-            <button class="btn-create" onclick="saveArtistCategories()" style="padding: 0.5rem 1.2rem;">Save Profile</button>
+            <button class="btn-create" onclick="saveArtistCategories()" style="padding: 0.5rem 1.2rem;">Save
+              Profile</button>
           </div>
         </div>
 
@@ -1303,7 +1554,8 @@
         <div id="clientProfileInfo" style="display: none;">
           <div class="profile-field-label">Your Account</div>
           <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5;">
-            As a <strong>Client</strong>, you can browse the marketplace, purchase digital assets, and commission artists for custom work.
+            As a <strong>Client</strong>, you can browse the marketplace, purchase digital assets, and commission
+            artists for custom work.
             To create and sell content, register as an <strong>Artist</strong> account.
           </p>
         </div>
@@ -1322,12 +1574,14 @@
             </div>
             <div style="font-size: 0.85rem; color: var(--text-dim); margin-top: 2px;" id="profUsername">@artist</div>
             <div class="category-chips" id="profCategoryChips" style="margin-top: 6px;"></div>
-            <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 6px;" id="profStats">Digital Assets • Available for Custom Briefs</p>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 6px;" id="profStats">Digital Assets •
+              Available for Custom Briefs</p>
           </div>
         </div>
         <div style="display: flex; gap: 0.75rem;">
           <button class="btn-secondary" onclick="switchTab('marketplace')">← Back to Market</button>
-          <button class="btn-create" id="btnProfileCommissionRequest" onclick="openCommissionForCurrentProfile()">Request Custom Work</button>
+          <button class="btn-create" id="btnProfileCommissionRequest"
+            onclick="openCommissionForCurrentProfile()">Request Custom Work</button>
         </div>
       </div>
 
@@ -1344,7 +1598,8 @@
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
         <div>
           <h2 style="font-size: 1.4rem; font-weight: 800;" id="commHeading">Your Commission Briefs</h2>
-          <p style="color: var(--text-muted); font-size: 0.85rem;">Click any request card to inspect its in-depth milestone audit trail.</p>
+          <p style="color: var(--text-muted); font-size: 0.85rem;">Click any request card to inspect its in-depth
+            milestone audit trail.</p>
         </div>
         <button class="btn-create" id="btnNewBrief" onclick="openNewCommModal()">+ Create Brief</button>
       </div>
@@ -1357,7 +1612,8 @@
     <section id="tab-vault" class="tab-content">
       <div style="margin-bottom: 1.5rem;">
         <h2 style="font-size: 1.4rem; font-weight: 800;">Purchased Digital Goods</h2>
-        <p style="color: var(--text-muted); font-size: 0.85rem;">Instant access to high-res source files, GIFs, models, and assets you own.</p>
+        <p style="color: var(--text-muted); font-size: 0.85rem;">Instant access to high-res source files, GIFs, models,
+          and assets you own.</p>
       </div>
       <div class="feed-panel" style="height: auto; min-height: 250px;">
         <table class="ledger-table">
@@ -1381,9 +1637,11 @@
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
         <div>
           <h2 style="font-size: 1.4rem; font-weight: 800;">Your Milestone Escrow Records</h2>
-          <p style="color: var(--text-muted); font-size: 0.85rem;">Secure escrow settlements for your own projects only.</p>
+          <p style="color: var(--text-muted); font-size: 0.85rem;">Secure escrow settlements for your own projects only.
+          </p>
         </div>
-        <button class="btn-create" style="background: rgba(16, 185, 129, 0.15); color: var(--accent-emerald);" onclick="testDeposit()">+ Deposit Funds</button>
+        <button class="btn-create" style="background: rgba(16, 185, 129, 0.15); color: var(--accent-emerald);"
+          onclick="testDeposit()">+ Deposit Funds</button>
       </div>
       <div class="feed-panel" style="height: auto; min-height: 250px;">
         <table class="ledger-table">
@@ -1409,7 +1667,8 @@
     <section id="tab-ownership" class="tab-content">
       <div style="margin-bottom: 1.5rem;">
         <h2 style="font-size: 1.4rem; font-weight: 800;">Character & IP Copyright Registry</h2>
-        <p style="color: var(--text-muted); font-size: 0.85rem;">Permanently certified ownership hashes for your completed projects.</p>
+        <p style="color: var(--text-muted); font-size: 0.85rem;">Permanently certified ownership hashes for your
+          completed projects.</p>
       </div>
       <div class="feed-panel" style="height: auto; min-height: 250px;">
         <table class="ledger-table">
@@ -1443,13 +1702,16 @@
 
           <div>
             <h2 id="detailModalTitle" style="font-size: 1.3rem; font-weight: 800;"></h2>
-            <div id="detailModalArtist" style="font-size: 0.85rem; color: var(--primary); font-weight: 600; margin-top: 2px;"></div>
-            <div id="detailModalDesc" style="font-size: 0.85rem; color: var(--text-muted); margin-top: 6px; line-height: 1.45;"></div>
+            <div id="detailModalArtist"
+              style="font-size: 0.85rem; color: var(--primary); font-weight: 600; margin-top: 2px;"></div>
+            <div id="detailModalDesc"
+              style="font-size: 0.85rem; color: var(--text-muted); margin-top: 6px; line-height: 1.45;"></div>
           </div>
 
           <!-- Vendor Info Box -->
           <div class="product-vendor-box">
-            <div style="font-weight: 800; font-size: 0.78rem; color: var(--primary); text-transform: uppercase; margin-bottom: 4px;">
+            <div
+              style="font-weight: 800; font-size: 0.78rem; color: var(--primary); text-transform: uppercase; margin-bottom: 4px;">
               📦 Vendor Specs & Licensing:
             </div>
             <div id="detailModalVendorInfo"></div>
@@ -1466,7 +1728,8 @@
             <div class="reviews-list" id="detailReviewsList"></div>
 
             <!-- Add Review Input -->
-            <form id="formAddReview" onsubmit="handleAddReview(event)" style="background: var(--bg-surface); padding: 0.75rem; border-radius: 8px;">
+            <form id="formAddReview" onsubmit="handleAddReview(event)"
+              style="background: var(--bg-surface); padding: 0.75rem; border-radius: 8px;">
               <input type="hidden" id="detailModalProductId">
               <div style="display: flex; gap: 0.75rem; margin-bottom: 0.5rem; align-items: center;">
                 <label style="font-size: 0.75rem; color: var(--text-dim); white-space: nowrap;">Your Rating:</label>
@@ -1479,9 +1742,11 @@
                 </select>
               </div>
               <div class="form-group" style="margin-bottom: 0.5rem;">
-                <input type="text" id="revCommentInput" placeholder="Write helpful feedback or question about this asset..." required>
+                <input type="text" id="revCommentInput"
+                  placeholder="Write helpful feedback or question about this asset..." required>
               </div>
-              <button type="submit" class="btn-create" style="padding: 0.4rem 0.8rem; font-size: 0.75rem;">Post Review</button>
+              <button type="submit" class="btn-create" style="padding: 0.4rem 0.8rem; font-size: 0.75rem;">Post
+                Review</button>
             </form>
           </div>
         </div>
@@ -1493,7 +1758,8 @@
             <div class="creator-profile-meta">
               <div class="creator-avatar-badge" id="modalCreatorAvatar">A</div>
               <div>
-                <div style="font-size: 0.85rem; font-weight: 800; color: var(--text-main);" id="modalCreatorName">Artist Name</div>
+                <div style="font-size: 0.85rem; font-weight: 800; color: var(--text-main);" id="modalCreatorName">Artist
+                  Name</div>
                 <div style="font-size: 0.75rem; color: var(--text-dim);" id="modalCreatorHandle">@artist</div>
               </div>
             </div>
@@ -1502,7 +1768,8 @@
             </button>
           </div>
 
-          <div style="font-size: 0.82rem; color: var(--text-dim); text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em;">
+          <div
+            style="font-size: 0.82rem; color: var(--text-dim); text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em;">
             Unlock Deliverable
           </div>
 
@@ -1511,7 +1778,8 @@
             <div class="checkout-price-callout" id="detailModalBasePrice">$0.00</div>
           </div>
 
-          <div id="testerInstantUnlockBanner" style="display: none; background: rgba(16, 185, 129, 0.12); color: var(--accent-emerald); padding: 0.75rem; border-radius: 8px; font-size: 0.8rem;">
+          <div id="testerInstantUnlockBanner"
+            style="display: none; background: rgba(16, 185, 129, 0.12); color: var(--accent-emerald); padding: 0.75rem; border-radius: 8px; font-size: 0.8rem;">
             ⚡ <strong>All-Download Testing Pass Active</strong><br>
             No purchase popup or fee required. Click below to add directly to your downloads.
           </div>
@@ -1538,7 +1806,8 @@
             ✓ Cryptographic purchase receipt
           </div>
 
-          <button type="button" class="btn-secondary" style="margin-top: auto;" onclick="closeModal('modalProductDetail')">
+          <button type="button" class="btn-secondary" style="margin-top: auto;"
+            onclick="closeModal('modalProductDetail')">
             Close
           </button>
         </div>
@@ -1561,17 +1830,26 @@
         <div class="form-group">
           <label>Product Media / Preview (Image, GIF, Animated PNG)</label>
           <div style="display: flex; gap: 0.5rem; margin-bottom: 0.4rem;">
-            <button type="button" class="composer-mini-btn" id="btnMediaModeFile" onclick="switchMediaInputMode('file')" style="flex:1;">📁 Upload from Device (Image / GIF)</button>
-            <button type="button" class="composer-mini-btn" id="btnMediaModeUrl" onclick="switchMediaInputMode('url')" style="flex:1;">🔗 Remote Web URL</button>
+            <button type="button" class="composer-mini-btn" id="btnMediaModeFile" onclick="switchMediaInputMode('file')"
+              style="flex:1;">📁 Upload from Device (Image / GIF)</button>
+            <button type="button" class="composer-mini-btn" id="btnMediaModeUrl" onclick="switchMediaInputMode('url')"
+              style="flex:1;">🔗 Remote Web URL</button>
           </div>
 
           <div id="mediaUploadZone" class="upload-zone">
-            <input type="file" id="pubMediaFile" accept="image/*,.gif,.png,.jpg,.jpeg,.webp,.svg" onchange="handleLocalMediaUpload(event)">
+            <input type="file" id="pubMediaFile" accept="image/*,.gif,.png,.jpg,.jpeg,.webp,.svg"
+              onchange="handleLocalMediaUpload(event)">
             <div style="font-size: 0.825rem; color: var(--primary); font-weight: 600;">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 4px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                style="vertical-align: middle; margin-right: 4px;">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="17 8 12 3 7 8"></polyline>
+                <line x1="12" y1="3" x2="12" y2="15"></line>
+              </svg>
               Choose image or GIF file from your device
             </div>
-            <div style="font-size: 0.72rem; color: var(--text-dim); margin-top: 2px;">Supports PNG, Animated GIF, JPG, WebP, SVG</div>
+            <div style="font-size: 0.72rem; color: var(--text-dim); margin-top: 2px;">Supports PNG, Animated GIF, JPG,
+              WebP, SVG</div>
           </div>
 
           <div id="mediaUrlZone" style="display: none;">
@@ -1583,8 +1861,11 @@
           <div class="upload-preview-wrap" id="mediaPreviewWrap" style="display: none; margin-top: 0.5rem;">
             <img class="upload-preview-thumb" id="mediaPreviewImg" src="" alt="Preview">
             <div style="flex: 1; min-width: 0;">
-              <div style="font-size: 0.78rem; font-weight: 700; color: var(--accent-emerald);" id="mediaPreviewStatus">File Loaded Successfully</div>
-              <div style="font-size: 0.72rem; color: var(--text-dim); text-overflow: ellipsis; overflow: hidden; white-space: nowrap;" id="mediaPreviewInfo">Ready for buyers</div>
+              <div style="font-size: 0.78rem; font-weight: 700; color: var(--accent-emerald);" id="mediaPreviewStatus">
+                File Loaded Successfully</div>
+              <div
+                style="font-size: 0.72rem; color: var(--text-dim); text-overflow: ellipsis; overflow: hidden; white-space: nowrap;"
+                id="mediaPreviewInfo">Ready for buyers</div>
             </div>
             <button type="button" class="btn-row-del" onclick="clearMediaSelection()" title="Remove file">✕</button>
           </div>
@@ -1592,7 +1873,8 @@
 
         <!-- Thumbnail Position Adjuster -->
         <div class="thumb-adjuster" id="thumbAdjuster">
-          <div style="font-size: 0.78rem; font-weight: 700; color: var(--primary);">🖼 Thumbnail Card Preview (Adjust Focus Point)</div>
+          <div style="font-size: 0.78rem; font-weight: 700; color: var(--primary);">🖼 Thumbnail Card Preview (Adjust
+            Focus Point)</div>
           <div class="thumb-preview-box">
             <img class="thumb-preview-img" id="thumbAdjPreview" src="" alt="Preview">
           </div>
@@ -1629,7 +1911,8 @@
               <div class="composer-sublabel">
                 <span>📝 Description & Usage Rules</span>
               </div>
-              <textarea id="pubVendorDesc" rows="2" placeholder="e.g. Transparent animated GIF + APNG files. Permitted for commercial VTuber streams and Twitch emotes."></textarea>
+              <textarea id="pubVendorDesc" rows="2"
+                placeholder="e.g. Transparent animated GIF + APNG files. Permitted for commercial VTuber streams and Twitch emotes."></textarea>
             </div>
 
             <!-- Bullet Points (Multiple bullet points can be added dynamically or pasted) -->
@@ -1637,8 +1920,10 @@
               <div class="composer-sublabel">
                 <span>• Bullet Points (Add as many as you need)</span>
                 <div style="display:flex; gap:0.4rem;">
-                  <button type="button" class="composer-mini-btn" onclick="addVendorBulletRow()">+ Add Single Bullet</button>
-                  <button type="button" class="composer-mini-btn" onclick="addMultipleBulletRowsPrompt()">+ Add Multiple Bullets</button>
+                  <button type="button" class="composer-mini-btn" onclick="addVendorBulletRow()">+ Add Single
+                    Bullet</button>
+                  <button type="button" class="composer-mini-btn" onclick="addMultipleBulletRowsPrompt()">+ Add Multiple
+                    Bullets</button>
                 </div>
               </div>
               <div id="pubBulletContainer"></div>
@@ -1657,12 +1942,14 @@
 
         <div class="form-group">
           <label>Short Product Overview / Tagline</label>
-          <textarea id="pubDescription" rows="2" placeholder="Brief summary of creative aesthetic..." required></textarea>
+          <textarea id="pubDescription" rows="2" placeholder="Brief summary of creative aesthetic..."
+            required></textarea>
         </div>
 
         <div class="form-group">
           <label>Deliverable Package / Downloadable File Link (Direct Link or Storage Vault)</label>
-          <input type="text" id="pubDownloadUrl" placeholder="https://storage.link/asset.zip (or leave blank for test vault)">
+          <input type="text" id="pubDownloadUrl"
+            placeholder="https://storage.link/asset.zip (or leave blank for test vault)">
         </div>
 
         <div class="modal-actions">
@@ -1737,6 +2024,102 @@
       const current = document.documentElement.getAttribute('data-theme') || 'light';
       const next = current === 'dark' ? 'light' : 'dark';
       applyTheme(next);
+    }
+
+    // Auth shader: soft animated gradient in #authShader (brand purples).
+    // Cheap by design: renders at reduced resolution, 30fps cap, pauses when hidden.
+    (function initAuthShader() {
+      const host = document.getElementById('authShader');
+      if (!host) return;
+      const canvas = document.createElement('canvas');
+      const gl = canvas.getContext('webgl', { antialias: false, alpha: false, depth: false, stencil: false, powerPreference: 'low-power' });
+      if (!gl) return; // keep the flat fill
+
+      const vs = 'attribute vec2 a;void main(){gl_Position=vec4(a,0.,1.);}';
+      const fs = `
+        precision mediump float;
+        uniform vec2 r; uniform float t;
+        const vec3 LIGHT = vec3(0.898, 0.757, 0.961); // #e5c1f5 (light lavender)
+        const vec3 MAIN  = vec3(0.729, 0.529, 0.831); // #ba87d4 (brand purple)
+        const vec3 DEEP  = vec3(0.118, 0.094, 0.612); // #1e1899 (dark indigo)
+        const vec3 MIST  = vec3(0.965, 0.925, 0.995); // near-white highlight
+        float blob(vec2 p, vec2 c, float s){ vec2 d=p-c; return exp(-dot(d,d)/s); }
+        void main(){
+          vec2 uv = gl_FragCoord.xy / r;
+          vec2 p = (uv - 0.5) * vec2(r.x / r.y, 1.0);
+          float k = t * 0.55;
+          float a = blob(p, vec2(-0.45 + 0.18*sin(k*1.1), -0.10 + 0.22*cos(k*0.9)), 0.30);
+          float b = blob(p, vec2( 0.40 + 0.20*cos(k*0.8),  0.15 + 0.25*sin(k*1.2)), 0.38);
+          float c = blob(p, vec2( 0.05 + 0.25*sin(k*0.7),  0.40 + 0.15*cos(k*1.0)), 0.22);
+          float d = blob(p, vec2(-0.30 + 0.15*cos(k*0.6), -0.35 + 0.18*sin(k*0.85)), 0.26);
+          vec3 col = mix(LIGHT, MAIN, smoothstep(0.0, 0.9, a + c*0.5));
+          col = mix(col, DEEP, smoothstep(0.0, 0.85, d + a*0.4) * 0.95);
+          col = mix(col, MIST, smoothstep(0.1, 0.95, b) * 0.9);
+          // light dither to hide banding on smooth gradients
+          col += (fract(sin(dot(gl_FragCoord.xy, vec2(12.9898, 78.233))) * 43758.5453) - 0.5) / 255.0;
+          gl_FragColor = vec4(col, 1.0);
+        }`;
+      function sh(type, src) { const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s); return gl.getShaderParameter(s, gl.COMPILE_STATUS) ? s : null; }
+      const v = sh(gl.VERTEX_SHADER, vs), f = sh(gl.FRAGMENT_SHADER, fs);
+      if (!v || !f) return;
+      const prog = gl.createProgram();
+      gl.attachShader(prog, v); gl.attachShader(prog, f); gl.linkProgram(prog);
+      if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) return;
+      gl.useProgram(prog);
+      gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
+      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW); // one big triangle
+      const loc = gl.getAttribLocation(prog, 'a');
+      gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+      const uR = gl.getUniformLocation(prog, 'r'), uT = gl.getUniformLocation(prog, 't');
+
+      host.appendChild(canvas);
+      const SCALE = 0.5; // smooth gradients upscale cleanly; a quarter of the pixels to shade
+      function resize() {
+        const w = Math.max(2, Math.round(host.clientWidth * SCALE)), h = Math.max(2, Math.round(host.clientHeight * SCALE));
+        if (canvas.width !== w || canvas.height !== h) { canvas.width = w; canvas.height = h; gl.viewport(0, 0, w, h); }
+      }
+      const t0 = performance.now();
+      let raf = 0, last = 0, onScreen = false;
+      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const logo = document.getElementById('authShaderLogo');
+      const tagline = document.getElementById('authShaderTagline');
+      // Palette: indigo, lavender, white — cycle so text always contrasts the bg
+      const COLS = [
+        [229, 193, 245], // #e5c1f5 light lavender
+        [255, 255, 255], // white
+        [186, 135, 212], // #ba87d4 brand purple
+        [255, 255, 255], // white
+      ];
+      function lerpCol(a, b, x) { return a.map((v, i) => (v + (b[i] - v) * x) | 0); }
+      function toRgb(c) { return `rgb(${c[0]},${c[1]},${c[2]})`; }
+      function draw(now) {
+        resize();
+        const sec = reduced ? 8.0 : (now - t0) / 1000;
+        gl.uniform2f(uR, canvas.width, canvas.height);
+        gl.uniform1f(uT, sec);
+        gl.drawArrays(gl.TRIANGLES, 0, 3);
+        // rotate overlay color on same clock, slower cycle
+        const cyc = (sec * 0.18) % COLS.length;
+        const ci = Math.floor(cyc) % COLS.length, cn = (ci + 1) % COLS.length;
+        const col = toRgb(lerpCol(COLS[ci], COLS[cn], cyc - Math.floor(cyc)));
+        if (logo) logo.style.color = col;
+        if (tagline) tagline.style.color = col;
+      }
+      function frame(now) {
+        raf = 0;
+        if (!onScreen || document.hidden) return;
+        if (now - last >= 33) { last = now; draw(now); }
+        if (!reduced) raf = requestAnimationFrame(frame);
+      }
+      function sync() { if (!raf && onScreen && !document.hidden) raf = requestAnimationFrame(frame); }
+      new IntersectionObserver(es => { onScreen = es[0].isIntersecting; sync(); }).observe(host); // false when the overlay is display:none
+      document.addEventListener('visibilitychange', sync);
+      new ResizeObserver(() => { if (onScreen) draw(performance.now()); }).observe(host);
+      canvas.addEventListener('webglcontextlost', e => { e.preventDefault(); canvas.remove(); });
+    })();
+
+    function authSocialStub(provider) {
+      document.getElementById('authErrorMsg').textContent = provider + ' sign-in isn\'t available yet.';
     }
 
     function switchAuthMode(mode) {
@@ -2050,7 +2433,7 @@
             const zoom = vi.thumb_zoom || '1';
             imgStyle = `object-fit: cover; object-position: ${escapeHtml(pos)}; transform: scale(${escapeHtml(zoom)}); transform-origin: ${escapeHtml(pos)};`;
           }
-        } catch (e) {}
+        } catch (e) { }
 
         return `
           <div class="product-card" onclick="openProductDetailModal(${p.id})">
@@ -2157,7 +2540,7 @@
             const zoom = vi.thumb_zoom || '1';
             imgStyle = `object-fit: cover; object-position: ${escapeHtml(pos)}; transform: scale(${escapeHtml(zoom)}); transform-origin: ${escapeHtml(pos)};`;
           }
-        } catch (e) {}
+        } catch (e) { }
 
         return `
           <div class="product-card" onclick="openProductDetailModal(${p.id})">
@@ -2748,7 +3131,7 @@
     function renderLedger() {
       const tb = document.getElementById('escrowTableBody');
       if (!currentUser) return;
-      
+
       const myEscrow = escrowLedger.filter(e => e.client_id === currentUser.id || e.artist_id === currentUser.id);
 
       if (myEscrow.length === 0) {
@@ -2769,9 +3152,9 @@
             </span>
           </td>
           <td>
-            ${e.status === 'HELD' && currentUser.id === e.client_id ? 
-              `<button class="btn-action success" style="padding: 2px 6px;" onclick="releaseEscrow(${e.id})">Release</button>` : 
-              '<span style="color: var(--text-dim); font-size: 0.75rem;">Audited</span>'}
+            ${e.status === 'HELD' && currentUser.id === e.client_id ?
+          `<button class="btn-action success" style="padding: 2px 6px;" onclick="releaseEscrow(${e.id})">Release</button>` :
+          '<span style="color: var(--text-dim); font-size: 0.75rem;">Audited</span>'}
           </td>
         </tr>
       `).join('');
