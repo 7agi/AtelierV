@@ -79,11 +79,25 @@
     }
 
     /* Auth Overlay - split layout from Figma "aV Website Design" */
+    @keyframes authSlideIn {
+      from { opacity: 0; transform: translateY(18px) scale(0.985); }
+      to   { opacity: 1; transform: translateY(0)   scale(1); }
+    }
+    @keyframes authFadeOut {
+      from { opacity: 1; transform: scale(1); }
+      to   { opacity: 0; transform: scale(1.025); }
+    }
+
     #authOverlay {
       position: fixed;
       inset: 0;
       z-index: 1000;
       display: flex;
+      animation: authSlideIn 0.55s cubic-bezier(0.22,1,0.36,1) both;
+    }
+    #authOverlay.fading-out {
+      animation: authFadeOut 0.45s cubic-bezier(0.4,0,1,1) forwards;
+      pointer-events: none;
     }
 
     .auth-shell {
@@ -103,6 +117,14 @@
       --auth-divider: var(--bg-subtle-hover);
     }
 
+    @keyframes authPanelIn {
+      from { opacity: 0; transform: translateX(-22px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes authShaderIn {
+      from { opacity: 0; transform: translateX(18px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
     .auth-panel {
       flex: 0 0 42%;
       min-width: 340px;
@@ -115,6 +137,7 @@
       background: linear-gradient(160deg, #f8f3ff 0%, #ede4f8 40%, #faf0fb 100%);
       position: relative;
       overflow: hidden;
+      animation: authPanelIn 0.6s cubic-bezier(0.22,1,0.36,1) 0.08s both;
     }
     [data-theme="dark"] .auth-panel {
       background: linear-gradient(160deg, #1e1830 0%, #2a1e3f 40%, #1a1628 100%);
@@ -292,6 +315,7 @@
       background: var(--primary);
       position: relative;
       overflow: hidden;
+      animation: authShaderIn 0.65s cubic-bezier(0.22,1,0.36,1) 0.12s both;
     }
 
     .auth-shader canvas {
@@ -521,7 +545,7 @@
       overflow: hidden;
       background: linear-gradient(180deg, #f8f4ff 0%, #ede8f8 60%, #f5eeff 100%);
     }
-    [data-theme="dark"] #tab-marketplace {
+    [data-theme="dark"] .tab-content {
       background: linear-gradient(180deg, #18122b 0%, #1e1530 60%, #1a1228 100%);
     }
 
@@ -2332,7 +2356,11 @@
     function setSession(user) {
       currentUser = user;
       localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
-      document.getElementById('authOverlay').style.display = 'none';
+      (function() {
+        const ov = document.getElementById('authOverlay');
+        ov.classList.add('fading-out');
+        ov.addEventListener('animationend', () => { ov.style.display = 'none'; }, { once: true });
+      })();
 
       document.getElementById('navUserName').textContent = user.display_name;
       const tag = document.getElementById('navRoleTag');
