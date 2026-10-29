@@ -1665,12 +1665,6 @@
         <span class="cart-badge" id="cartBadge">0</span>
       </button>
 
-      <!-- My Cart -->
-      <button type="button" class="cart-btn" id="btnCart" onclick="switchTab('cart')" title="My Cart" aria-label="My Cart">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
-        <span class="cart-badge" id="cartBadge">0</span>
-      </button>
-
       <div class="user-pill">
         <div>
           <span style="font-weight: 700; font-size: 0.85rem;" id="navUserName">User</span>
@@ -2319,8 +2313,8 @@
       applyTheme(next);
     }
 
-    // Auth shader: soft animated gradient in #authShader (brand purples).
-    // Cheap by design: renders at reduced resolution, 30fps cap, pauses when hidden.
+    // Auth shader: animated brand-purple gradient with a rotating 3D cube in #authShader.
+    // Cheap by design: analytic ray/box (no raymarching), reduced resolution, ~50fps cap, pauses when hidden.
     (function initAuthShader() {
       const host = document.getElementById('authShader');
       if (!host) return;
@@ -2330,24 +2324,73 @@
 
       const vs = 'attribute vec2 a;void main(){gl_Position=vec4(a,0.,1.);}';
       const fs = `
+        #ifdef GL_FRAGMENT_PRECISION_HIGH
+        precision highp float;
+        #else
         precision mediump float;
+        #endif
         uniform vec2 r; uniform float t;
-        const vec3 LIGHT = vec3(0.898, 0.757, 0.961); // #e5c1f5 (light lavender)
-        const vec3 MAIN  = vec3(0.729, 0.529, 0.831); // #ba87d4 (brand purple)
-        const vec3 DEEP  = vec3(0.118, 0.094, 0.612); // #1e1899 (dark indigo)
-        const vec3 MIST  = vec3(0.965, 0.925, 0.995); // near-white highlight
+        const vec3 LIGHT  = vec3(0.898, 0.757, 0.961); // #e5c1f5 (light lavender)
+        const vec3 MAIN   = vec3(0.729, 0.529, 0.831); // #ba87d4 (brand purple)
+        const vec3 DEEP   = vec3(0.118, 0.094, 0.612); // #1e1899 (dark indigo)
+        const vec3 MIST   = vec3(0.965, 0.925, 0.995); // near-white highlight
+        const vec3 INK    = vec3(0.000, 0.000, 0.160); // shadow side of the cube
+        const vec3 VIOLET = vec3(0.450, 0.000, 0.800); // vivid purple streak
+        const float S = 0.70;                          // cube half-size
         float blob(vec2 p, vec2 c, float s){ vec2 d=p-c; return exp(-dot(d,d)/s); }
+        mat3 rotX(float a){ float c=cos(a), s=sin(a); return mat3(1.,0.,0., 0.,c,s, 0.,-s,c); }
+        mat3 rotY(float a){ float c=cos(a), s=sin(a); return mat3(c,0.,-s, 0.,1.,0., s,0.,c); }
+        mat3 rotZ(float a){ float c=cos(a), s=sin(a); return mat3(c,s,0., -s,c,0., 0.,0.,1.); }
         void main(){
           vec2 uv = gl_FragCoord.xy / r;
           vec2 p = (uv - 0.5) * vec2(r.x / r.y, 1.0);
           float k = t * 0.55;
+
+          // ---- background: soft drifting gradient ----
           float a = blob(p, vec2(-0.45 + 0.18*sin(k*1.1), -0.10 + 0.22*cos(k*0.9)), 0.30);
           float b = blob(p, vec2( 0.40 + 0.20*cos(k*0.8),  0.15 + 0.25*sin(k*1.2)), 0.38);
           float c = blob(p, vec2( 0.05 + 0.25*sin(k*0.7),  0.40 + 0.15*cos(k*1.0)), 0.22);
           float d = blob(p, vec2(-0.30 + 0.15*cos(k*0.6), -0.35 + 0.18*sin(k*0.85)), 0.26);
-          vec3 col = mix(LIGHT, MAIN, smoothstep(0.0, 0.9, a + c*0.5));
-          col = mix(col, DEEP, smoothstep(0.0, 0.85, d + a*0.4) * 0.95);
-          col = mix(col, MIST, smoothstep(0.1, 0.95, b) * 0.9);
+          vec3 bg = mix(LIGHT, MAIN, smoothstep(0.0, 0.9, a + c*0.5));
+          bg = mix(bg, DEEP, smoothstep(0.0, 0.85, d + a*0.4) * 0.95);
+          bg = mix(bg, MIST, smoothstep(0.1, 0.95, b) * 0.9);
+          vec3 col = bg;
+
+          // ---- rotating cube: analytic ray/box hit, spun about a tilted axis ----
+          mat3 Q = rotZ(0.28) * rotX(0.62) * rotY(t * 0.5);   // local -> world
+          vec3 ro = vec3(0.0, 0.0, 4.4);
+          vec3 rd = normalize(vec3(p, -1.5));
+          vec3 lro = ro * Q;                                   // world -> local
+          vec3 lrd = rd * Q;
+          vec3 m = 1.0 / lrd;
+          vec3 n = m * lro;
+          vec3 kk = abs(m) * S;
+          vec3 t1 = -n - kk;
+          vec3 t2 = -n + kk;
+          float tN = max(max(t1.x, t1.y), t1.z);
+          float tF = min(min(t2.x, t2.y), t2.z);
+          float cov = smoothstep(0.0, 4.0 / r.y, tF - tN);     // anti-aliased silhouette
+          if (cov > 0.0) {
+            vec3 nl = -sign(lrd) * step(t1.yzx, t1.xyz) * step(t1.zxy, t1.xyz);
+            vec3 ph = lro + lrd * tN;
+            vec3 nw = Q * nl;
+            vec3 pw = Q * ph;
+            vec3 L = normalize(vec3(-0.35, 0.85, 0.55));
+            float lit = dot(nw, L) * 0.62 + 0.36;
+            lit += 0.14 * sin(dot(pw, vec3(1.7, 1.1, 1.4)) * 1.6 - t * 0.35); // light streak sliding over faces
+            float nd = max(dot(nw, -rd), 0.0);
+            lit += (1.0 - nd) * (1.0 - nd) * 0.12;
+            lit = clamp(lit, 0.0, 1.0);
+            vec3 cc = mix(INK, DEEP, smoothstep(0.05, 0.38, lit));
+            cc = mix(cc, VIOLET, smoothstep(0.32, 0.58, lit));
+            cc = mix(cc, MAIN, smoothstep(0.52, 0.78, lit));
+            cc = mix(cc, LIGHT, smoothstep(0.74, 1.0, lit));
+            vec3 q = abs(ph) / S;
+            vec3 on = 1.0 - abs(nl);
+            float e = max(max(q.x*on.x, q.y*on.y), q.z*on.z);
+            cc = mix(cc, MIST, smoothstep(0.965, 0.995, e) * 0.35);            // thin edge highlight
+            col = mix(bg, cc, cov);
+          }
           // light dither to hide banding on smooth gradients
           col += (fract(sin(dot(gl_FragCoord.xy, vec2(12.9898, 78.233))) * 43758.5453) - 0.5) / 255.0;
           gl_FragColor = vec4(col, 1.0);
@@ -2366,7 +2409,7 @@
       const uR = gl.getUniformLocation(prog, 'r'), uT = gl.getUniformLocation(prog, 't');
 
       host.appendChild(canvas);
-      const SCALE = 0.5; // smooth gradients upscale cleanly; a quarter of the pixels to shade
+      const SCALE = 0.75; // a bit higher than the gradient alone needed, so cube edges stay crisp
       function resize() {
         const w = Math.max(2, Math.round(host.clientWidth * SCALE)), h = Math.max(2, Math.round(host.clientHeight * SCALE));
         if (canvas.width !== w || canvas.height !== h) { canvas.width = w; canvas.height = h; gl.viewport(0, 0, w, h); }
@@ -2401,7 +2444,7 @@
       function frame(now) {
         raf = 0;
         if (!onScreen || document.hidden) return;
-        if (now - last >= 33) { last = now; draw(now); }
+        if (now - last >= 20) { last = now; draw(now); }
         if (!reduced) raf = requestAnimationFrame(frame);
       }
       function sync() { if (!raf && onScreen && !document.hidden) raf = requestAnimationFrame(frame); }
