@@ -979,7 +979,7 @@ async fn list_commissions(
     };
 
     let user_opt = sqlx::query_as::<_, User>(
-        "SELECT id, username, display_name, role, password_hash, all_download_access, created_at FROM users WHERE id = ?"
+        "SELECT id, username, display_name, role, password_hash, all_download_access, creator_categories, created_at FROM users WHERE id = ?"
     )
     .bind(user_id)
     .fetch_optional(&state.db)

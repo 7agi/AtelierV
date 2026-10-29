@@ -2660,6 +2660,10 @@
       };
     }
 
+    async function safeJson(res) {
+      try { return res.ok ? await res.json() : null; } catch (e) { return null; }
+    }
+
     async function fetchAllData() {
       if (!currentUser) return;
       try {
@@ -2673,12 +2677,12 @@
           fetch('/api/users/artists')
         ]);
 
-        products = await pRes.json();
-        commissions = await cRes.json();
-        purchases = await puRes.json();
-        escrowLedger = await eRes.json();
-        ownershipLogs = await oRes.json();
-        availableArtists = await aRes.json();
+        products        = await safeJson(pRes)  ?? products;
+        commissions     = await safeJson(cRes)  ?? commissions;
+        purchases       = await safeJson(puRes) ?? purchases;
+        escrowLedger    = await safeJson(eRes)  ?? escrowLedger;
+        ownershipLogs   = await safeJson(oRes)  ?? ownershipLogs;
+        availableArtists = await safeJson(aRes) ?? availableArtists;
 
         renderProducts();
         renderMyProducts();
