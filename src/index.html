@@ -338,17 +338,21 @@
     /* Header & Navigation */
     header {
       height: 60px;
-      background: rgba(var(--bg-surface-rgb, 255,255,255), 0.82);
+      background: color-mix(in srgb, var(--bg-surface) 85%, transparent);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      gap: 0;
       padding: 0 1.6rem;
       position: sticky;
       top: 0;
       z-index: 50;
-      border-bottom: 1px solid rgba(186,135,212,0.1);
+      border-bottom: 1px solid rgba(186,135,212,0.12);
+    }
+    /* dark mode fallback for browsers without color-mix */
+    [data-theme="dark"] header {
+      background: rgba(18, 14, 30, 0.88);
     }
 
     .brand-logo {
@@ -1478,8 +1482,9 @@
 
   <!-- Header -->
   <header>
-    <div style="display: flex; align-items: center; gap: 1rem;">
-      <a class="brand-logo" onclick="switchTab('marketplace')" aria-label="AtelierV">
+    <!-- Logo + nav tabs flow left together -->
+    <div style="display:flex;align-items:center;gap:0;flex:1;min-width:0;">
+      <a class="brand-logo" onclick="switchTab('marketplace')" aria-label="AtelierV" style="flex-shrink:0;margin-right:0.5rem;">
         <svg viewBox="17 25 62 45" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:36px;height:auto;">
           <path d="M43.1396 34.3262C49.1699 38.0371 51.9531 43.6035 52.6953 51.9531C53.623 58.4473 55.6641 64.0137 57.0557 65.4053C57.9834 66.1475 59.375 66.6113 60.3027 66.4258L54.7363 51.9531C53.3447 46.3867 51.0254 40.8203 43.1396 34.3262Z" fill="#E5C1F5"/>
           <path d="M42.2119 51.9531C41.748 59.375 39.8926 64.0137 34.3262 66.0547C36.6455 66.0547 39.8926 65.4053 42.2119 62.9004V51.9531Z" fill="#E5C1F5"/>
@@ -1487,10 +1492,9 @@
           <path d="M46.8506 28.2959C44.5312 28.2959 42.8613 30.1514 42.8613 32.4707C42.8613 33.584 43.2324 34.5117 43.7891 35.2539L52.6787 60.7705C53.4223 62.905 54.5131 65.1126 56.6056 65.9673C57.6043 66.3752 58.6619 66.5199 59.8389 66.4258C61.6943 66.0547 62.9004 64.7559 63.3643 63.2715L74.6826 33.584C74.9609 32.6562 74.9609 31.9141 74.9609 31.543C74.9609 29.6875 73.291 28.2959 71.25 28.2959C69.3945 28.2959 67.9102 29.502 67.2607 31.3574L58.9111 53.623L50.5615 31.0791C49.9121 29.3164 48.7061 28.2959 46.8506 28.2959Z" fill="#BA87D4"/>
         </svg>
       </a>
-      <span class="user-role-tag role-Client" id="navRoleBadge" style="display:none;">User Portal</span>
-    </div>
+      <span id="navRoleBadge" style="display:none;"></span>
 
-    <!-- Main Navigation Tabs -->
+    <!-- Main Navigation Tabs (inside the left group) -->
     <div class="nav-tabs">
       <button class="nav-btn active" id="tabBtnMarket" onclick="switchTab('marketplace')">
         Digital Market
@@ -1514,6 +1518,7 @@
         Artist Page
       </button>
     </div>
+    </div><!-- end logo+nav group -->
 
     <div class="user-profile-bar">
       <!-- Dark / Light Theme Toggle Button -->
