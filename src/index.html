@@ -1657,6 +1657,15 @@
           </p>
         </div>
       </div>
+
+      <!-- Artist-only: My Listed Products -->
+      <div id="myListingsSection" style="display: none; margin-top: 2rem;">
+        <h3 style="font-size: 1.15rem; font-weight: 800; margin-bottom: 1rem;">🛒 My Listed Products</h3>
+        <div class="products-grid" id="myProductsContainer">
+          <!-- Injected via JS -->
+        </div>
+      </div>
+
           </div><!-- end market-inner -->
     </section>
 
@@ -2672,6 +2681,7 @@
         availableArtists = await aRes.json();
 
         renderProducts();
+        renderMyProducts();
         if (activeProfileArtist) {
           renderArtistProfileProducts();
         }
@@ -2682,6 +2692,48 @@
       } catch (err) {
         console.error('Fetch error:', err);
       }
+    }
+
+    // Artist's own listed products (My Profile tab)
+    function renderMyProducts() {
+      const section = document.getElementById('myListingsSection');
+      const c = document.getElementById('myProductsContainer');
+      if (!section || !c || !currentUser || currentUser.role !== 'Artist') return;
+
+      section.style.display = 'block';
+
+      const myProducts = products.filter(p => p.artist_id === parseInt(currentUser.id, 10));
+      if (myProducts.length === 0) {
+        c.innerHTML = `<div style="grid-column: 1/-1; color: var(--text-dim); text-align: center; padding: 3rem;">You haven't listed any products yet. Use the <strong>+ Put Out Digital Product</strong> button to publish your first asset.</div>`;
+        return;
+      }
+
+      c.innerHTML = myProducts.map(p => {
+        let imgStyle = '';
+        try {
+          const vi = JSON.parse(p.vendor_info);
+          if (vi && (vi.thumb_pos || vi.thumb_zoom)) {
+            const pos = vi.thumb_pos || '50% 50%';
+            const zoom = vi.thumb_zoom || '1';
+            imgStyle = `object-fit: cover; object-position: ${escapeHtml(pos)}; transform: scale(${escapeHtml(zoom)}); transform-origin: ${escapeHtml(pos)};`;
+          }
+        } catch (e) {}
+
+        return `
+          <div class="product-card" onclick="openProductDetailModal(${p.id})">
+            <div class="product-media-wrap">
+              <img class="product-media" src="${escapeHtml(p.media_url)}" alt="${escapeHtml(p.title)}" loading="lazy" style="${imgStyle}">
+              <div class="product-price-tag">From $${p.min_price.toFixed(2)}</div>
+            </div>
+            <div class="product-body">
+              <div class="product-card-title">${escapeHtml(p.title)}</div>
+              <div style="font-size:0.78rem; color: var(--text-dim); margin-top: 4px;">
+                ★ ${p.average_rating.toFixed(1)} · ${p.review_count} reviews
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
     }
 
     // Home Page Product Cards
@@ -3085,7 +3137,7 @@
         });
 
         const payload = {
-          artist_id: currentUser.id,
+          artist_id: parseInt(currentUser.id, 10),
           title: title,
           media_url: finalMedia,
           min_price: parseFloat(minPrice),
