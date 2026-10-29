@@ -504,13 +504,7 @@
       flex-direction: column;
     }
 
-    /* non-market tabs keep a sensible max-width */
-    .tab-content:not(#tab-marketplace) {
-      max-width: 1360px;
-      width: 100%;
-      margin: 0 auto;
-      padding: 1.8rem;
-    }
+
 
     .tab-content {
       display: none;
@@ -520,8 +514,8 @@
       display: block;
     }
 
-    /* Marketplace tab: full-bleed wave background */
-    #tab-marketplace {
+    /* Marketplace + all tabs: full-bleed wave background */
+    .tab-content {
       position: relative;
       min-height: calc(100vh - 60px);
       overflow: hidden;
@@ -1591,6 +1585,23 @@
 
     <!-- TAB: MY OWN PROFILE (Artist & Client) -->
     <section id="tab-my-profile" class="tab-content">
+      <svg class="market-waves" viewBox="0 0 1400 780" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <defs><style>.mw{fill:none;stroke-linecap:round;animation:mwdrift linear infinite}@keyframes mwdrift{0%{transform:translateX(0)}100%{transform:translateX(-140px)}}</style></defs>
+        <g stroke="#ba87d4" stroke-opacity="0.18" stroke-width="2.5">
+          <path class="mw" style="animation-duration:18s" d="M-100 520 C 100 440 300 600 500 500 S 900 380 1100 480 S 1400 560 1600 480"/>
+          <path class="mw" style="animation-duration:22s;animation-delay:-4s" d="M-100 580 C 120 500 320 640 540 560 S 940 440 1140 540 S 1440 600 1640 540"/>
+          <path class="mw" style="animation-duration:26s;animation-delay:-8s" d="M-100 640 C 140 560 340 680 560 610 S 960 510 1160 600 S 1460 660 1660 600"/>
+        </g>
+        <g stroke="#ba87d4" stroke-opacity="0.30" stroke-width="1.8">
+          <path class="mw" style="animation-duration:14s;animation-delay:-2s" d="M-100 600 C 80 520 260 660 460 580 S 860 460 1060 560 S 1360 640 1560 560"/>
+          <path class="mw" style="animation-duration:17s;animation-delay:-6s" d="M-100 660 C 90 580 280 710 500 640 S 900 530 1100 620 S 1400 690 1600 620"/>
+        </g>
+        <g stroke="#e5c1f5" stroke-opacity="0.22" stroke-width="48" fill="none">
+          <path class="mw" style="animation-duration:24s;animation-delay:-10s" d="M-200 700 C 100 580 400 760 700 660 S 1100 520 1400 640 S 1700 720 2000 640"/>
+          <path class="mw" style="animation-duration:30s;animation-delay:-14s" d="M-200 750 C 120 650 420 800 720 710 S 1120 590 1420 690 S 1720 760 2020 680"/>
+        </g>
+      </svg>
+      <div class="market-inner">
       <div class="my-profile-section">
         <div style="display: flex; align-items: center; gap: 1.1rem;">
           <div class="profile-avatar-large" id="myProfAvatar">?</div>
@@ -1622,10 +1633,28 @@
           </p>
         </div>
       </div>
+          </div><!-- end market-inner -->
     </section>
 
     <!-- TAB: DEDICATED ARTIST PROFILE PAGE -->
     <section id="tab-profile" class="tab-content">
+      <svg class="market-waves" viewBox="0 0 1400 780" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <defs><style>.mw{fill:none;stroke-linecap:round;animation:mwdrift linear infinite}@keyframes mwdrift{0%{transform:translateX(0)}100%{transform:translateX(-140px)}}</style></defs>
+        <g stroke="#ba87d4" stroke-opacity="0.18" stroke-width="2.5">
+          <path class="mw" style="animation-duration:18s" d="M-100 520 C 100 440 300 600 500 500 S 900 380 1100 480 S 1400 560 1600 480"/>
+          <path class="mw" style="animation-duration:22s;animation-delay:-4s" d="M-100 580 C 120 500 320 640 540 560 S 940 440 1140 540 S 1440 600 1640 540"/>
+          <path class="mw" style="animation-duration:26s;animation-delay:-8s" d="M-100 640 C 140 560 340 680 560 610 S 960 510 1160 600 S 1460 660 1660 600"/>
+        </g>
+        <g stroke="#ba87d4" stroke-opacity="0.30" stroke-width="1.8">
+          <path class="mw" style="animation-duration:14s;animation-delay:-2s" d="M-100 600 C 80 520 260 660 460 580 S 860 460 1060 560 S 1360 640 1560 560"/>
+          <path class="mw" style="animation-duration:17s;animation-delay:-6s" d="M-100 660 C 90 580 280 710 500 640 S 900 530 1100 620 S 1400 690 1600 620"/>
+        </g>
+        <g stroke="#e5c1f5" stroke-opacity="0.22" stroke-width="48" fill="none">
+          <path class="mw" style="animation-duration:24s;animation-delay:-10s" d="M-200 700 C 100 580 400 760 700 660 S 1100 520 1400 640 S 1700 720 2000 640"/>
+          <path class="mw" style="animation-duration:30s;animation-delay:-14s" d="M-200 750 C 120 650 420 800 720 710 S 1120 590 1420 690 S 1720 760 2020 680"/>
+        </g>
+      </svg>
+      <div class="market-inner">
       <div class="profile-banner">
         <div class="profile-hero">
           <div class="profile-avatar-large" id="profAvatar">?</div>
@@ -1651,10 +1680,28 @@
           <!-- Injected via JavaScript -->
         </div>
       </div>
+          </div><!-- end market-inner -->
     </section>
 
     <!-- TAB 2: COMMISSIONS -->
     <section id="tab-commissions" class="tab-content">
+      <svg class="market-waves" viewBox="0 0 1400 780" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <defs><style>.mw{fill:none;stroke-linecap:round;animation:mwdrift linear infinite}@keyframes mwdrift{0%{transform:translateX(0)}100%{transform:translateX(-140px)}}</style></defs>
+        <g stroke="#ba87d4" stroke-opacity="0.18" stroke-width="2.5">
+          <path class="mw" style="animation-duration:18s" d="M-100 520 C 100 440 300 600 500 500 S 900 380 1100 480 S 1400 560 1600 480"/>
+          <path class="mw" style="animation-duration:22s;animation-delay:-4s" d="M-100 580 C 120 500 320 640 540 560 S 940 440 1140 540 S 1440 600 1640 540"/>
+          <path class="mw" style="animation-duration:26s;animation-delay:-8s" d="M-100 640 C 140 560 340 680 560 610 S 960 510 1160 600 S 1460 660 1660 600"/>
+        </g>
+        <g stroke="#ba87d4" stroke-opacity="0.30" stroke-width="1.8">
+          <path class="mw" style="animation-duration:14s;animation-delay:-2s" d="M-100 600 C 80 520 260 660 460 580 S 860 460 1060 560 S 1360 640 1560 560"/>
+          <path class="mw" style="animation-duration:17s;animation-delay:-6s" d="M-100 660 C 90 580 280 710 500 640 S 900 530 1100 620 S 1400 690 1600 620"/>
+        </g>
+        <g stroke="#e5c1f5" stroke-opacity="0.22" stroke-width="48" fill="none">
+          <path class="mw" style="animation-duration:24s;animation-delay:-10s" d="M-200 700 C 100 580 400 760 700 660 S 1100 520 1400 640 S 1700 720 2000 640"/>
+          <path class="mw" style="animation-duration:30s;animation-delay:-14s" d="M-200 750 C 120 650 420 800 720 710 S 1120 590 1420 690 S 1720 760 2020 680"/>
+        </g>
+      </svg>
+      <div class="market-inner">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
         <div>
           <h2 style="font-size: 1.4rem; font-weight: 800;" id="commHeading">Your Commission Briefs</h2>
@@ -1665,10 +1712,28 @@
       <div class="commissions-grid" id="commissionsContainer">
         <!-- Injected via JavaScript -->
       </div>
+          </div><!-- end market-inner -->
     </section>
 
     <!-- TAB 3: VAULT / DOWNLOADS -->
     <section id="tab-vault" class="tab-content">
+      <svg class="market-waves" viewBox="0 0 1400 780" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <defs><style>.mw{fill:none;stroke-linecap:round;animation:mwdrift linear infinite}@keyframes mwdrift{0%{transform:translateX(0)}100%{transform:translateX(-140px)}}</style></defs>
+        <g stroke="#ba87d4" stroke-opacity="0.18" stroke-width="2.5">
+          <path class="mw" style="animation-duration:18s" d="M-100 520 C 100 440 300 600 500 500 S 900 380 1100 480 S 1400 560 1600 480"/>
+          <path class="mw" style="animation-duration:22s;animation-delay:-4s" d="M-100 580 C 120 500 320 640 540 560 S 940 440 1140 540 S 1440 600 1640 540"/>
+          <path class="mw" style="animation-duration:26s;animation-delay:-8s" d="M-100 640 C 140 560 340 680 560 610 S 960 510 1160 600 S 1460 660 1660 600"/>
+        </g>
+        <g stroke="#ba87d4" stroke-opacity="0.30" stroke-width="1.8">
+          <path class="mw" style="animation-duration:14s;animation-delay:-2s" d="M-100 600 C 80 520 260 660 460 580 S 860 460 1060 560 S 1360 640 1560 560"/>
+          <path class="mw" style="animation-duration:17s;animation-delay:-6s" d="M-100 660 C 90 580 280 710 500 640 S 900 530 1100 620 S 1400 690 1600 620"/>
+        </g>
+        <g stroke="#e5c1f5" stroke-opacity="0.22" stroke-width="48" fill="none">
+          <path class="mw" style="animation-duration:24s;animation-delay:-10s" d="M-200 700 C 100 580 400 760 700 660 S 1100 520 1400 640 S 1700 720 2000 640"/>
+          <path class="mw" style="animation-duration:30s;animation-delay:-14s" d="M-200 750 C 120 650 420 800 720 710 S 1120 590 1420 690 S 1720 760 2020 680"/>
+        </g>
+      </svg>
+      <div class="market-inner">
       <div style="margin-bottom: 1.5rem;">
         <h2 style="font-size: 1.4rem; font-weight: 800;">Purchased Digital Goods</h2>
         <p style="color: var(--text-muted); font-size: 0.85rem;">Instant access to high-res source files, GIFs, models, and assets you own.</p>
@@ -1688,10 +1753,28 @@
           </tbody>
         </table>
       </div>
+          </div><!-- end market-inner -->
     </section>
 
     <!-- TAB 4: ESCROW (Client & Artist's Own Records Only) -->
     <section id="tab-escrow" class="tab-content">
+      <svg class="market-waves" viewBox="0 0 1400 780" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <defs><style>.mw{fill:none;stroke-linecap:round;animation:mwdrift linear infinite}@keyframes mwdrift{0%{transform:translateX(0)}100%{transform:translateX(-140px)}}</style></defs>
+        <g stroke="#ba87d4" stroke-opacity="0.18" stroke-width="2.5">
+          <path class="mw" style="animation-duration:18s" d="M-100 520 C 100 440 300 600 500 500 S 900 380 1100 480 S 1400 560 1600 480"/>
+          <path class="mw" style="animation-duration:22s;animation-delay:-4s" d="M-100 580 C 120 500 320 640 540 560 S 940 440 1140 540 S 1440 600 1640 540"/>
+          <path class="mw" style="animation-duration:26s;animation-delay:-8s" d="M-100 640 C 140 560 340 680 560 610 S 960 510 1160 600 S 1460 660 1660 600"/>
+        </g>
+        <g stroke="#ba87d4" stroke-opacity="0.30" stroke-width="1.8">
+          <path class="mw" style="animation-duration:14s;animation-delay:-2s" d="M-100 600 C 80 520 260 660 460 580 S 860 460 1060 560 S 1360 640 1560 560"/>
+          <path class="mw" style="animation-duration:17s;animation-delay:-6s" d="M-100 660 C 90 580 280 710 500 640 S 900 530 1100 620 S 1400 690 1600 620"/>
+        </g>
+        <g stroke="#e5c1f5" stroke-opacity="0.22" stroke-width="48" fill="none">
+          <path class="mw" style="animation-duration:24s;animation-delay:-10s" d="M-200 700 C 100 580 400 760 700 660 S 1100 520 1400 640 S 1700 720 2000 640"/>
+          <path class="mw" style="animation-duration:30s;animation-delay:-14s" d="M-200 750 C 120 650 420 800 720 710 S 1120 590 1420 690 S 1720 760 2020 680"/>
+        </g>
+      </svg>
+      <div class="market-inner">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
         <div>
           <h2 style="font-size: 1.4rem; font-weight: 800;">Your Milestone Escrow Records</h2>
@@ -1717,10 +1800,28 @@
           </tbody>
         </table>
       </div>
+          </div><!-- end market-inner -->
     </section>
 
     <!-- TAB 5: COPYRIGHT REGISTRY -->
     <section id="tab-ownership" class="tab-content">
+      <svg class="market-waves" viewBox="0 0 1400 780" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <defs><style>.mw{fill:none;stroke-linecap:round;animation:mwdrift linear infinite}@keyframes mwdrift{0%{transform:translateX(0)}100%{transform:translateX(-140px)}}</style></defs>
+        <g stroke="#ba87d4" stroke-opacity="0.18" stroke-width="2.5">
+          <path class="mw" style="animation-duration:18s" d="M-100 520 C 100 440 300 600 500 500 S 900 380 1100 480 S 1400 560 1600 480"/>
+          <path class="mw" style="animation-duration:22s;animation-delay:-4s" d="M-100 580 C 120 500 320 640 540 560 S 940 440 1140 540 S 1440 600 1640 540"/>
+          <path class="mw" style="animation-duration:26s;animation-delay:-8s" d="M-100 640 C 140 560 340 680 560 610 S 960 510 1160 600 S 1460 660 1660 600"/>
+        </g>
+        <g stroke="#ba87d4" stroke-opacity="0.30" stroke-width="1.8">
+          <path class="mw" style="animation-duration:14s;animation-delay:-2s" d="M-100 600 C 80 520 260 660 460 580 S 860 460 1060 560 S 1360 640 1560 560"/>
+          <path class="mw" style="animation-duration:17s;animation-delay:-6s" d="M-100 660 C 90 580 280 710 500 640 S 900 530 1100 620 S 1400 690 1600 620"/>
+        </g>
+        <g stroke="#e5c1f5" stroke-opacity="0.22" stroke-width="48" fill="none">
+          <path class="mw" style="animation-duration:24s;animation-delay:-10s" d="M-200 700 C 100 580 400 760 700 660 S 1100 520 1400 640 S 1700 720 2000 640"/>
+          <path class="mw" style="animation-duration:30s;animation-delay:-14s" d="M-200 750 C 120 650 420 800 720 710 S 1120 590 1420 690 S 1720 760 2020 680"/>
+        </g>
+      </svg>
+      <div class="market-inner">
       <div style="margin-bottom: 1.5rem;">
         <h2 style="font-size: 1.4rem; font-weight: 800;">Character & IP Copyright Registry</h2>
         <p style="color: var(--text-muted); font-size: 0.85rem;">Permanently certified ownership hashes for your completed projects.</p>
@@ -1741,6 +1842,7 @@
           </tbody>
         </table>
       </div>
+          </div><!-- end market-inner -->
     </section>
   </main>
 
