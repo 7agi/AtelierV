@@ -337,16 +337,18 @@
 
     /* Header & Navigation */
     header {
-      height: 68px;
-      background: var(--bg-surface);
+      height: 60px;
+      background: rgba(var(--bg-surface-rgb, 255,255,255), 0.82);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0 1.8rem;
+      padding: 0 1.6rem;
       position: sticky;
       top: 0;
       z-index: 50;
-      box-shadow: var(--shadow-sm);
+      border-bottom: 1px solid rgba(186,135,212,0.1);
     }
 
     .brand-logo {
@@ -362,7 +364,7 @@
 
     .nav-tabs {
       display: flex;
-      gap: 0.2rem;
+      gap: 0;
       padding: 0;
       background: transparent;
     }
@@ -370,22 +372,23 @@
     .nav-btn {
       background: transparent;
       color: var(--text-muted);
-      padding: 0.42rem 1rem;
-      border-radius: 999px;
-      font-size: 0.82rem;
-      font-weight: 600;
+      padding: 0.42rem 0.7rem;
+      border-radius: 0;
+      font-size: 0.85rem;
+      font-weight: 500;
       cursor: pointer;
-      transition: 0.15s;
+      transition: color 0.15s;
     }
 
     .nav-btn:hover {
-      color: var(--text-main);
-      background: rgba(186, 135, 212, 0.12);
+      color: var(--primary);
+      background: transparent;
     }
 
     .nav-btn.active {
-      background: var(--primary);
-      color: #ffffff;
+      background: transparent;
+      color: var(--primary);
+      font-weight: 700;
     }
 
     .user-profile-bar {
@@ -417,11 +420,13 @@
       display: flex;
       align-items: center;
       gap: 0.4rem;
-      font-size: 0.72rem;
+      font-size: 0.75rem;
+      font-weight: 600;
       color: var(--text-dim);
-      padding: 4px 10px;
-      border-radius: 16px;
+      padding: 5px 12px;
+      border-radius: 999px;
       background: var(--bg-subtle);
+      border: 1px solid rgba(186,135,212,0.12);
     }
 
     .status-dot {
@@ -438,10 +443,9 @@
     .user-pill {
       display: flex;
       align-items: center;
-      gap: 0.6rem;
-      background: var(--bg-subtle);
-      padding: 0.35rem 0.75rem;
-      border-radius: 8px;
+      gap: 0.55rem;
+      background: transparent;
+      padding: 0;
     }
 
     .user-role-tag {
@@ -491,13 +495,17 @@
     /* Main Container */
     main {
       flex: 1;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* non-market tabs keep a sensible max-width */
+    .tab-content:not(#tab-marketplace) {
       max-width: 1360px;
       width: 100%;
       margin: 0 auto;
       padding: 1.8rem;
-      display: flex;
-      flex-direction: column;
-      gap: 1.8rem;
     }
 
     .tab-content {
@@ -508,30 +516,68 @@
       display: block;
     }
 
+    /* Marketplace tab: full-bleed wave background */
+    #tab-marketplace {
+      position: relative;
+      min-height: calc(100vh - 60px);
+      overflow: hidden;
+      background: linear-gradient(180deg, #f8f4ff 0%, #ede8f8 60%, #f5eeff 100%);
+    }
+    [data-theme="dark"] #tab-marketplace {
+      background: linear-gradient(180deg, #18122b 0%, #1e1530 60%, #1a1228 100%);
+    }
+
+    .market-waves {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .market-inner {
+      position: relative;
+      z-index: 1;
+      max-width: 1360px;
+      margin: 0 auto;
+      padding: 2.4rem 1.8rem 1.8rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.8rem;
+    }
+
     /* Market Banner */
     .market-banner {
-      background: var(--bg-surface);
-      border-radius: 14px;
-      padding: 1.6rem 2rem;
+      background: rgba(255,255,255,0.82);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-radius: 18px;
+      padding: 2rem 2.2rem;
       display: flex;
       justify-content: space-between;
-      align-items: center;
+      align-items: flex-start;
       gap: 1.5rem;
-      box-shadow: var(--shadow-sm);
+      box-shadow: 0 4px 32px rgba(186,135,212,0.1), 0 1px 4px rgba(0,0,0,0.04);
+      max-width: 560px;
+    }
+    [data-theme="dark"] .market-banner {
+      background: rgba(30,20,50,0.72);
     }
 
     .market-title {
-      font-size: 1.55rem;
+      font-size: 1.9rem;
       font-weight: 800;
-      margin-bottom: 0.35rem;
+      margin-bottom: 0.5rem;
       color: var(--text-main);
+      line-height: 1.2;
     }
 
     .market-desc {
       color: var(--text-muted);
       font-size: 0.88rem;
-      max-width: 650px;
-      line-height: 1.45;
+      max-width: 420px;
+      line-height: 1.5;
     }
 
     .products-grid {
@@ -1441,7 +1487,7 @@
           <path d="M46.8506 28.2959C44.5312 28.2959 42.8613 30.1514 42.8613 32.4707C42.8613 33.584 43.2324 34.5117 43.7891 35.2539L52.6787 60.7705C53.4223 62.905 54.5131 65.1126 56.6056 65.9673C57.6043 66.3752 58.6619 66.5199 59.8389 66.4258C61.6943 66.0547 62.9004 64.7559 63.3643 63.2715L74.6826 33.584C74.9609 32.6562 74.9609 31.9141 74.9609 31.543C74.9609 29.6875 73.291 28.2959 71.25 28.2959C69.3945 28.2959 67.9102 29.502 67.2607 31.3574L58.9111 53.623L50.5615 31.0791C49.9121 29.3164 48.7061 28.2959 46.8506 28.2959Z" fill="#BA87D4"/>
         </svg>
       </a>
-      <span class="user-role-tag role-Client" id="navRoleBadge">User Portal</span>
+      <span class="user-role-tag role-Client" id="navRoleBadge" style="display:none;">User Portal</span>
     </div>
 
     <!-- Main Navigation Tabs -->
@@ -1494,16 +1540,47 @@
   <main>
     <!-- TAB 1: HOME / DIGITAL MARKETPLACE -->
     <section id="tab-marketplace" class="tab-content active">
-      <div class="market-banner">
-        <div>
-          <h1 class="market-title">Curated Digital Assets & Creative Goods</h1>
-          <p class="market-desc">Explore models, animated GIFs, emote packs, overlays, and 3D rigs created by verified artists. Click any asset to inspect specs, licensing, reviews, and unlock.</p>
-        </div>
-        <button class="btn-create" id="btnPublishProduct" style="display: none;" onclick="openPublishModal()">+ Put Out Digital Product</button>
-      </div>
+      <!-- Animated wave background -->
+      <svg class="market-waves" viewBox="0 0 1400 780" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <defs>
+          <style>
+            .mw { fill: none; stroke-linecap: round; animation: mwdrift linear infinite; }
+            @keyframes mwdrift {
+              0%   { transform: translateX(0); }
+              100% { transform: translateX(-140px); }
+            }
+          </style>
+        </defs>
+        <!-- layer 1 – wide, light -->
+        <g stroke="#ba87d4" stroke-opacity="0.18" stroke-width="2.5">
+          <path class="mw" style="animation-duration:18s" d="M-100 520 C 100 440 300 600 500 500 S 900 380 1100 480 S 1400 560 1600 480"/>
+          <path class="mw" style="animation-duration:22s;animation-delay:-4s" d="M-100 580 C 120 500 320 640 540 560 S 940 440 1140 540 S 1440 600 1640 540"/>
+          <path class="mw" style="animation-duration:26s;animation-delay:-8s" d="M-100 640 C 140 560 340 680 560 610 S 960 510 1160 600 S 1460 660 1660 600"/>
+        </g>
+        <!-- layer 2 – tighter, more purple -->
+        <g stroke="#ba87d4" stroke-opacity="0.30" stroke-width="1.8">
+          <path class="mw" style="animation-duration:14s;animation-delay:-2s" d="M-100 600 C 80 520 260 660 460 580 S 860 460 1060 560 S 1360 640 1560 560"/>
+          <path class="mw" style="animation-duration:17s;animation-delay:-6s" d="M-100 660 C 90 580 280 710 500 640 S 900 530 1100 620 S 1400 690 1600 620"/>
+        </g>
+        <!-- layer 3 – filled soft purple blobs / wide strokes -->
+        <g stroke="#e5c1f5" stroke-opacity="0.22" stroke-width="48" fill="none">
+          <path class="mw" style="animation-duration:24s;animation-delay:-10s" d="M-200 700 C 100 580 400 760 700 660 S 1100 520 1400 640 S 1700 720 2000 640"/>
+          <path class="mw" style="animation-duration:30s;animation-delay:-14s" d="M-200 750 C 120 650 420 800 720 710 S 1120 590 1420 690 S 1720 760 2020 680"/>
+        </g>
+      </svg>
 
-      <div class="products-grid" id="productsContainer">
-        <!-- Injected via JavaScript -->
+      <div class="market-inner">
+        <div class="market-banner">
+          <div>
+            <h1 class="market-title">Curated Digital Assets &amp;<br>Creative Goods</h1>
+            <p class="market-desc">Explore models, animated GIFs, emote packs, overlays, and 3D rigs created by verified artists. Click any asset to inspect specs, licensing, reviews, and unlock.</p>
+          </div>
+          <button class="btn-create" id="btnPublishProduct" style="display: none;" onclick="openPublishModal()">+ Put Out Digital Product</button>
+        </div>
+
+        <div class="products-grid" id="productsContainer">
+          <!-- Injected via JavaScript -->
+        </div>
       </div>
     </section>
 
