@@ -1395,6 +1395,126 @@
       color: var(--primary);
       font-weight: 700;
     }
+
+    /* ===== Added: icon buttons, cart, profile sub-nav, star picker, password meter, toast ===== */
+    .theme-toggle-btn svg, .cart-btn svg { width: 18px; height: 18px; display: block; }
+    .cart-btn {
+      position: relative;
+      background: var(--bg-subtle);
+      color: var(--text-main);
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: 0.15s;
+    }
+    .cart-btn:hover, .cart-btn.active { background: var(--primary-light); color: var(--primary); }
+    .cart-badge {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      min-width: 17px;
+      height: 17px;
+      padding: 0 4px;
+      border-radius: 999px;
+      background: var(--accent-rose);
+      color: #fff;
+      font-size: 0.62rem;
+      font-weight: 800;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+    }
+    .cart-badge.show { display: flex; }
+
+    .profile-subnav { display: flex; gap: 0.4rem; flex-wrap: wrap; margin: 0 0 1.5rem; }
+    .profile-subnav button {
+      background: var(--bg-subtle);
+      color: var(--text-muted);
+      padding: 0.45rem 0.95rem;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.15s;
+    }
+    .profile-subnav button:hover { color: var(--primary); }
+    .profile-subnav button.active { background: var(--primary); color: #fff; }
+    .profile-panel { display: none; }
+    .profile-panel.active { display: block; }
+
+    .no-rating { color: var(--text-dim); font-style: italic; }
+    .star-picker { display: inline-flex; gap: 2px; }
+    .star-picker button { background: transparent; padding: 2px; cursor: pointer; color: var(--text-dim); line-height: 0; border-radius: 4px; }
+    .star-picker button svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linejoin: round; transition: transform 0.1s; }
+    .star-picker button.on { color: var(--accent-amber); }
+    .star-picker button.on svg { fill: currentColor; }
+    .star-picker button:hover svg { transform: scale(1.15); }
+    .star-picker button:focus-visible { outline: 2px solid var(--primary); }
+
+    .pw-meter { margin-top: 0.5rem; }
+    .pw-meter-bar { display: flex; gap: 4px; }
+    .pw-meter-bar span { flex: 1; height: 4px; border-radius: 2px; background: rgba(144, 139, 156, 0.3); transition: background 0.15s; }
+    .pw-meter-label { font-size: 0.72rem; margin-top: 4px; color: var(--text-dim); }
+    .pw-meter[data-level="short"] .pw-meter-label { color: var(--accent-rose); }
+    .pw-meter[data-level="weak"] .pw-meter-bar span:nth-child(1) { background: var(--accent-rose); }
+    .pw-meter[data-level="weak"] .pw-meter-label { color: var(--accent-rose); }
+    .pw-meter[data-level="normal"] .pw-meter-bar span:nth-child(-n+2) { background: var(--accent-amber); }
+    .pw-meter[data-level="normal"] .pw-meter-label { color: var(--accent-amber); }
+    .pw-meter[data-level="strong"] .pw-meter-bar span { background: var(--accent-emerald); }
+    .pw-meter[data-level="strong"] .pw-meter-label { color: var(--accent-emerald); }
+
+    .qty-stepper { display: inline-flex; align-items: center; background: var(--bg-subtle); border-radius: 8px; overflow: hidden; }
+    .qty-stepper button { width: 30px; height: 30px; background: transparent; color: var(--text-main); font-size: 1rem; font-weight: 700; cursor: pointer; }
+    .qty-stepper button:hover { background: var(--primary-light); color: var(--primary); }
+    .qty-stepper span { min-width: 30px; text-align: center; font-weight: 700; font-size: 0.85rem; }
+    .btn-cart-add { width: 100%; margin-top: 0.5rem; display: flex; align-items: center; justify-content: center; gap: 0.45rem; font-weight: 700; }
+    .btn-cart-add svg { width: 16px; height: 16px; }
+
+    .cart-layout { display: grid; grid-template-columns: 1fr 320px; gap: 1.5rem; align-items: start; }
+    @media (max-width: 820px) { .cart-layout { grid-template-columns: 1fr; } }
+    .cart-list { display: flex; flex-direction: column; gap: 0.75rem; }
+    .cart-item { display: flex; gap: 1rem; align-items: center; background: var(--bg-surface); border-radius: 12px; padding: 0.85rem; box-shadow: var(--shadow-sm); }
+    .cart-thumb { width: 84px; height: 84px; border-radius: 8px; object-fit: cover; background: var(--bg-subtle); flex-shrink: 0; }
+    .cart-info { flex: 1; min-width: 0; }
+    .cart-title { font-weight: 700; font-size: 0.95rem; cursor: pointer; }
+    .cart-title:hover { color: var(--primary); }
+    .cart-sub { font-size: 0.75rem; color: var(--text-dim); margin-top: 2px; }
+    .cart-actions { margin-top: 0.5rem; display: flex; gap: 0.75rem; align-items: center; }
+    .cart-remove { background: transparent; color: var(--text-dim); font-size: 0.75rem; font-weight: 600; cursor: pointer; }
+    .cart-remove:hover { color: var(--accent-rose); }
+    .cart-line { font-family: 'JetBrains Mono', monospace; font-weight: 700; color: var(--primary); min-width: 80px; text-align: right; }
+    .cart-summary { background: var(--bg-surface); border-radius: 14px; padding: 1.3rem; box-shadow: var(--shadow-sm); display: flex; flex-direction: column; gap: 0.7rem; position: sticky; top: 1rem; }
+    .cart-summary-row { display: flex; justify-content: space-between; font-size: 0.88rem; color: var(--text-muted); }
+    .cart-summary-total { font-size: 1.15rem; font-weight: 800; color: var(--text-main); }
+    .cart-empty { text-align: center; color: var(--text-dim); padding: 3.5rem 1rem; display: flex; flex-direction: column; align-items: center; gap: 1rem; }
+    .cart-empty svg { width: 42px; height: 42px; opacity: 0.5; }
+
+    .artist-list { display: flex; flex-direction: column; gap: 0.7rem; margin-bottom: 2.2rem; }
+    .artist-row { display: flex; align-items: center; gap: 1rem; background: var(--bg-surface); border-radius: 12px; padding: 0.85rem 1rem; box-shadow: var(--shadow-sm); }
+    .artist-row .creator-avatar-badge { width: 46px; height: 46px; font-size: 1.05rem; }
+    .artist-info { flex: 1; min-width: 0; }
+    .artist-name { font-weight: 800; font-size: 0.98rem; }
+    .artist-handle { font-weight: 500; font-size: 0.8rem; color: var(--text-dim); margin-left: 0.3rem; }
+    .artist-meta { font-size: 0.75rem; color: var(--text-dim); margin-top: 0.35rem; }
+    .artist-actions { display: flex; gap: 0.5rem; flex-shrink: 0; }
+    .artist-search { width: 100%; max-width: 340px; padding: 0.55rem 0.8rem; border-radius: 8px; background: var(--bg-surface); color: var(--text-main); font-size: 0.85rem; }
+    @media (max-width: 640px) { .artist-row { flex-wrap: wrap; } .artist-actions { width: 100%; } }
+    .req-artist-box { background: var(--bg-subtle); border-radius: 8px; padding: 0.65rem 0.8rem; font-weight: 700; font-size: 0.9rem; }
+
+    .toast {
+      position: fixed; bottom: 24px; left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: var(--text-main); color: var(--bg-surface);
+      padding: 0.65rem 1.1rem; border-radius: 999px;
+      font-size: 0.82rem; font-weight: 600;
+      opacity: 0; pointer-events: none; transition: 0.25s; z-index: 2000;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
   </style>
 </head>
 
@@ -1456,10 +1576,14 @@
           <div class="form-group">
             <label for="signupPassword">Password</label>
             <div class="pw-wrap">
-              <input type="password" id="signupPassword" placeholder="Password" required autocomplete="new-password">
+              <input type="password" id="signupPassword" placeholder="At least 8 characters" required autocomplete="new-password" oninput="updatePwMeter(this.value)">
               <button type="button" class="pw-eye" onclick="togglePw('signupPassword',this)" aria-label="Show password">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
               </button>
+            </div>
+            <div class="pw-meter" id="pwMeter" data-level="none">
+              <div class="pw-meter-bar"><span></span><span></span><span></span></div>
+              <div class="pw-meter-label" id="pwMeterLabel">Use at least 8 characters.</div>
             </div>
           </div>
           <button type="submit" class="btn-buy auth-submit">Sign up</button>
@@ -1514,25 +1638,16 @@
 
     <!-- Main Navigation Tabs (inside the left group) -->
     <div class="nav-tabs">
-      <button class="nav-btn active" id="tabBtnMarket" onclick="switchTab('marketplace')">
+      <button class="nav-btn active" id="tabBtnMarket" data-tab="marketplace" onclick="switchTab('marketplace')">
         Digital Market
       </button>
-      <button class="nav-btn" id="tabBtnComms" onclick="switchTab('commissions')">
+      <button class="nav-btn" id="tabBtnComms" data-tab="commissions" onclick="switchTab('commissions')">
         Custom Requests
       </button>
-      <button class="nav-btn" id="tabBtnVault" onclick="switchTab('vault')">
-        My Downloads
-      </button>
-      <button class="nav-btn" id="tabBtnEscrow" onclick="switchTab('escrow')">
-        Safe Escrow
-      </button>
-      <button class="nav-btn" id="tabBtnOwnership" onclick="switchTab('ownership')">
-        Copyright Registry
-      </button>
-      <button class="nav-btn" id="tabBtnMyProfile" onclick="switchTab('my-profile')">
+      <button class="nav-btn" id="tabBtnMyProfile" data-tab="my-profile" onclick="switchTab('my-profile')">
         My Profile
       </button>
-      <button class="nav-btn" id="tabBtnProfile" style="display: none;" onclick="switchTab('profile')">
+      <button class="nav-btn" id="tabBtnProfile" data-tab="profile" style="display: none;" onclick="switchTab('profile')">
         Artist Page
       </button>
     </div>
@@ -1540,8 +1655,14 @@
 
     <div class="user-profile-bar">
       <!-- Dark / Light Theme Toggle Button -->
-      <button type="button" class="theme-toggle-btn" id="btnThemeToggle" onclick="toggleTheme()" title="Switch Light/Dark Mode">
-        🌙
+      <button type="button" class="theme-toggle-btn" id="btnThemeToggle" onclick="toggleTheme()" title="Switch Light/Dark Mode" aria-label="Toggle light or dark mode">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+
+      <!-- My Cart -->
+      <button type="button" class="cart-btn" id="btnCart" onclick="switchTab('cart')" title="My Cart" aria-label="My Cart">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+        <span class="cart-badge" id="cartBadge">0</span>
       </button>
 
       <div class="ws-indicator">
@@ -1626,6 +1747,13 @@
         </g>
       </svg>
       <div class="market-inner">
+      <div class="profile-subnav" id="profileSubnav">
+        <button type="button" class="active" data-psec="overview" onclick="openProfileSection('overview')">Profile</button>
+        <button type="button" data-psec="downloads" onclick="openProfileSection('downloads')">My Downloads</button>
+        <button type="button" data-psec="escrow" onclick="openProfileSection('escrow')">Safe Escrow</button>
+        <button type="button" data-psec="ownership" onclick="openProfileSection('ownership')">Copyright Registry</button>
+      </div>
+      <div class="profile-panel active" id="psec-overview">
       <div class="my-profile-section">
         <div style="display: flex; align-items: center; gap: 1.1rem;">
           <div class="profile-avatar-large" id="myProfAvatar">?</div>
@@ -1660,10 +1788,84 @@
 
       <!-- Artist-only: My Listed Products -->
       <div id="myListingsSection" style="display: none; margin-top: 2rem;">
-        <h3 style="font-size: 1.15rem; font-weight: 800; margin-bottom: 1rem;">🛒 My Listed Products</h3>
+        <h3 style="font-size: 1.15rem; font-weight: 800; margin-bottom: 1rem;">My Listed Products</h3>
         <div class="products-grid" id="myProductsContainer">
           <!-- Injected via JS -->
         </div>
+      </div>
+      </div><!-- end psec-overview -->
+
+      <div class="profile-panel" id="psec-downloads">
+      <div style="margin-bottom: 1.5rem;">
+        <h2 style="font-size: 1.4rem; font-weight: 800;">Purchased Digital Goods</h2>
+        <p style="color: var(--text-muted); font-size: 0.85rem;">Instant access to high-res source files, GIFs, models, and assets you own.</p>
+      </div>
+      <div class="feed-panel" style="height: auto; min-height: 250px;">
+        <table class="ledger-table">
+          <thead>
+            <tr>
+              <th>Item / Product</th>
+              <th>Paid Amount</th>
+              <th>Purchase Date</th>
+              <th>Asset Download</th>
+            </tr>
+          </thead>
+          <tbody id="purchasesTableBody">
+            <!-- Injected via JavaScript -->
+          </tbody>
+        </table>
+      </div>
+      </div>
+
+      <div class="profile-panel" id="psec-escrow">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+        <div>
+          <h2 style="font-size: 1.4rem; font-weight: 800;">Your Milestone Escrow Records</h2>
+          <p style="color: var(--text-muted); font-size: 0.85rem;">Secure escrow settlements for your own projects only.</p>
+        </div>
+        <button class="btn-create" style="background: rgba(16, 185, 129, 0.15); color: var(--accent-emerald);" onclick="testDeposit()">+ Deposit Funds</button>
+      </div>
+      <div class="feed-panel" style="height: auto; min-height: 250px;">
+        <table class="ledger-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Commission Ref</th>
+              <th>Client</th>
+              <th>Artist</th>
+              <th>Amount</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="escrowTableBody">
+            <!-- Injected via JavaScript -->
+          </tbody>
+        </table>
+      </div>
+      </div>
+
+      <div class="profile-panel" id="psec-ownership">
+      <div style="margin-bottom: 1.5rem;">
+        <h2 style="font-size: 1.4rem; font-weight: 800;">Character & IP Copyright Registry</h2>
+        <p style="color: var(--text-muted); font-size: 0.85rem;">Permanently certified ownership hashes for your completed projects.</p>
+      </div>
+      <div class="feed-panel" style="height: auto; min-height: 250px;">
+        <table class="ledger-table">
+          <thead>
+            <tr>
+              <th>Character / Asset Title</th>
+              <th>Owner</th>
+              <th>Original Creator</th>
+              <th>License Terms</th>
+              <th>Cryptographic Certificate Hash</th>
+            </tr>
+          </thead>
+          <tbody id="ownershipTableBody">
+            <!-- Injected via JavaScript -->
+          </tbody>
+        </table>
+      </div>
       </div>
 
           </div><!-- end market-inner -->
@@ -1735,12 +1937,21 @@
         </g>
       </svg>
       <div class="market-inner">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-        <div>
-          <h2 style="font-size: 1.4rem; font-weight: 800;" id="commHeading">Your Commission Briefs</h2>
-          <p style="color: var(--text-muted); font-size: 0.85rem;">Click any request card to inspect its in-depth milestone audit trail.</p>
+      <!-- Clients: browse signed-up artists and request one directly -->
+      <div id="artistDirectorySection" style="display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-end; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.2rem;">
+          <div>
+            <h2 style="font-size: 1.4rem; font-weight: 800;">Request an Artist</h2>
+            <p style="color: var(--text-muted); font-size: 0.85rem;">Artists who have signed up. Pick one and send them a custom request.</p>
+          </div>
+          <input type="search" class="artist-search" id="artistSearch" placeholder="Search by name or specialty..." oninput="renderArtistDirectory()">
         </div>
-        <button class="btn-create" id="btnNewBrief" onclick="openNewCommModal()">+ Create Brief</button>
+        <div class="artist-list" id="artistListContainer"></div>
+      </div>
+
+      <div style="margin-bottom: 1.5rem;">
+        <h2 style="font-size: 1.4rem; font-weight: 800;" id="commHeading">Your Commission Briefs</h2>
+        <p style="color: var(--text-muted); font-size: 0.85rem;">Click any request card to inspect its in-depth milestone audit trail.</p>
       </div>
       <div class="commissions-grid" id="commissionsContainer">
         <!-- Injected via JavaScript -->
@@ -1748,8 +1959,8 @@
           </div><!-- end market-inner -->
     </section>
 
-    <!-- TAB 3: VAULT / DOWNLOADS -->
-    <section id="tab-vault" class="tab-content">
+    <!-- TAB: MY CART -->
+    <section id="tab-cart" class="tab-content">
       <svg class="market-waves" viewBox="0 0 1400 780" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
         <defs><style>.mw{fill:none;stroke-linecap:round;animation:mwdrift linear infinite}@keyframes mwdrift{0%{transform:translateX(0)}100%{transform:translateX(-140px)}}</style></defs>
         <g stroke="#ba87d4" stroke-opacity="0.18" stroke-width="2.5">
@@ -1767,115 +1978,12 @@
         </g>
       </svg>
       <div class="market-inner">
-      <div style="margin-bottom: 1.5rem;">
-        <h2 style="font-size: 1.4rem; font-weight: 800;">Purchased Digital Goods</h2>
-        <p style="color: var(--text-muted); font-size: 0.85rem;">Instant access to high-res source files, GIFs, models, and assets you own.</p>
-      </div>
-      <div class="feed-panel" style="height: auto; min-height: 250px;">
-        <table class="ledger-table">
-          <thead>
-            <tr>
-              <th>Item / Product</th>
-              <th>Paid Amount</th>
-              <th>Purchase Date</th>
-              <th>Asset Download</th>
-            </tr>
-          </thead>
-          <tbody id="purchasesTableBody">
-            <!-- Injected via JavaScript -->
-          </tbody>
-        </table>
-      </div>
-          </div><!-- end market-inner -->
-    </section>
-
-    <!-- TAB 4: ESCROW (Client & Artist's Own Records Only) -->
-    <section id="tab-escrow" class="tab-content">
-      <svg class="market-waves" viewBox="0 0 1400 780" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <defs><style>.mw{fill:none;stroke-linecap:round;animation:mwdrift linear infinite}@keyframes mwdrift{0%{transform:translateX(0)}100%{transform:translateX(-140px)}}</style></defs>
-        <g stroke="#ba87d4" stroke-opacity="0.18" stroke-width="2.5">
-          <path class="mw" style="animation-duration:18s" d="M-100 520 C 100 440 300 600 500 500 S 900 380 1100 480 S 1400 560 1600 480"/>
-          <path class="mw" style="animation-duration:22s;animation-delay:-4s" d="M-100 580 C 120 500 320 640 540 560 S 940 440 1140 540 S 1440 600 1640 540"/>
-          <path class="mw" style="animation-duration:26s;animation-delay:-8s" d="M-100 640 C 140 560 340 680 560 610 S 960 510 1160 600 S 1460 660 1660 600"/>
-        </g>
-        <g stroke="#ba87d4" stroke-opacity="0.30" stroke-width="1.8">
-          <path class="mw" style="animation-duration:14s;animation-delay:-2s" d="M-100 600 C 80 520 260 660 460 580 S 860 460 1060 560 S 1360 640 1560 560"/>
-          <path class="mw" style="animation-duration:17s;animation-delay:-6s" d="M-100 660 C 90 580 280 710 500 640 S 900 530 1100 620 S 1400 690 1600 620"/>
-        </g>
-        <g stroke="#e5c1f5" stroke-opacity="0.22" stroke-width="48" fill="none">
-          <path class="mw" style="animation-duration:24s;animation-delay:-10s" d="M-200 700 C 100 580 400 760 700 660 S 1100 520 1400 640 S 1700 720 2000 640"/>
-          <path class="mw" style="animation-duration:30s;animation-delay:-14s" d="M-200 750 C 120 650 420 800 720 710 S 1120 590 1420 690 S 1720 760 2020 680"/>
-        </g>
-      </svg>
-      <div class="market-inner">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-        <div>
-          <h2 style="font-size: 1.4rem; font-weight: 800;">Your Milestone Escrow Records</h2>
-          <p style="color: var(--text-muted); font-size: 0.85rem;">Secure escrow settlements for your own projects only.</p>
+        <div style="margin-bottom: 1.5rem;">
+          <h2 style="font-size: 1.4rem; font-weight: 800;">My Cart</h2>
+          <p style="color: var(--text-muted); font-size: 0.85rem;">Items you want to buy but haven't purchased yet.</p>
         </div>
-        <button class="btn-create" style="background: rgba(16, 185, 129, 0.15); color: var(--accent-emerald);" onclick="testDeposit()">+ Deposit Funds</button>
-      </div>
-      <div class="feed-panel" style="height: auto; min-height: 250px;">
-        <table class="ledger-table">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Commission Ref</th>
-              <th>Client</th>
-              <th>Artist</th>
-              <th>Amount</th>
-              <th>Status</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody id="escrowTableBody">
-            <!-- Injected via JavaScript -->
-          </tbody>
-        </table>
-      </div>
-          </div><!-- end market-inner -->
-    </section>
-
-    <!-- TAB 5: COPYRIGHT REGISTRY -->
-    <section id="tab-ownership" class="tab-content">
-      <svg class="market-waves" viewBox="0 0 1400 780" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <defs><style>.mw{fill:none;stroke-linecap:round;animation:mwdrift linear infinite}@keyframes mwdrift{0%{transform:translateX(0)}100%{transform:translateX(-140px)}}</style></defs>
-        <g stroke="#ba87d4" stroke-opacity="0.18" stroke-width="2.5">
-          <path class="mw" style="animation-duration:18s" d="M-100 520 C 100 440 300 600 500 500 S 900 380 1100 480 S 1400 560 1600 480"/>
-          <path class="mw" style="animation-duration:22s;animation-delay:-4s" d="M-100 580 C 120 500 320 640 540 560 S 940 440 1140 540 S 1440 600 1640 540"/>
-          <path class="mw" style="animation-duration:26s;animation-delay:-8s" d="M-100 640 C 140 560 340 680 560 610 S 960 510 1160 600 S 1460 660 1660 600"/>
-        </g>
-        <g stroke="#ba87d4" stroke-opacity="0.30" stroke-width="1.8">
-          <path class="mw" style="animation-duration:14s;animation-delay:-2s" d="M-100 600 C 80 520 260 660 460 580 S 860 460 1060 560 S 1360 640 1560 560"/>
-          <path class="mw" style="animation-duration:17s;animation-delay:-6s" d="M-100 660 C 90 580 280 710 500 640 S 900 530 1100 620 S 1400 690 1600 620"/>
-        </g>
-        <g stroke="#e5c1f5" stroke-opacity="0.22" stroke-width="48" fill="none">
-          <path class="mw" style="animation-duration:24s;animation-delay:-10s" d="M-200 700 C 100 580 400 760 700 660 S 1100 520 1400 640 S 1700 720 2000 640"/>
-          <path class="mw" style="animation-duration:30s;animation-delay:-14s" d="M-200 750 C 120 650 420 800 720 710 S 1120 590 1420 690 S 1720 760 2020 680"/>
-        </g>
-      </svg>
-      <div class="market-inner">
-      <div style="margin-bottom: 1.5rem;">
-        <h2 style="font-size: 1.4rem; font-weight: 800;">Character & IP Copyright Registry</h2>
-        <p style="color: var(--text-muted); font-size: 0.85rem;">Permanently certified ownership hashes for your completed projects.</p>
-      </div>
-      <div class="feed-panel" style="height: auto; min-height: 250px;">
-        <table class="ledger-table">
-          <thead>
-            <tr>
-              <th>Character / Asset Title</th>
-              <th>Owner</th>
-              <th>Original Creator</th>
-              <th>License Terms</th>
-              <th>Cryptographic Certificate Hash</th>
-            </tr>
-          </thead>
-          <tbody id="ownershipTableBody">
-            <!-- Injected via JavaScript -->
-          </tbody>
-        </table>
-      </div>
-          </div><!-- end market-inner -->
+        <div id="cartContainer"></div>
+      </div><!-- end market-inner -->
     </section>
   </main>
 
@@ -1917,15 +2025,17 @@
             <!-- Add Review Input -->
             <form id="formAddReview" onsubmit="handleAddReview(event)" style="background: var(--bg-surface); padding: 0.75rem; border-radius: 8px;">
               <input type="hidden" id="detailModalProductId">
-              <div style="display: flex; gap: 0.75rem; margin-bottom: 0.5rem; align-items: center;">
+              <div style="display: flex; gap: 0.75rem; margin-bottom: 0.5rem; align-items: center; flex-wrap: wrap;">
                 <label style="font-size: 0.75rem; color: var(--text-dim); white-space: nowrap;">Your Rating:</label>
-                <select id="revRatingInput" style="padding: 4px; font-size: 0.8rem;">
-                  <option value="5">★★★★★ (5 Stars - Exceptional)</option>
-                  <option value="4">★★★★☆ (4 Stars - Great)</option>
-                  <option value="3">★★★☆☆ (3 Stars - Average)</option>
-                  <option value="2">★★☆☆☆ (2 Stars - Needs Work)</option>
-                  <option value="1">★☆☆☆☆ (1 Star - Poor)</option>
-                </select>
+                <div class="star-picker" id="starPicker" role="group" aria-label="Your rating" onmouseleave="paintStars(pickedRating)">
+                  <button type="button" aria-label="1 star" aria-pressed="false" onclick="setReviewRating(1)" onmouseenter="paintStars(1)"><svg viewBox="0 0 24 24" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></button>
+                  <button type="button" aria-label="2 stars" aria-pressed="false" onclick="setReviewRating(2)" onmouseenter="paintStars(2)"><svg viewBox="0 0 24 24" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></button>
+                  <button type="button" aria-label="3 stars" aria-pressed="false" onclick="setReviewRating(3)" onmouseenter="paintStars(3)"><svg viewBox="0 0 24 24" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></button>
+                  <button type="button" aria-label="4 stars" aria-pressed="false" onclick="setReviewRating(4)" onmouseenter="paintStars(4)"><svg viewBox="0 0 24 24" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></button>
+                  <button type="button" aria-label="5 stars" aria-pressed="false" onclick="setReviewRating(5)" onmouseenter="paintStars(5)"><svg viewBox="0 0 24 24" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></button>
+                </div>
+                <span id="revRatingLabel" style="font-size: 0.75rem; color: var(--text-dim);">Tap a star to rate</span>
+                <input type="hidden" id="revRatingInput" value="0">
               </div>
               <div class="form-group" style="margin-bottom: 0.5rem;">
                 <input type="text" id="revCommentInput" placeholder="Write helpful feedback or question about this asset..." required>
@@ -1970,19 +2080,32 @@
             <input type="hidden" id="checkoutProductId">
             <div id="checkoutInputArea" class="form-group">
               <label>Your Price / Support Creator (USD):</label>
-              <input type="number" step="0.01" id="checkoutOfferedPrice" required>
+              <input type="number" step="0.01" id="checkoutOfferedPrice" required oninput="updateModalTotal()">
               <div style="font-size: 0.72rem; color: var(--text-dim); margin-top: 4px;">
                 You can support the creator with any amount &ge; the base price.
               </div>
             </div>
 
-            <button type="submit" class="btn-buy" id="btnCheckoutSubmit">
-              Instant Unlock & Download
+            <div id="checkoutQtyArea" class="form-group">
+              <label>Quantity:</label>
+              <div style="display: flex; align-items: center; gap: 0.8rem;">
+                <div class="qty-stepper">
+                  <button type="button" onclick="changeModalQty(-1)" aria-label="Decrease quantity">&minus;</button>
+                  <span id="modalQtyValue">1</span>
+                  <button type="button" onclick="changeModalQty(1)" aria-label="Increase quantity">+</button>
+                </div>
+                <span id="modalTotalLine" style="font-size: 0.82rem; font-weight: 700; color: var(--text-main);"></span>
+              </div>
+            </div>
+
+            <button type="submit" class="btn-buy" id="btnCheckoutSubmit">Buy Now</button>
+            <button type="button" class="btn-secondary btn-cart-add" id="btnAddToCart" onclick="addCurrentProductToCart()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg> Add to Cart
             </button>
           </form>
 
           <div style="font-size: 0.72rem; color: var(--text-dim); line-height: 1.4; padding-top: 0.75rem;">
-            ✓ Instant delivery to 'My Downloads'<br>
+            ✓ Delivered straight to 'My Downloads'<br>
             ✓ Lifetime download link access<br>
             ✓ Cryptographic purchase receipt
           </div>
@@ -2125,15 +2248,16 @@
   <!-- Modal: Launch Commission Brief -->
   <div class="modal-backdrop" id="modalNewComm">
     <div class="modal-box">
-      <div class="modal-title">Launch Custom Request Brief</div>
+      <div class="modal-title">Request Custom Work</div>
       <form id="formComm" onsubmit="handleCreateCommission(event)">
         <div class="form-group">
           <label>Title</label>
           <input type="text" id="commInputTitle" placeholder="e.g. Vtuber 2.0 Rigging" required>
         </div>
         <div class="form-group">
-          <label>Target Artist</label>
-          <select id="commInputArtist" required></select>
+          <label>Requesting</label>
+          <div class="req-artist-box" id="commArtistLabel"></div>
+          <input type="hidden" id="commInputArtist">
         </div>
         <div class="form-group">
           <label>Agreed Price (USD)</label>
@@ -2151,6 +2275,8 @@
     </div>
   </div>
 
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
   <script>
     let currentUser = null;
     let products = [];
@@ -2166,6 +2292,10 @@
     const STORAGE_KEY = 'atelierv_user_session';
     const THEME_KEY = 'atelierv_theme';
 
+    const ICON_MOON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
+    const ICON_CART = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>';
+    const ICON_SUN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>';
+
     // Theme Management
     function initTheme() {
       const savedTheme = localStorage.getItem(THEME_KEY) || 'light';
@@ -2177,7 +2307,7 @@
       localStorage.setItem(THEME_KEY, theme);
       const btn = document.getElementById('btnThemeToggle');
       if (btn) {
-        btn.textContent = theme === 'dark' ? '☀️' : '🌙';
+        btn.innerHTML = theme === 'dark' ? ICON_SUN : ICON_MOON;
         btn.title = theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode';
       }
     }
@@ -2330,6 +2460,11 @@
       e.preventDefault();
       const err = document.getElementById('authErrorMsg');
       err.textContent = '';
+      const pw = document.getElementById('signupPassword').value;
+      if (pw.length < PW_MIN_LENGTH) {
+        err.textContent = `Password must be at least ${PW_MIN_LENGTH} characters.`;
+        return;
+      }
       const res = await fetch('/api/auth/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -2345,6 +2480,8 @@
         return;
       }
       const data = await res.json();
+      document.getElementById('formSignup').reset();
+      updatePwMeter('');
       setSession(data.user);
     }
 
@@ -2368,7 +2505,13 @@
       (function() {
         const ov = document.getElementById('authOverlay');
         ov.classList.add('fading-out');
-        ov.addEventListener('animationend', () => { ov.style.display = 'none'; }, { once: true });
+        const onEnd = (e) => {
+          if (e.animationName !== 'authFadeOut') return;
+          ov.removeEventListener('animationend', onEnd);
+          // Only hide if the user is still signed in (they may have signed out mid-fade)
+          if (currentUser) ov.style.display = 'none';
+        };
+        ov.addEventListener('animationend', onEnd);
       })();
 
       document.getElementById('navUserName').textContent = user.display_name;
@@ -2385,14 +2528,14 @@
 
       if (user.role === 'Artist') {
         document.getElementById('btnPublishProduct').style.display = 'block';
-        document.getElementById('btnNewBrief').style.display = 'none';
+        document.getElementById('artistDirectorySection').style.display = 'none';
         document.getElementById('commHeading').textContent = 'Commissions Put Out to You';
         document.getElementById('artistCategoriesSection').style.display = 'block';
         document.getElementById('clientProfileInfo').style.display = 'none';
         buildCategoryCheckboxes(user.creator_categories);
       } else {
         document.getElementById('btnPublishProduct').style.display = 'none';
-        document.getElementById('btnNewBrief').style.display = 'block';
+        document.getElementById('artistDirectorySection').style.display = 'block';
         document.getElementById('commHeading').textContent = 'Your Commission Briefs';
         document.getElementById('artistCategoriesSection').style.display = 'none';
         document.getElementById('clientProfileInfo').style.display = 'block';
@@ -2406,6 +2549,9 @@
       myTag.textContent = user.role;
       myTag.className = `user-role-tag role-${user.role}`;
 
+      loadCart();
+      updateCartBadge();
+      renderCart();
       fetchAllData();
     }
 
@@ -2461,23 +2607,49 @@
     function handleLogout() {
       localStorage.removeItem(STORAGE_KEY);
       currentUser = null;
-      document.getElementById('authOverlay').style.display = 'flex';
+      products = []; commissions = []; purchases = []; escrowLedger = []; ownershipLogs = []; availableArtists = [];
+      productsLoaded = false;
+      cart = [];
+      currentDetailProduct = null;
+      activeProfileArtist = null;
+
+      document.querySelectorAll('.modal-backdrop.open').forEach(m => m.classList.remove('open'));
+      const ov = document.getElementById('authOverlay');
+      // The overlay keeps the 'fading-out' class from login (opacity 0, pointer-events none).
+      // It must be cleared or the login screen stays invisible after signing out.
+      ov.classList.remove('fading-out');
+      ov.style.display = 'flex';
+      document.getElementById('formLogin').reset();
+      document.getElementById('formSignup').reset();
+      updatePwMeter('');
       switchAuthMode('login');
+
+      updateCartBadge();
+      renderCart();
+      document.getElementById('tabBtnProfile').style.display = 'none';
+      openProfileSection('overview');
+      switchTab('marketplace');
     }
 
     function switchTab(tab) {
       document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-      document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.nav-btn').forEach(el => el.classList.toggle('active', el.dataset.tab === tab));
+      const cartBtn = document.getElementById('btnCart');
+      if (cartBtn) cartBtn.classList.toggle('active', tab === 'cart');
 
       const t = document.getElementById(`tab-${tab}`);
       if (t) t.classList.add('active');
 
-      const btn = Array.from(document.querySelectorAll('.nav-btn')).find(b => b.onclick && b.onclick.toString().includes(tab));
-      if (btn) btn.classList.add('active');
-
       if (tab !== 'profile') {
         document.getElementById('tabBtnProfile').style.display = 'none';
       }
+    }
+
+    // My Profile sub-sections (Profile / My Downloads / Safe Escrow / Copyright Registry)
+    function openProfileSection(name = 'overview') {
+      switchTab('my-profile');
+      document.querySelectorAll('.profile-panel').forEach(p => p.classList.toggle('active', p.id === `psec-${name}`));
+      document.querySelectorAll('#profileSubnav button').forEach(b => b.classList.toggle('active', b.dataset.psec === name));
     }
 
     function openModal(id) { document.getElementById(id).classList.add('open'); }
@@ -2516,14 +2688,17 @@
       openModal('modalPublishProduct');
     }
 
-    async function openNewCommModal(preselectedArtistId = null) {
-      const res = await fetch('/api/users/artists');
-      availableArtists = await res.json();
-      const sel = document.getElementById('commInputArtist');
-      sel.innerHTML = availableArtists.map(a => `<option value="${a.id}">${escapeHtml(a.display_name)} (@${escapeHtml(a.username)})</option>`).join('');
-      if (preselectedArtistId) {
-        sel.value = preselectedArtistId;
+    async function openNewCommModal(artistId = null) {
+      if (!artistId) return;
+      let artist = availableArtists.find(a => a.id === artistId);
+      if (!artist) {
+        const res = await fetch('/api/users/artists');
+        availableArtists = await safeJson(res) ?? availableArtists;
+        artist = availableArtists.find(a => a.id === artistId);
       }
+      if (!artist) { alert('That artist could not be found.'); return; }
+      document.getElementById('commInputArtist').value = artist.id;
+      document.getElementById('commArtistLabel').textContent = `${artist.display_name} (@${artist.username})`;
       openModal('modalNewComm');
     }
 
@@ -2595,9 +2770,6 @@
       }
 
       c.innerHTML = filtered.map(p => {
-        const fullStars = Math.round(p.average_rating);
-        const starStr = '★'.repeat(fullStars) + '☆'.repeat(5 - fullStars);
-
         let imgStyle = '';
         try {
           const vi = JSON.parse(p.vendor_info);
@@ -2617,11 +2789,7 @@
             <div class="product-body">
               <div class="product-card-title">${escapeHtml(p.title)}</div>
               
-              <div class="product-rating-bar">
-                <span class="stars">${starStr}</span>
-                <span style="font-weight: 700;">${p.average_rating.toFixed(1)}</span>
-                <span style="color: var(--text-dim);">(${p.review_count} reviews)</span>
-              </div>
+              ${ratingBarHtml(p)}
 
               <div class="click-view-hint">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><polyline points="12 16 16 12 12 8"></polyline><line x1="8" y1="12" x2="16" y2="12"></line></svg>
@@ -2683,6 +2851,7 @@
         escrowLedger    = await safeJson(eRes)  ?? escrowLedger;
         ownershipLogs   = await safeJson(oRes)  ?? ownershipLogs;
         availableArtists = await safeJson(aRes) ?? availableArtists;
+        if (pRes.ok) productsLoaded = true;
 
         renderProducts();
         renderMyProducts();
@@ -2693,6 +2862,8 @@
         renderPurchases();
         renderLedger();
         renderOwnership();
+        renderArtistDirectory();
+        renderCart();
       } catch (err) {
         console.error('Fetch error:', err);
       }
@@ -2731,9 +2902,7 @@
             </div>
             <div class="product-body">
               <div class="product-card-title">${escapeHtml(p.title)}</div>
-              <div style="font-size:0.78rem; color: var(--text-dim); margin-top: 4px;">
-                ★ ${p.average_rating.toFixed(1)} · ${p.review_count} reviews
-              </div>
+              <div style="margin-top: 4px;">${ratingBarHtml(p)}</div>
             </div>
           </div>
         `;
@@ -2749,9 +2918,6 @@
       }
 
       c.innerHTML = products.map(p => {
-        const fullStars = Math.round(p.average_rating);
-        const starStr = '★'.repeat(fullStars) + '☆'.repeat(5 - fullStars);
-
         let imgStyle = '';
         try {
           const vi = JSON.parse(p.vendor_info);
@@ -2772,11 +2938,7 @@
               <div class="product-artist">by ${escapeHtml(p.artist_name)} (@${escapeHtml(p.artist_username)})</div>
               <div class="product-card-title">${escapeHtml(p.title)}</div>
               
-              <div class="product-rating-bar">
-                <span class="stars">${starStr}</span>
-                <span style="font-weight: 700;">${p.average_rating.toFixed(1)}</span>
-                <span style="color: var(--text-dim);">(${p.review_count} reviews)</span>
-              </div>
+              ${ratingBarHtml(p)}
 
               <div class="click-view-hint">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><polyline points="12 16 16 12 12 8"></polyline><line x1="8" y1="12" x2="16" y2="12"></line></svg>
@@ -2809,32 +2971,37 @@
       document.getElementById('detailModalDesc').textContent = p.description;
       renderDetailVendorInfo(p.vendor_info);
 
-      const fullStars = Math.round(p.average_rating);
-      document.getElementById('detailModalRatingBadge').innerHTML = `
-        <span class="stars">${'★'.repeat(fullStars)}${'☆'.repeat(5 - fullStars)}</span>
-        <span style="font-weight: 700; color: var(--text-main);">${p.average_rating.toFixed(1)}</span>
-        <span style="color: var(--text-dim);">(${p.review_count} reviews)</span>
-      `;
+      document.getElementById('detailModalRatingBadge').innerHTML = ratingInnerHtml(p);
 
       // Populate Right Column Price
       document.getElementById('detailModalBasePrice').textContent = `$${p.min_price.toFixed(2)}`;
 
-      const isTester = currentUser && currentUser.all_download_access;
+      resetReviewForm();
+      setModalQty(1);
+
+      // "Instant Unlock & Download" is ONLY for accounts with the All-Download Pass.
+      // Everyone else buys it (Buy Now) or saves it to their cart.
+      const pass = hasPass();
       const testerBanner = document.getElementById('testerInstantUnlockBanner');
       const checkoutArea = document.getElementById('checkoutInputArea');
+      const qtyArea = document.getElementById('checkoutQtyArea');
       const btnSubmit = document.getElementById('btnCheckoutSubmit');
+      const input = document.getElementById('checkoutOfferedPrice');
+      input.min = p.min_price;
+      input.value = p.min_price.toFixed(2);
+      input.required = !pass;
 
-      if (isTester) {
+      if (pass) {
         testerBanner.style.display = 'block';
         checkoutArea.style.display = 'none';
-        btnSubmit.textContent = '⚡ Direct Download / Add to Vault (Free Tester Access)';
+        qtyArea.style.display = 'none';
+        btnSubmit.textContent = 'Instant Unlock & Download';
       } else {
         testerBanner.style.display = 'none';
         checkoutArea.style.display = 'block';
-        const input = document.getElementById('checkoutOfferedPrice');
-        input.min = p.min_price;
-        input.value = p.min_price.toFixed(2);
-        btnSubmit.textContent = 'Instant Unlock & Download';
+        qtyArea.style.display = 'block';
+        btnSubmit.textContent = 'Buy Now';
+        updateModalTotal();
       }
 
       await loadProductReviews(p.id);
@@ -3051,8 +3218,13 @@
     async function handleAddReview(e) {
       e.preventDefault();
       const prodId = parseInt(document.getElementById('detailModalProductId').value);
-      const rating = parseInt(document.getElementById('revRatingInput').value);
+      const rating = pickedRating;
       const comment = document.getElementById('revCommentInput').value.trim();
+
+      if (!rating) {
+        alert('Please tap a star to choose your rating first.');
+        return;
+      }
 
       const res = await fetch(`/api/products/${prodId}/reviews`, {
         method: 'POST',
@@ -3065,43 +3237,47 @@
       });
 
       if (res.ok) {
-        document.getElementById('revCommentInput').value = '';
+        resetReviewForm();
         await loadProductReviews(prodId);
-        fetchAllData();
+        await fetchAllData();
+        const fresh = products.find(x => x.id === prodId);
+        if (fresh) {
+          currentDetailProduct = fresh;
+          document.getElementById('detailModalRatingBadge').innerHTML = ratingInnerHtml(fresh);
+        }
+      } else {
+        alert(await res.text() || 'Could not post your review.');
       }
     }
 
     async function handleExecutePurchase(e) {
       e.preventDefault();
+      if (!currentUser) return;
       const prodId = parseInt(document.getElementById('checkoutProductId').value);
-      const isTester = currentUser && currentUser.all_download_access;
-      const offer = isTester ? 0.0 : parseFloat(document.getElementById('checkoutOfferedPrice').value);
+      const pass = hasPass();
+      const offer = pass ? 0.0 : parseFloat(document.getElementById('checkoutOfferedPrice').value);
+      const qty = pass ? 1 : modalQty;
 
-      const res = await fetch(`/api/products/${prodId}/purchase`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          product_id: prodId,
-          client_id: currentUser.id,
-          offered_price: offer
-        })
-      });
+      const { done, paid, error } = await buyProduct(prodId, offer, qty);
 
-      if (!res.ok) {
-        alert(await res.text() || 'Purchase error');
+      if (error) {
+        alert(done ? `${error}\n\nOnly ${done} of ${qty} copies were purchased.` : error);
+        if (!done) return;
+        closeModal('modalProductDetail');
+        openProfileSection('downloads');
+        fetchAllData();
         return;
       }
 
-      const data = await res.json();
       closeModal('modalProductDetail');
 
-      if (isTester) {
-        alert(`⚡ Asset unlocked instantly via your All-Download Testing Pass!\n\nAccess it anytime in the 'My Downloads' tab.`);
+      if (pass) {
+        alert(`⚡ Asset unlocked instantly via your All-Download Pass!\n\nAccess it anytime in My Profile › My Downloads.`);
       } else {
-        alert(`🎉 Purchase Successful for $${data.amount_paid.toFixed(2)}!\n\nYour file download link is ready in the 'My Downloads' tab.`);
+        alert(`🎉 Purchase Successful for ${money(paid)}!\n\nYour file download link is ready in My Profile › My Downloads.`);
       }
 
-      switchTab('vault');
+      openProfileSection('downloads');
       fetchAllData();
     }
 
@@ -3309,7 +3485,7 @@
 
     async function handleCreateCommission(e) {
       e.preventDefault();
-      await fetch('/api/commissions', {
+      const res = await fetch('/api/commissions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -3320,8 +3496,13 @@
           brief: document.getElementById('commInputBrief').value
         })
       });
+      if (!res.ok) {
+        alert((await res.text()) || 'Could not send your request.');
+        return;
+      }
       closeModal('modalNewComm');
       document.getElementById('formComm').reset();
+      showToast('Request sent to the artist');
       fetchAllData();
     }
 
@@ -3410,6 +3591,342 @@
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ client_id: currentUser.id, amount: parseFloat(amt) })
       }).then(() => fetchAllData());
+    }
+
+
+    // ---------- Ratings ----------
+    function ratingInnerHtml(p) {
+      const n = p.review_count || 0;
+      if (n === 0) return `<span class="no-rating">No star rating yet (0 reviews)</span>`;
+      const avg = Number(p.average_rating) || 0;
+      const full = Math.max(0, Math.min(5, Math.round(avg)));
+      return `
+        <span class="stars">${'★'.repeat(full)}${'☆'.repeat(5 - full)}</span>
+        <span style="font-weight: 700;">${avg.toFixed(1)}</span>
+        <span style="color: var(--text-dim);">(${n} ${n === 1 ? 'review' : 'reviews'})</span>`;
+    }
+    function ratingBarHtml(p) {
+      return `<div class="product-rating-bar">${ratingInnerHtml(p)}</div>`;
+    }
+
+    // Clickable star picker
+    let pickedRating = 0;
+    function paintStars(n) {
+      document.querySelectorAll('#starPicker button').forEach((b, i) => b.classList.toggle('on', i < n));
+    }
+    function setReviewRating(n) {
+      pickedRating = n;
+      document.getElementById('revRatingInput').value = n;
+      paintStars(n);
+      document.querySelectorAll('#starPicker button').forEach((b, i) => b.setAttribute('aria-pressed', String(i + 1 === n)));
+      document.getElementById('revRatingLabel').textContent = n ? `${n} / 5` : 'Tap a star to rate';
+    }
+    function resetReviewForm() {
+      setReviewRating(0);
+      document.getElementById('revCommentInput').value = '';
+    }
+
+    // ---------- Password strength ----------
+    const PW_MIN_LENGTH = 8;
+    const COMMON_PASSWORDS = ['password', 'password1', '12345678', '123456789', '1234567890', 'qwertyui', 'qwertyuiop', 'iloveyou', '11111111', 'abc12345', 'admin123', 'letmein1'];
+    function evaluatePassword(pw) {
+      if (!pw) return { level: 'none', label: `Use at least ${PW_MIN_LENGTH} characters.` };
+      if (pw.length < PW_MIN_LENGTH) {
+        const need = PW_MIN_LENGTH - pw.length;
+        return { level: 'short', label: `Too short: ${need} more character${need === 1 ? '' : 's'} needed.` };
+      }
+      const variety = [/[a-z]/, /[A-Z]/, /[0-9]/, /[^A-Za-z0-9]/].filter(r => r.test(pw)).length;
+      let score = variety + (pw.length >= 12 ? 2 : pw.length >= 10 ? 1 : 0);
+      if (COMMON_PASSWORDS.includes(pw.toLowerCase()) || /^(.)\1+$/.test(pw)) score = 0;
+      if (score >= 5) return { level: 'strong', label: 'Strong password' };
+      if (score >= 3) return { level: 'normal', label: 'Normal password: add length or symbols to make it stronger' };
+      return { level: 'weak', label: 'Weak password: mix upper & lower case, numbers and symbols' };
+    }
+    function updatePwMeter(pw) {
+      const meter = document.getElementById('pwMeter');
+      if (!meter) return;
+      const r = evaluatePassword(pw);
+      meter.dataset.level = r.level;
+      document.getElementById('pwMeterLabel').textContent = r.label;
+    }
+
+    // ---------- Toast ----------
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      if (!t) return;
+      t.textContent = msg;
+      t.classList.add('show');
+      clearTimeout(showToast._t);
+      showToast._t = setTimeout(() => t.classList.remove('show'), 2400);
+    }
+
+    // ---------- Artist directory (Custom Requests tab, Clients) ----------
+    function renderArtistDirectory() {
+      const c = document.getElementById('artistListContainer');
+      if (!c || !currentUser || currentUser.role === 'Artist') return;
+      const q = (document.getElementById('artistSearch')?.value || '').trim().toLowerCase();
+      const artists = availableArtists.filter(a => a.id !== currentUser.id);
+
+      if (artists.length === 0) {
+        c.innerHTML = `<div class="cart-empty" style="padding: 2rem;">No artists have signed up yet.</div>`;
+        return;
+      }
+      const list = artists.filter(a => !q || [a.display_name, a.username, a.creator_categories].some(v => (v || '').toLowerCase().includes(q)));
+      if (list.length === 0) {
+        c.innerHTML = `<div class="cart-empty" style="padding: 2rem;">No artists match your search.</div>`;
+        return;
+      }
+      c.innerHTML = list.map(a => {
+        const cats = (a.creator_categories || '').split(',').map(x => x.trim()).filter(Boolean);
+        const chips = cats.length
+          ? `<div class="category-chips">${cats.map(x => `<span class="cat-chip">${escapeHtml(x)}</span>`).join('')}</div>`
+          : `<div class="artist-meta" style="margin-top: 0.2rem;">No specializations listed yet</div>`;
+        const count = products.filter(p => p.artist_id === a.id).length;
+        return `
+          <div class="artist-row">
+            <div class="creator-avatar-badge">${escapeHtml((a.display_name || a.username || 'A').charAt(0).toUpperCase())}</div>
+            <div class="artist-info">
+              <div class="artist-name">${escapeHtml(a.display_name)}<span class="artist-handle">@${escapeHtml(a.username)}</span></div>
+              ${chips}
+              <div class="artist-meta">${count} digital product${count === 1 ? '' : 's'} listed</div>
+            </div>
+            <div class="artist-actions">
+              <button type="button" class="btn-secondary" onclick="viewArtistById(${a.id})">View Profile</button>
+              <button type="button" class="btn-create" onclick="openNewCommModal(${a.id})">Request</button>
+            </div>
+          </div>`;
+      }).join('');
+    }
+    function viewArtistById(id) {
+      const a = availableArtists.find(x => x.id === id);
+      if (a) viewArtistProfile(a.id, a.display_name, a.username, a.creator_categories);
+    }
+
+    // ---------- Cart ----------
+    let cart = [];
+    let productsLoaded = false;
+    let modalQty = 1;
+    const MAX_QTY = 99;
+
+    function hasPass() { return !!(currentUser && currentUser.all_download_access); }
+    function money(n) { return '$' + (Number(n) || 0).toFixed(2); }
+    function cartKey() { return currentUser ? `atelierv_cart_${currentUser.id}` : null; }
+
+    function loadCart() {
+      cart = [];
+      const k = cartKey();
+      if (!k) return;
+      try {
+        const raw = JSON.parse(localStorage.getItem(k) || '[]');
+        if (Array.isArray(raw)) {
+          cart = raw.filter(i => i && Number.isInteger(i.product_id) && i.qty > 0)
+                    .map(i => ({ product_id: i.product_id, qty: Math.min(MAX_QTY, i.qty), price: Number(i.price) || 0 }));
+        }
+      } catch (e) { cart = []; }
+    }
+    function saveCart() {
+      const k = cartKey();
+      if (k) { try { localStorage.setItem(k, JSON.stringify(cart)); } catch (e) {} }
+      updateCartBadge();
+    }
+    function updateCartBadge() {
+      const badge = document.getElementById('cartBadge');
+      if (!badge) return;
+      const n = cart.reduce((sum, i) => sum + i.qty, 0);
+      badge.textContent = n > 99 ? '99+' : String(n);
+      badge.classList.toggle('show', n > 0);
+    }
+
+    function setModalQty(n) {
+      modalQty = Math.max(1, Math.min(MAX_QTY, n));
+      const el = document.getElementById('modalQtyValue');
+      if (el) el.textContent = modalQty;
+      updateModalTotal();
+    }
+    function changeModalQty(d) { setModalQty(modalQty + d); }
+    function updateModalTotal() {
+      const el = document.getElementById('modalTotalLine');
+      if (!el || !currentDetailProduct || hasPass()) return;
+      const price = parseFloat(document.getElementById('checkoutOfferedPrice').value);
+      const unit = isNaN(price) ? currentDetailProduct.min_price : price;
+      el.textContent = `Total: ${money(unit * modalQty)}`;
+    }
+
+    function addCurrentProductToCart() {
+      const p = currentDetailProduct;
+      if (!p || !currentUser) return;
+      const pass = hasPass();
+      let price = p.min_price;
+      if (!pass) {
+        const input = document.getElementById('checkoutOfferedPrice');
+        const v = parseFloat(input.value);
+        if (isNaN(v) || v < p.min_price) {
+          alert(`Your price must be at least the base price of ${money(p.min_price)}.`);
+          return;
+        }
+        price = v;
+      }
+      const qty = pass ? 1 : modalQty;
+      const existing = cart.find(i => i.product_id === p.id);
+      if (existing) {
+        existing.qty = pass ? 1 : Math.min(MAX_QTY, existing.qty + qty);
+        existing.price = price;
+      } else {
+        cart.push({ product_id: p.id, qty, price });
+      }
+      saveCart();
+      renderCart();
+      closeModal('modalProductDetail');
+      showToast(`Added ${qty} × ${p.title} to your cart`);
+    }
+
+    function changeCartQty(productId, delta) {
+      const item = cart.find(i => i.product_id === productId);
+      if (!item) return;
+      item.qty = Math.max(1, Math.min(MAX_QTY, item.qty + delta));
+      saveCart();
+      renderCart();
+    }
+    function removeFromCart(productId) {
+      cart = cart.filter(i => i.product_id !== productId);
+      saveCart();
+      renderCart();
+    }
+    function clearCart() {
+      if (cart.length === 0) return;
+      if (!confirm('Remove everything from your cart?')) return;
+      cart = [];
+      saveCart();
+      renderCart();
+    }
+
+    function renderCart() {
+      const c = document.getElementById('cartContainer');
+      if (!c) return;
+      if (!currentUser) { c.innerHTML = ''; return; }
+      if (!productsLoaded) { c.innerHTML = `<div class="cart-empty">Loading your cart...</div>`; return; }
+
+      // Drop items whose product was removed from the market
+      const before = cart.length;
+      cart = cart.filter(i => products.some(p => p.id === i.product_id));
+      if (cart.length !== before) saveCart();
+
+      if (cart.length === 0) {
+        c.innerHTML = `
+          <div class="cart-empty">
+            ${ICON_CART}
+            <div>Your cart is empty.<br>Open any product, choose a quantity and tap <strong>Add to Cart</strong> to save it for later.</div>
+            <button type="button" class="btn-create" onclick="switchTab('marketplace')">Browse the Digital Market</button>
+          </div>`;
+        return;
+      }
+
+      const pass = hasPass();
+      let total = 0, units = 0;
+      const rows = cart.map(item => {
+        const p = products.find(x => x.id === item.product_id);
+        const unit = pass ? 0 : Math.max(Number(item.price) || 0, p.min_price);
+        const qty = pass ? 1 : item.qty;
+        const line = unit * qty;
+        total += line; units += qty;
+        return `
+          <div class="cart-item">
+            <img class="cart-thumb" src="${escapeHtml(p.media_url)}" alt="${escapeHtml(p.title)}" loading="lazy">
+            <div class="cart-info">
+              <div class="cart-title" onclick="openProductDetailModal(${p.id})">${escapeHtml(p.title)}</div>
+              <div class="cart-sub">by ${escapeHtml(p.artist_name)} (@${escapeHtml(p.artist_username)})</div>
+              <div class="cart-sub">${pass ? 'Free with your All-Download Pass' : `${money(unit)} each`}</div>
+              <div class="cart-actions">
+                ${pass ? '' : `
+                <div class="qty-stepper">
+                  <button type="button" onclick="changeCartQty(${p.id}, -1)" aria-label="Decrease quantity">&minus;</button>
+                  <span>${qty}</span>
+                  <button type="button" onclick="changeCartQty(${p.id}, 1)" aria-label="Increase quantity">+</button>
+                </div>`}
+                <button type="button" class="cart-remove" onclick="removeFromCart(${p.id})">Remove</button>
+              </div>
+            </div>
+            <div class="cart-line">${money(line)}</div>
+          </div>`;
+      }).join('');
+
+      c.innerHTML = `
+        <div class="cart-layout">
+          <div class="cart-list">${rows}</div>
+          <div class="cart-summary">
+            <div style="font-weight: 800; font-size: 1rem;">Order Summary</div>
+            <div class="cart-summary-row"><span>Items</span><span>${units}</span></div>
+            <div class="cart-summary-row cart-summary-total"><span>Total</span><span>${money(total)}</span></div>
+            <button type="button" class="btn-buy" id="btnCartCheckout" onclick="checkoutCart()">${pass ? 'Instant Unlock &amp; Download' : 'Checkout'}</button>
+            <button type="button" class="btn-secondary" onclick="clearCart()">Clear Cart</button>
+          </div>
+        </div>`;
+    }
+
+    // Purchases `qty` copies of a product, one request per copy
+    async function buyProduct(prodId, unitPrice, qty) {
+      let done = 0, paid = 0, error = null;
+      for (let i = 0; i < qty; i++) {
+        try {
+          const res = await fetch(`/api/products/${prodId}/purchase`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ product_id: prodId, client_id: currentUser.id, offered_price: unitPrice })
+          });
+          if (!res.ok) { error = (await res.text()) || 'Purchase error'; break; }
+          const data = await res.json();
+          done++;
+          paid += Number(data.amount_paid) || 0;
+        } catch (e) {
+          error = 'Network error. Please try again.';
+          break;
+        }
+      }
+      return { done, paid, error };
+    }
+
+    let checkingOut = false;
+    async function checkoutCart() {
+      if (checkingOut || !currentUser || cart.length === 0) return;
+      checkingOut = true;
+      const btn = document.getElementById('btnCartCheckout');
+      if (btn) { btn.disabled = true; btn.textContent = 'Processing...'; }
+
+      const pass = hasPass();
+      let totalPaid = 0, totalCopies = 0;
+      const problems = [];
+
+      for (const item of [...cart]) {
+        const p = products.find(x => x.id === item.product_id);
+        if (!p) { cart = cart.filter(i => i !== item); continue; }
+        const unit = pass ? 0 : Math.max(Number(item.price) || 0, p.min_price);
+        const qty = pass ? 1 : item.qty;
+        const { done, paid, error } = await buyProduct(p.id, unit, qty);
+        totalPaid += paid; totalCopies += done;
+        if (done >= qty) {
+          cart = cart.filter(i => i !== item);
+        } else {
+          item.qty = qty - done;
+          problems.push(`${p.title}: ${error || 'could not be purchased'}`);
+        }
+      }
+
+      saveCart();
+      checkingOut = false;
+      renderCart();
+      await fetchAllData();
+
+      if (problems.length) {
+        alert(`Some items could not be purchased and are still in your cart:\n\n${problems.join('\n')}`);
+      }
+      if (totalCopies > 0) {
+        if (!problems.length) {
+          alert(pass
+            ? `⚡ ${totalCopies} item${totalCopies === 1 ? '' : 's'} unlocked instantly via your All-Download Pass!\n\nFind them in My Profile › My Downloads.`
+            : `🎉 Purchase Successful for ${money(totalPaid)}!\n\nYour files are ready in My Profile › My Downloads.`);
+        }
+        openProfileSection('downloads');
+      }
     }
 
     function escapeHtml(s) {

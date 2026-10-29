@@ -491,6 +491,9 @@ async fn signup_user(
     if clean_user.is_empty() || payload.password.trim().is_empty() {
         return (axum::http::StatusCode::BAD_REQUEST, "Username and password are required").into_response();
     }
+    if payload.password.chars().count() < 8 {
+        return (axum::http::StatusCode::BAD_REQUEST, "Password must be at least 8 characters").into_response();
+    }
 
     let role = match payload.role.as_str() {
         "Artist" => "Artist",
@@ -669,7 +672,7 @@ async fn list_products(State(state): State<AppState>) -> Json<Vec<DigitalProduct
             file_download_url: r.7,
             min_price: r.8,
             vendor_info: r.9,
-            average_rating: r.10.unwrap_or(5.0),
+            average_rating: r.10.unwrap_or(0.0),
             review_count: r.11,
             created_at: "".into(),
         })
@@ -712,7 +715,7 @@ async fn get_product_detail(
             file_download_url: r.7,
             min_price: r.8,
             vendor_info: r.9,
-            average_rating: r.10.unwrap_or(5.0),
+            average_rating: r.10.unwrap_or(0.0),
             review_count: r.11,
             created_at: "".into(),
         }).into_response(),
