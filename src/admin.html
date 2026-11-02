@@ -189,6 +189,7 @@
     <div class="panel">
       <div class="panel-hdr">
         <span>&#128230; Digital Products - Admin Oversight</span>
+        <button class="btn-tester" id="btnSeedProducts" onclick="seedSampleProducts()" style="margin-left:auto;">&#127807; Seed 5 Samples</button>
       </div>
       <div class="panel-body" style="max-height:300px;">
         <table class="ledger-table">
@@ -405,6 +406,83 @@
       loadData();
       setInterval(loadData, 4000);
     });
+
+    async function seedSampleProducts() {
+      const btn = document.getElementById('btnSeedProducts');
+      btn.disabled = true; btn.textContent = 'Seeding...';
+
+      // Grab the first artist persona from the loaded user list to assign products to
+      const rows = document.querySelectorAll('#tbUsers tr');
+      let artistId = null;
+      for (const row of rows) {
+        const roleCell = row.cells && row.cells[2];
+        if (roleCell && roleCell.textContent.trim() === 'Artist') {
+          // id is in the delete button onclick
+          const del = row.querySelector('.btn-del');
+          if (del) { const m = del.getAttribute('onclick').match(/\d+/); if (m) { artistId = parseInt(m[0]); break; } }
+        }
+      }
+      if (!artistId) {
+        alert('No Artist persona found. Create an Artist account first, then seed.');
+        btn.disabled = false; btn.textContent = '\u{1F33B} Seed 5 Samples';
+        return;
+      }
+
+      const SAMPLES = [
+        {
+          title: 'Cyberpunk Catgirl Emote Pack',
+          description: 'Animated emote pack featuring a cyberpunk catgirl — blinking, laughing, crying, hype, and zzz states. Rigged for VTuber use.',
+          media_url: 'https://images.unsplash.com/photo-1614729939124-032d1e6c9945?w=600&q=80',
+          min_price: 12.00,
+          vendor_info: JSON.stringify({ description: '10 animated emotes, PNG + GIF export', bullets: ['Transparent background', 'Loop-ready GIFs', 'Stream-tested at 112×112'], kv: [{key:'Format',value:'GIF + PNG'},{key:'Resolution',value:'512×512'}], thumb_pos:'50% 30%', thumb_zoom:'1.1' })
+        },
+        {
+          title: 'Low-Poly Fantasy Weapon Pack',
+          description: 'Eight hand-crafted low-poly fantasy weapons: sword, axe, staff, bow, dagger, mace, spear, and shield. Game-ready FBX + OBJ.',
+          media_url: 'https://images.unsplash.com/photo-1621184455862-c163dfb30e0f?w=600&q=80',
+          min_price: 24.00,
+          vendor_info: JSON.stringify({ description: '8 weapons, FBX + OBJ + textures', bullets: ['<2k tris per mesh', 'PBR textures included', 'Blender source file'], kv: [{key:'Format',value:'FBX / OBJ'},{key:'Poly Count',value:'< 2000 tris'}], thumb_pos:'50% 50%', thumb_zoom:'1' })
+        },
+        {
+          title: 'Neon Stream Overlay Bundle',
+          description: 'Complete neon-themed stream overlay: starting soon, BRB, just chatting, and end screen panels. Editable in Photoshop.',
+          media_url: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=600&q=80',
+          min_price: 15.00,
+          vendor_info: JSON.stringify({ description: 'Full overlay pack for live streamers', bullets: ['1920×1080 PSD source', 'Font files included', 'Twitch + YouTube safe'], kv: [{key:'Resolution',value:'1920×1080'},{key:'Format',value:'PNG + PSD'}], thumb_pos:'50% 50%', thumb_zoom:'1' })
+        },
+        {
+          title: 'Mochi Bunny VTuber Model (Live2D)',
+          description: 'Rigged Live2D model of a soft mochi bunny character. Includes 12 expressions, mouth shapes, and physics for hair and ears.',
+          media_url: 'https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=600&q=80',
+          min_price: 89.00,
+          vendor_info: JSON.stringify({ description: 'Full Live2D rig, commercial license', bullets: ['12 facial expressions', 'Physics-driven hair & ears', 'VTube Studio ready'], kv: [{key:'Software',value:'Live2D Cubism 4+'},{key:'License',value:'Commercial'}], thumb_pos:'50% 20%', thumb_zoom:'1.15' })
+        },
+        {
+          title: 'Pixel Art Alert Pack (Retro)',
+          description: 'Retro pixel art animated alerts: follow, sub, raid, and donation. Chiptune SFX included as separate WAV files.',
+          media_url: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=600&q=80',
+          min_price: 8.50,
+          vendor_info: JSON.stringify({ description: 'Animated alert overlays + SFX', bullets: ['GIF + WebM formats', 'Chiptune WAV SFX', 'StreamElements + OBS ready'], kv: [{key:'Format',value:'GIF + WebM + WAV'},{key:'Style',value:'8-bit retro'}], thumb_pos:'50% 50%', thumb_zoom:'1' })
+        }
+      ];
+
+      let ok = 0, fail = 0;
+      for (const s of SAMPLES) {
+        try {
+          const r = await fetch('/api/products', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ artist_id: artistId, ...s, file_download_url: 'https://example.com/sample_asset.zip' })
+          });
+          if (r.ok) ok++; else fail++;
+        } catch { fail++; }
+      }
+
+      btn.disabled = false; btn.textContent = '\u{1F33B} Seed 5 Samples';
+      alert(`Seeded ${ok} product${ok !== 1 ? 's' : ''}${fail ? ', ' + fail + ' failed' : ''}. Refreshing...`);
+      loadData();
+    }
+
   </script>
 </body>
 </html>
