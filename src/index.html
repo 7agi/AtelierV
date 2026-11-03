@@ -59,6 +59,16 @@
       --shadow-lg: 0 12px 32px rgba(0,0,0,0.4);
     }
 
+
+    /* Smooth light/dark switch: applied only while toggling so normal hover/animation behaviour is untouched */
+    html.theme-transition, html.theme-transition *, html.theme-transition *::before, html.theme-transition *::after {
+      transition: background-color .45s ease, color .45s ease, border-color .45s ease,
+                  fill .45s ease, stroke .45s ease, box-shadow .45s ease, opacity .45s ease !important;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html.theme-transition, html.theme-transition *, html.theme-transition *::before, html.theme-transition *::after { transition: none !important; }
+    }
+
     * {
       box-sizing: border-box;
       margin: 0;
@@ -1979,12 +1989,6 @@
       <button class="nav-btn" id="tabBtnBrowseComms" data-tab="browse-commissions" onclick="switchTab('browse-commissions')">
         Commissions
       </button>
-      <button class="nav-btn auth-only" id="tabBtnComms" data-tab="commissions" onclick="switchTab('commissions')" style="display:none;">
-        My Requests
-      </button>
-      <button class="nav-btn auth-only" id="tabBtnMyProfile" data-tab="my-profile" onclick="switchTab('my-profile')" style="display:none;">
-        My Profile
-      </button>
       <button class="nav-btn" id="tabBtnProfile" data-tab="profile" style="display: none;" onclick="switchTab('profile')">
         Artist Page
       </button>
@@ -2025,7 +2029,6 @@
               </div>
             </div>
             <button type="button" class="user-menu-item" role="menuitem" onclick="closeUserMenu(); openProfileSection('overview')">My Profile</button>
-            <button type="button" class="user-menu-item" role="menuitem" onclick="closeUserMenu(); openProfileSection('requests')">My Requests</button>
             <button type="button" class="user-menu-item danger" role="menuitem" onclick="closeUserMenu(); handleLogout()">Sign Out</button>
           </div>
         </div>
@@ -2783,7 +2786,7 @@
         <div class="profile-field-label">Payment connections <span style="font-size:0.7rem;color:var(--text-dim);font-weight:400;text-transform:none;">(UI preview — click to connect)</span></div>
         <div class="payment-grid" id="paymentGrid">
             <div class="payment-card" onclick="togglePayment(this,'PayPal')">
-              <svg viewBox="0 0 24 24" fill="none"><path d="M7.5 22H4l1.5-9h3.5c3.5 0 6-1.5 6.5-5C16.5 3.5 14 2 10.5 2H5L2 22" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 13h3c3.5 0 6-1.5 6.5-5" stroke="#003087" stroke-width="1.5" stroke-linecap="round"/></svg>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#003087" d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944.901C5.026.382 5.474 0 5.998 0h7.46c2.57 0 4.578.543 5.69 1.81 1.01 1.15 1.304 2.42 1.012 4.287-.023.143-.047.288-.077.437-.983 5.05-4.349 6.797-8.647 6.797h-2.19c-.524 0-.968.382-1.05.9l-1.12 7.106z"/><path fill="#009cde" d="M21.222 6.917a3.35 3.35 0 0 0-.607-.541c-.013.076-.026.175-.041.254-.93 4.778-4.005 7.201-9.138 7.201h-2.19a.563.563 0 0 0-.556.479l-1.187 7.527h-.506l-.24 1.516a.56.56 0 0 0 .554.647h3.882c.46 0 .85-.334.922-.788.06-.26.76-4.852.816-5.09a.932.932 0 0 1 .923-.788h.58c3.76 0 6.705-1.528 7.565-5.946.36-1.847.174-3.388-.777-4.471z"/></svg>
               <div class="payment-card-name">PayPal</div>
               <div class="payment-card-status">Not connected</div>
             </div>
@@ -2808,7 +2811,7 @@
               <div class="payment-card-status">Not connected</div>
             </div>
             <div class="payment-card" onclick="togglePayment(this,'GCash')">
-              <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" fill="#007DFF" opacity=".15"/><path d="M12 7v5l3 3" stroke="#007DFF" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="12" r="9" stroke="#007DFF" stroke-width="1.5"/></svg>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><rect width="24" height="24" rx="6" fill="#0063F7"/><path d="M16.26 9.02A5.2 5.2 0 1 0 17.2 12H12.4" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
               <div class="payment-card-name">GCash</div>
               <div class="payment-card-status">Not connected</div>
             </div>
@@ -2863,7 +2866,11 @@
     function toggleTheme() {
       const current = document.documentElement.getAttribute('data-theme') || 'light';
       const next = current === 'dark' ? 'light' : 'dark';
+      const root = document.documentElement;
+      root.classList.add('theme-transition');
       applyTheme(next);
+      clearTimeout(window._themeTransitionTimer);
+      window._themeTransitionTimer = setTimeout(() => root.classList.remove('theme-transition'), 500);
     }
 
     // Auth shader: animated brand-purple gradient blobs in #authShader.
@@ -3317,11 +3324,6 @@
       document.getElementById('navGuestBar').style.display = 'none';
       document.getElementById('navUserPill').style.display = 'flex';
       document.querySelectorAll('.auth-only').forEach(el => el.style.display = '');
-      // Artists reach My Profile / My Requests from the avatar menu instead of the top bar
-      ['tabBtnComms', 'tabBtnMyProfile'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.style.display = user.role === 'Artist' ? 'none' : '';
-      });
       // fire any pending post-auth action
       if (window._pendingAuthAction) { const fn = window._pendingAuthAction; window._pendingAuthAction = null; setTimeout(fn, 300); }
       document.getElementById('navUserName').textContent = user.display_name;
