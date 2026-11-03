@@ -1,33 +1,16 @@
 [package]
-name = "atelierv"
+name = "atelier-v"
 version = "0.1.0"
 edition = "2021"
-description = "VGen-inspired single-binary commission, escrow, digital marketplace & admin hub"
-
-[[bin]]
-name = "atelierv"
-path = "src/main.rs"
-
-[[bin]]
-name = "atelierv-admin"
-path = "src/admin.rs"
-
-[[bin]]
-name = "atelierv-admin-cli"
-path = "src/admin_cli.rs"
 
 [dependencies]
-axum = { version = "0.7", features = ["ws"] }
-tokio = { version = "1.38", features = ["full"] }
-tokio-stream = "0.1"
-sqlx = { version = "0.7", features = ["runtime-tokio-rustls", "sqlite"] }
+axum = "0.7"
+tokio = { version = "1.0", features = ["full"] }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
-tower-http = { version = "0.5", features = ["cors", "trace"] }
-tracing = "0.1"
-tracing-subscriber = { version = "0.3", features = ["env-filter"] }
-open = "5.1"
+sqlx = { version = "0.7", features = ["runtime-tokio-native-tls", "sqlite", "macros"] }
+tower-http = { version = "0.5", features = ["fs", "cors"] }
+bcrypt = "0.15"
 chrono = { version = "0.4", features = ["serde"] }
-futures = "0.3"
-sha2 = "0.10"
-rand = "0.8"
+uuid = { version = "1.0", features = ["v4", "serde"] }
+dotenvy = "0.15"
