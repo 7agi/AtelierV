@@ -2,9 +2,11 @@ name: Build & Release AtelierV Suite
 
 on:
   push:
-    branches: [ "main", "master" ]
+    branches: [ "main", "master", "v1.2", "v*" ]
     tags:
       - 'v*'
+  pull_request:
+    branches: [ "main", "master", "v1.2", "v*" ]
   workflow_dispatch:
 
 permissions:
