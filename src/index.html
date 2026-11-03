@@ -1890,8 +1890,8 @@
         <!-- Login -->
         <form id="formLogin" onsubmit="handleAuthLogin(event)">
           <div class="form-group">
-            <label for="loginUsername">Username</label>
-            <input type="text" id="loginUsername" placeholder="Username" required autocomplete="username">
+            <label for="loginUsername">Email or username</label>
+            <input type="text" id="loginUsername" placeholder="Email or username" required autocomplete="username" autocapitalize="none" spellcheck="false">
           </div>
           <div class="form-group">
             <label for="loginPassword">Password</label>
@@ -1908,8 +1908,12 @@
         <!-- Signup -->
         <form id="formSignup" style="display: none;" onsubmit="handleAuthSignup(event)">
           <div class="form-group">
-            <label for="signupUsername">Username</label>
-            <input type="text" id="signupUsername" placeholder="Username" required autocomplete="username">
+            <label for="signupEmail">Email</label>
+            <input type="email" id="signupEmail" placeholder="you@example.com" required autocomplete="email" autocapitalize="none" spellcheck="false">
+          </div>
+          <div class="form-group">
+            <label for="signupUsername">Username <span style="font-weight:400;color:var(--text-dim);">(optional)</span></label>
+            <input type="text" id="signupUsername" placeholder="Leave blank to use your email name" maxlength="24" autocomplete="username" autocapitalize="none" spellcheck="false">
           </div>
           <div class="form-group">
             <label for="signupDisplayName">Display Name</label>
@@ -3020,7 +3024,7 @@
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          username: document.getElementById('loginUsername').value.trim(),
+          identifier: document.getElementById('loginUsername').value.trim(),
           password: document.getElementById('loginPassword').value
         })
       });
@@ -3045,6 +3049,7 @@
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          email: document.getElementById('signupEmail').value.trim(),
           username: document.getElementById('signupUsername').value.trim(),
           display_name: document.getElementById('signupDisplayName').value.trim(),
           role: document.getElementById('signupRole').value,

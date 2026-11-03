@@ -1,6 +1,8 @@
 use sqlx::{sqlite::SqlitePoolOptions, FromRow, SqlitePool};
 use std::io::{self, Write};
 
+mod pwhash;
+
 #[derive(Debug, FromRow)]
 pub struct CliUser {
     pub id: i64,
@@ -138,7 +140,7 @@ async fn add_user(pool: &SqlitePool, all_access: bool) -> Result<(), Box<dyn std
     .bind(&username)
     .bind(display_name)
     .bind(role)
-    .bind(pass)
+    .bind(pwhash::hash_password(pass))
     .bind(access_flag)
     .execute(pool)
     .await?;

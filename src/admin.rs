@@ -15,6 +15,8 @@ use tokio::sync::broadcast;
 use tower_http::cors::CorsLayer;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
+mod pwhash;
+
 // Embedded Admin Control Center HTML
 const ADMIN_HTML: &str = include_str!("admin.html");
 
@@ -156,7 +158,7 @@ async fn create_user(
     .bind(p.username.trim().to_lowercase())
     .bind(&p.display_name)
     .bind(&p.role)
-    .bind(&pass)
+    .bind(pwhash::hash_password(&pass))
     .bind(all_access)
     .execute(&state.db)
     .await;

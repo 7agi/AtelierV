@@ -15,6 +15,8 @@ use tokio::sync::broadcast;
 use tower_http::cors::CorsLayer;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
+mod pwhash;
+
 // Embedded client/artist portal HTML
 const DASHBOARD_HTML: &str = include_str!("index.html");
 
@@ -79,7 +81,9 @@ impl From<User> for SafeUser {
 
 #[derive(Debug, Deserialize)]
 pub struct SignupReq {
-    pub username: String,
+    pub email: String,
+    #[serde(default)]
+    pub username: Option<String>, // optional: derived from the email when left blank
     pub display_name: String,
     pub role: String,
     pub password: String,
@@ -96,7 +100,9 @@ pub struct UpdateProfileReq {
 
 #[derive(Debug, Deserialize)]
 pub struct LoginReq {
-    pub username: String,
+    // Email or username (older clients send it as "username")
+    #[serde(alias = "username")]
+    pub identifier: String,
     pub password: String,
 }
 
@@ -459,7 +465,39 @@ pub async fn run_migrations(pool: &SqlitePool) -> Result<(), sqlx::Error> {
         .execute(pool)
         .await;
 
+    let _ = sqlx::query("ALTER TABLE users ADD COLUMN email TEXT")
+        .execute(pool)
+        .await;
+    // Case-insensitive unique emails (accounts created before emails existed simply have none)
+    let _ = sqlx::query("CREATE UNIQUE INDEX IF NOT EXISTS idx_users_email ON users(LOWER(email))")
+        .execute(pool)
+        .await;
+
+    migrate_legacy_passwords(pool).await?;
+
     tracing::info!("Database schema validated.");
+    Ok(())
+}
+
+/// Hash any password still stored as plaintext (accounts created before hashing was added).
+async fn migrate_legacy_passwords(pool: &SqlitePool) -> Result<(), sqlx::Error> {
+    let rows: Vec<(i64, String)> = sqlx::query_as("SELECT id, password_hash FROM users")
+        .fetch_all(pool)
+        .await?;
+    let mut migrated = 0;
+    for (id, stored) in rows {
+        if !pwhash::is_hashed(&stored) {
+            sqlx::query("UPDATE users SET password_hash = ? WHERE id = ?")
+                .bind(pwhash::hash_password(&stored))
+                .bind(id)
+                .execute(pool)
+                .await?;
+            migrated += 1;
+        }
+    }
+    if migrated > 0 {
+        tracing::info!("Hashed {} legacy plaintext password(s) with SHA-256.", migrated);
+    }
     Ok(())
 }
 
@@ -473,10 +511,12 @@ pub async fn seed_database(pool: &SqlitePool) -> Result<(), sqlx::Error> {
         sqlx::query(
             r#"
             INSERT INTO users (username, display_name, role, password_hash, all_download_access) VALUES
-            ('admin', 'Atelier Director', 'Admin', 'admin123', 1),
-            ('tester', 'QA Tester (All Access)', 'Client', 'tester123', 1);
+            ('admin', 'Atelier Director', 'Admin', ?, 1),
+            ('tester', 'QA Tester (All Access)', 'Client', ?, 1);
             "#,
         )
+        .bind(pwhash::hash_password("admin123"))
+        .bind(pwhash::hash_password("tester123"))
         .execute(pool)
         .await?;
 
@@ -494,17 +534,112 @@ async fn serve_dashboard() -> impl IntoResponse {
     Html(DASHBOARD_HTML)
 }
 
+fn is_valid_email(e: &str) -> bool {
+    if e.len() > 254 || e.chars().any(|c| c.is_whitespace()) {
+        return false;
+    }
+    let mut parts = e.split('@');
+    match (parts.next(), parts.next(), parts.next()) {
+        (Some(local), Some(domain), None) => {
+            !local.is_empty()
+                && domain.contains('.')
+                && !domain.starts_with('.')
+                && !domain.ends_with('.')
+                && !domain.contains("..")
+        }
+        _ => false,
+    }
+}
+
+fn valid_username(u: &str) -> bool {
+    (3..=24).contains(&u.chars().count())
+        && u.chars().all(|c| c.is_ascii_alphanumeric() || c == '_' || c == '.')
+}
+
+async fn username_taken(db: &SqlitePool, name: &str) -> bool {
+    sqlx::query_as::<_, (i64,)>("SELECT id FROM users WHERE LOWER(username) = ?")
+        .bind(name)
+        .fetch_optional(db)
+        .await
+        .map(|r| r.is_some())
+        .unwrap_or(true)
+}
+
+/// Build a free username from the part of the email before the "@".
+async fn unique_username_from_email(db: &SqlitePool, email: &str) -> String {
+    let mut base: String = email
+        .split('@')
+        .next()
+        .unwrap_or("")
+        .to_lowercase()
+        .chars()
+        .filter(|c| c.is_ascii_alphanumeric() || *c == '_' || *c == '.')
+        .take(18)
+        .collect();
+    if base.chars().count() < 3 {
+        base = "user".into();
+    }
+    let mut candidate = base.clone();
+    let mut n: u32 = 0;
+    while username_taken(db, &candidate).await {
+        n += 1;
+        candidate = format!("{}{}", base, n);
+        if n > 9999 {
+            break;
+        }
+    }
+    candidate
+}
+
 async fn signup_user(
     State(state): State<AppState>,
     Json(payload): Json<SignupReq>,
 ) -> Response {
-    let clean_user = payload.username.trim().to_lowercase();
-    if clean_user.is_empty() || payload.password.trim().is_empty() {
-        return (axum::http::StatusCode::BAD_REQUEST, "Username and password are required").into_response();
+    use axum::http::StatusCode;
+
+    let email = payload.email.trim().to_lowercase();
+    if email.is_empty() || payload.password.trim().is_empty() {
+        return (StatusCode::BAD_REQUEST, "Email and password are required").into_response();
+    }
+    if !is_valid_email(&email) {
+        return (StatusCode::BAD_REQUEST, "Please enter a valid email address").into_response();
     }
     if payload.password.chars().count() < 8 {
-        return (axum::http::StatusCode::BAD_REQUEST, "Password must be at least 8 characters").into_response();
+        return (StatusCode::BAD_REQUEST, "Password must be at least 8 characters").into_response();
     }
+
+    let email_taken = sqlx::query_as::<_, (i64,)>("SELECT id FROM users WHERE LOWER(email) = ?")
+        .bind(&email)
+        .fetch_optional(&state.db)
+        .await
+        .map(|r| r.is_some())
+        .unwrap_or(false);
+    if email_taken {
+        return (StatusCode::CONFLICT, "That email is already registered").into_response();
+    }
+
+    // Username is optional: use what was typed, otherwise derive one from the email.
+    let typed = payload
+        .username
+        .as_deref()
+        .map(|u| u.trim().trim_start_matches('@').to_lowercase())
+        .filter(|u| !u.is_empty());
+    let clean_user = match typed {
+        Some(u) => {
+            if !valid_username(&u) {
+                return (
+                    StatusCode::BAD_REQUEST,
+                    "Username must be 3 to 24 characters: letters, numbers, underscores or dots",
+                )
+                    .into_response();
+            }
+            if username_taken(&state.db, &u).await {
+                return (StatusCode::CONFLICT, "That username is already taken").into_response();
+            }
+            u
+        }
+        None => unique_username_from_email(&state.db, &email).await,
+    };
 
     let role = match payload.role.as_str() {
         "Artist" => "Artist",
@@ -512,12 +647,13 @@ async fn signup_user(
     };
 
     let res = sqlx::query(
-        "INSERT INTO users (username, display_name, role, password_hash, all_download_access) VALUES (?, ?, ?, ?, 0)"
+        "INSERT INTO users (username, email, display_name, role, password_hash, all_download_access) VALUES (?, ?, ?, ?, ?, 0)"
     )
     .bind(&clean_user)
+    .bind(&email)
     .bind(&payload.display_name)
     .bind(role)
-    .bind(&payload.password)
+    .bind(pwhash::hash_password(&payload.password))
     .execute(&state.db)
     .await;
 
@@ -540,7 +676,7 @@ async fn signup_user(
                 }
             })).into_response()
         }
-        Err(e) => (axum::http::StatusCode::CONFLICT, format!("Username taken or DB error: {}", e)).into_response(),
+        Err(e) => (StatusCode::CONFLICT, format!("Email or username already in use ({})", e)).into_response(),
     }
 }
 
@@ -548,28 +684,48 @@ async fn login_user(
     State(state): State<AppState>,
     Json(payload): Json<LoginReq>,
 ) -> Response {
-    let clean_user = payload.username.trim().to_lowercase();
+    use axum::http::StatusCode;
+
+    // Accepts either an email or a username (usernames can't contain "@", so there's no ambiguity)
+    let ident = payload.identifier.trim().trim_start_matches('@').to_lowercase();
     let user_opt = sqlx::query_as::<_, User>(
-        "SELECT id, username, display_name, role, password_hash, all_download_access, creator_categories, avatar_url, created_at FROM users WHERE LOWER(username) = ?"
+        "SELECT id, username, display_name, role, password_hash, all_download_access, creator_categories, avatar_url, created_at FROM users WHERE LOWER(username) = ? OR LOWER(email) = ?"
     )
-    .bind(&clean_user)
+    .bind(&ident)
+    .bind(&ident)
     .fetch_optional(&state.db)
     .await
     .unwrap_or(None);
 
-    match user_opt {
-        Some(user) => {
-            if user.password_hash == payload.password {
-                let safe = SafeUser::from(user);
-                Json(serde_json::json!({
-                    "status": "ok",
-                    "user": safe
-                })).into_response()
-            } else {
-                (axum::http::StatusCode::UNAUTHORIZED, "Invalid username or password").into_response()
-            }
+    let bad = || (StatusCode::UNAUTHORIZED, "Invalid email/username or password").into_response();
+
+    let user = match user_opt {
+        Some(u) => u,
+        None => {
+            // Burn comparable time so a missing account isn't distinguishable by response speed
+            let _ = pwhash::verify_password("sha256$00$00", &payload.password);
+            return bad();
         }
-        None => (axum::http::StatusCode::UNAUTHORIZED, "Invalid username or password").into_response(),
+    };
+
+    let ok = if pwhash::is_hashed(&user.password_hash) {
+        pwhash::verify_password(&user.password_hash, &payload.password)
+    } else if pwhash::ct_eq(user.password_hash.as_bytes(), payload.password.as_bytes()) {
+        // Legacy plaintext row (e.g. created by an old admin tool): accept once, then upgrade it
+        let _ = sqlx::query("UPDATE users SET password_hash = ? WHERE id = ?")
+            .bind(pwhash::hash_password(&payload.password))
+            .bind(user.id)
+            .execute(&state.db)
+            .await;
+        true
+    } else {
+        false
+    };
+
+    if ok {
+        Json(serde_json::json!({ "status": "ok", "user": SafeUser::from(user) })).into_response()
+    } else {
+        bad()
     }
 }
 
