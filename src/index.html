@@ -1665,6 +1665,30 @@
       accent-color: var(--primary);
     }
 
+    /* ── Publish product modal (simplified) ── */
+    .pub-modal { max-width: 520px; max-height: 90vh; overflow-y: auto; }
+    .pub-sub { font-size: 0.82rem; color: var(--text-dim); margin-bottom: 1.3rem; line-height: 1.45; }
+    .pub-opt { font-weight: 400; color: var(--text-dim); font-size: 0.72rem; margin-left: 0.3rem; }
+    .pub-row { display: grid; grid-template-columns: 1fr 130px; gap: 0.75rem; }
+    @media (max-width: 480px) { .pub-row { grid-template-columns: 1fr; } }
+    .price-wrap { position: relative; }
+    .price-wrap span { position: absolute; left: 0.8rem; top: 50%; transform: translateY(-50%); color: var(--text-dim); font-size: 0.85rem; pointer-events: none; }
+    .form-group .price-wrap input { padding-left: 1.6rem; }
+    .upload-zone.pub-drop { display: flex; align-items: center; justify-content: center; gap: 0.75rem; padding: 1.1rem; color: var(--primary); text-align: left; }
+    .pub-drop-title { font-size: 0.85rem; font-weight: 700; }
+    .pub-drop-hint { font-size: 0.72rem; color: var(--text-dim); margin-top: 1px; }
+    .pub-link { background: none; color: var(--primary); font-size: 0.78rem; font-weight: 600; cursor: pointer; padding: 0.3rem 0; display: inline-block; }
+    .pub-link:hover { text-decoration: underline; }
+    #mediaUrlZone { margin-top: 0.3rem; }
+    .pub-file-name { font-size: 0.8rem; font-weight: 700; color: var(--text-main); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .pub-file-info { font-size: 0.72rem; color: var(--text-dim); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .pub-more { border-top: 1px solid var(--bg-subtle-hover); margin-top: 0.4rem; padding-top: 0.8rem; }
+    .pub-more summary { cursor: pointer; font-size: 0.85rem; font-weight: 700; color: var(--text-main); list-style: none; margin-bottom: 0.8rem; }
+    .pub-more summary::-webkit-details-marker { display: none; }
+    .pub-more summary::before { content: "▸"; display: inline-block; margin-right: 0.45rem; color: var(--primary); transition: transform 0.15s; }
+    .pub-more[open] summary::before { transform: rotate(90deg); }
+    .pub-more .thumb-adjuster { margin-top: 0; }
+
     /* Category Chips */
     .category-chips {
       display: flex;
@@ -2614,125 +2638,109 @@
 
   <!-- Modal: Artist Publish Product -->
   <div class="modal-backdrop" id="modalPublishProduct">
-    <div class="modal-box" style="max-width: 620px; max-height: 90vh; overflow-y: auto;">
-      <div class="modal-title">Put Out Digital Product For Sale</div>
+    <div class="modal-box pub-modal">
+      <div class="modal-title" style="margin-bottom:0.25rem;">List a product</div>
+      <p class="pub-sub">Add a cover image, a title, a price and a short description. Everything else is optional.</p>
+
       <form id="formPublish" onsubmit="handlePublishProduct(event)">
+        <!-- Cover image -->
         <div class="form-group">
-          <label>Product Title</label>
-          <input type="text" id="pubTitle" placeholder="e.g. Cyberpunk Catgirl Animated Emote Pack" required>
-        </div>
+          <label>Cover image <span class="pub-opt">optional</span></label>
 
-        <!-- Media / Preview (Local File Upload or Direct URL) -->
-        <div class="form-group">
-          <label>Product Media / Preview <span style="font-weight:400;color:var(--text-dim);">(optional — Image, GIF, Animated PNG)</span></label>
-          <div style="display: flex; gap: 0.5rem; margin-bottom: 0.4rem;">
-            <button type="button" class="composer-mini-btn" id="btnMediaModeFile" onclick="switchMediaInputMode('file')" style="flex:1;">📁 Upload from Device (Image / GIF)</button>
-            <button type="button" class="composer-mini-btn" id="btnMediaModeUrl" onclick="switchMediaInputMode('url')" style="flex:1;">🔗 Remote Web URL</button>
-          </div>
-
-          <div id="mediaUploadZone" class="upload-zone">
+          <div id="mediaUploadZone" class="upload-zone pub-drop">
             <input type="file" id="pubMediaFile" accept="image/*,.gif,.png,.jpg,.jpeg,.webp,.svg" onchange="handleLocalMediaUpload(event)">
-            <div style="font-size: 0.825rem; color: var(--primary); font-weight: 600;">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 4px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
-              Choose image or GIF file from your device
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            <div>
+              <div class="pub-drop-title">Choose an image or GIF</div>
+              <div class="pub-drop-hint">PNG, GIF, JPG, WebP or SVG</div>
             </div>
-            <div style="font-size: 0.72rem; color: var(--text-dim); margin-top: 2px;">Supports PNG, Animated GIF, JPG, WebP, SVG</div>
           </div>
+          <button type="button" class="pub-link" id="btnMediaLink" onclick="switchMediaInputMode('url')">or paste an image link</button>
 
-          <div id="mediaUrlZone" style="display: none;">
-            <input type="url" id="pubMediaUrl" placeholder="https://... (or direct .gif / .png link)">
+          <div id="mediaUrlZone" style="display:none;">
+            <input type="url" id="pubMediaUrl" placeholder="https://… (direct .gif / .png link)">
           </div>
 
           <input type="hidden" id="pubFinalMediaUrl">
 
-          <div class="upload-preview-wrap" id="mediaPreviewWrap" style="display: none; margin-top: 0.5rem;">
+          <div class="upload-preview-wrap" id="mediaPreviewWrap">
             <img class="upload-preview-thumb" id="mediaPreviewImg" src="" alt="Preview">
-            <div style="flex: 1; min-width: 0;">
-              <div style="font-size: 0.78rem; font-weight: 700; color: var(--accent-emerald);" id="mediaPreviewStatus">File Loaded Successfully</div>
-              <div style="font-size: 0.72rem; color: var(--text-dim); text-overflow: ellipsis; overflow: hidden; white-space: nowrap;" id="mediaPreviewInfo">Ready for buyers</div>
+            <div style="flex:1;min-width:0;">
+              <div class="pub-file-name" id="mediaPreviewStatus">Image added</div>
+              <div class="pub-file-info" id="mediaPreviewInfo"></div>
             </div>
-            <button type="button" class="btn-row-del" onclick="clearMediaSelection()" title="Remove file">✕</button>
+            <button type="button" class="pub-link" onclick="clearMediaSelection()">Remove</button>
           </div>
         </div>
 
-        <!-- Thumbnail Position Adjuster -->
-        <div class="thumb-adjuster" id="thumbAdjuster">
-          <div style="font-size: 0.78rem; font-weight: 700; color: var(--primary);">🖼 Thumbnail Card Preview (Adjust Focus Point)</div>
-          <div class="thumb-preview-box">
-            <img class="thumb-preview-img" id="thumbAdjPreview" src="" alt="Preview">
+        <!-- Title + price -->
+        <div class="pub-row">
+          <div class="form-group">
+            <label for="pubTitle">Title</label>
+            <input type="text" id="pubTitle" placeholder="e.g. Catgirl Animated Emote Pack" required>
           </div>
-          <div class="thumb-slider-row">
-            <span style="white-space: nowrap;">Horizontal</span>
-            <input type="range" min="0" max="100" value="50" id="thumbPosX" oninput="updateThumbPos()">
-            <span id="thumbPosXVal">50%</span>
-          </div>
-          <div class="thumb-slider-row">
-            <span style="white-space: nowrap;">Vertical</span>
-            <input type="range" min="0" max="100" value="50" id="thumbPosY" oninput="updateThumbPos()">
-            <span id="thumbPosYVal">50%</span>
-          </div>
-          <div class="thumb-slider-row">
-            <span style="white-space: nowrap;">Zoom</span>
-            <input type="range" min="100" max="300" value="100" id="thumbZoom" oninput="updateThumbPos()">
-            <span id="thumbZoomVal">1×</span>
-          </div>
-          <input type="hidden" id="pubThumbObjectPosition" value="50% 50%">
-          <input type="hidden" id="pubThumbZoom" value="1">
-        </div>
-
-        <div class="form-group">
-          <label>Fixed Base Price (USD) - Clients cannot pay below this</label>
-          <input type="number" step="0.01" id="pubMinPrice" placeholder="20.00" required>
-        </div>
-
-        <!-- Structured Vendor Info Composer -->
-        <div class="form-group">
-          <label>Vendor Information & Specifications</label>
-          <div class="vendor-composer">
-            <!-- Text Description / General Rules -->
-            <div>
-              <div class="composer-sublabel">
-                <span>📝 Description & Usage Rules</span>
-              </div>
-              <textarea id="pubVendorDesc" rows="2" placeholder="e.g. Transparent animated GIF + APNG files. Permitted for commercial VTuber streams and Twitch emotes."></textarea>
-            </div>
-
-            <!-- Bullet Points (Multiple bullet points can be added dynamically or pasted) -->
-            <div>
-              <div class="composer-sublabel">
-                <span>• Bullet Points (Add as many as you need)</span>
-                <div style="display:flex; gap:0.4rem;">
-                  <button type="button" class="composer-mini-btn" onclick="addVendorBulletRow()">+ Add Single Bullet</button>
-                  <button type="button" class="composer-mini-btn" onclick="addMultipleBulletRowsPrompt()">+ Add Multiple Bullets</button>
-                </div>
-              </div>
-              <div id="pubBulletContainer"></div>
-            </div>
-
-            <!-- Key-Value Table -->
-            <div>
-              <div class="composer-sublabel">
-                <span>📋 Key-Value Specs Table (Format, License, Resolution, etc.)</span>
-                <button type="button" class="composer-mini-btn" onclick="addVendorKvRow()">+ Add Spec Row</button>
-              </div>
-              <div id="pubKvContainer"></div>
+          <div class="form-group">
+            <label for="pubMinPrice">Price (USD)</label>
+            <div class="price-wrap">
+              <span aria-hidden="true">$</span>
+              <input type="number" step="0.01" min="0" id="pubMinPrice" placeholder="20.00" required>
             </div>
           </div>
         </div>
 
         <div class="form-group">
-          <label>Short Product Overview / Tagline</label>
-          <textarea id="pubDescription" rows="2" placeholder="Brief summary of creative aesthetic..." required></textarea>
+          <label for="pubDescription">Description</label>
+          <textarea id="pubDescription" rows="3" placeholder="What is it, and how can buyers use it?" required></textarea>
         </div>
 
         <div class="form-group">
-          <label>Deliverable Package / Downloadable File Link (Direct Link or Storage Vault)</label>
-          <input type="text" id="pubDownloadUrl" placeholder="https://storage.link/asset.zip (or leave blank for test vault)">
+          <label for="pubDownloadUrl">Download link <span class="pub-opt">optional</span></label>
+          <input type="text" id="pubDownloadUrl" placeholder="https://… (leave blank to use the test vault)">
         </div>
+
+        <!-- Optional extras, tucked away -->
+        <details class="pub-more" id="pubMore">
+          <summary>Add more details <span class="pub-opt">optional</span></summary>
+
+          <div class="form-group">
+            <label for="pubIncluded">What's included <span class="pub-opt">one per line</span></label>
+            <textarea id="pubIncluded" rows="3" placeholder="High-res PNG files&#10;Animated GIF versions&#10;Commercial license"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label>Specs <span class="pub-opt">e.g. File format, Resolution</span></label>
+            <div id="pubKvContainer"></div>
+            <button type="button" class="pub-link" onclick="addVendorKvRow()">+ Add a spec</button>
+          </div>
+
+          <div class="thumb-adjuster" id="thumbAdjuster">
+            <div class="pub-file-name">Thumbnail crop</div>
+            <div class="thumb-preview-box">
+              <img class="thumb-preview-img" id="thumbAdjPreview" src="" alt="Preview">
+            </div>
+            <div class="thumb-slider-row">
+              <span style="width:4.5rem;">Horizontal</span>
+              <input type="range" min="0" max="100" value="50" id="thumbPosX" oninput="updateThumbPos()">
+              <span id="thumbPosXVal">50%</span>
+            </div>
+            <div class="thumb-slider-row">
+              <span style="width:4.5rem;">Vertical</span>
+              <input type="range" min="0" max="100" value="50" id="thumbPosY" oninput="updateThumbPos()">
+              <span id="thumbPosYVal">50%</span>
+            </div>
+            <div class="thumb-slider-row">
+              <span style="width:4.5rem;">Zoom</span>
+              <input type="range" min="100" max="300" value="100" id="thumbZoom" oninput="updateThumbPos()">
+              <span id="thumbZoomVal">1×</span>
+            </div>
+            <input type="hidden" id="pubThumbObjectPosition" value="50% 50%">
+            <input type="hidden" id="pubThumbZoom" value="1">
+          </div>
+        </details>
 
         <div class="modal-actions">
           <button type="button" class="btn-secondary" onclick="closeModal('modalPublishProduct')">Cancel</button>
-          <button type="button" class="btn-create" onclick="handlePublishProduct()">Publish to Market</button>
+          <button type="submit" class="btn-create">Publish</button>
         </div>
       </form>
     </div>
@@ -3504,35 +3512,11 @@
     function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 
     function openPublishModal() {
-      switchMediaInputMode('file');
+      document.getElementById('formPublish').reset();
       clearMediaSelection();
-      // Reset thumbnail adjuster sliders
-      document.getElementById('thumbPosX').value = 50;
-      document.getElementById('thumbPosY').value = 50;
-      document.getElementById('thumbZoom').value = 100;
-      document.getElementById('thumbPosXVal').textContent = '50%';
-      document.getElementById('thumbPosYVal').textContent = '50%';
-      document.getElementById('thumbZoomVal').textContent = '1×';
-      document.getElementById('pubThumbObjectPosition').value = '50% 50%';
-      document.getElementById('pubThumbZoom').value = '1';
-      const adjImg = document.getElementById('thumbAdjPreview');
-      if (adjImg) {
-        adjImg.style.objectPosition = '50% 50%';
-        adjImg.style.transform = 'scale(1)';
-      }
-
-      const bContainer = document.getElementById('pubBulletContainer');
-      if (bContainer && bContainer.children.length === 0) {
-        addVendorBulletRow('Original high-res deliverable files included');
-        addVendorBulletRow('Commercial broadcast & streaming rights granted');
-        addVendorBulletRow('Clean transparent alpha backgrounds included');
-      }
-      const kContainer = document.getElementById('pubKvContainer');
-      if (kContainer && kContainer.children.length === 0) {
-        addVendorKvRow('File Format', 'Transparent PNG + Animated GIF');
-        addVendorKvRow('Resolution', '1080x1080 / 112x112 / 56x56');
-        addVendorKvRow('License', 'Full Commercial / Monetized Streams');
-      }
+      document.getElementById('pubKvContainer').innerHTML = '';
+      document.getElementById('pubMore').open = false;
+      updateThumbPos();
       openModal('modalPublishProduct');
     }
 
@@ -3906,38 +3890,19 @@
       container.textContent = raw;
     }
 
-    // Media Input Mode Switcher (File vs URL)
+    // "or paste an image link" reveals the URL field
     function switchMediaInputMode(mode) {
-      const btnFile = document.getElementById('btnMediaModeFile');
-      const btnUrl = document.getElementById('btnMediaModeUrl');
-      const zoneUpload = document.getElementById('mediaUploadZone');
-      const zoneUrl = document.getElementById('mediaUrlZone');
-
-      if (mode === 'file') {
-        zoneUpload.style.display = 'block';
-        zoneUrl.style.display = 'none';
-        btnFile.style.background = 'var(--primary)';
-        btnFile.style.color = '#fff';
-        btnUrl.style.background = 'var(--primary-light)';
-        btnUrl.style.color = 'var(--primary)';
-      } else {
-        zoneUpload.style.display = 'none';
-        zoneUrl.style.display = 'block';
-        btnUrl.style.background = 'var(--primary)';
-        btnUrl.style.color = '#fff';
-        btnFile.style.background = 'var(--primary-light)';
-        btnFile.style.color = 'var(--primary)';
-
-        const directUrlInput = document.getElementById('pubMediaUrl');
-        directUrlInput.oninput = () => {
-          const val = directUrlInput.value.trim();
-          if (val) {
-            setMediaPreview(val, 'Remote URL Linked', val);
-          } else {
-            clearMediaSelection();
-          }
-        };
-      }
+      const showUrl = mode === 'url';
+      document.getElementById('mediaUrlZone').style.display = showUrl ? 'block' : 'none';
+      document.getElementById('btnMediaLink').style.display = showUrl ? 'none' : 'inline-block';
+      if (!showUrl) return;
+      const input = document.getElementById('pubMediaUrl');
+      input.oninput = () => {
+        const val = input.value.trim();
+        if (val) setMediaPreview(val, 'Linked image', val, true);
+        else clearMediaSelection();
+      };
+      input.focus();
     }
 
     // Local file handler for images & animated GIFs
@@ -3973,8 +3938,11 @@
       }
     }
 
-    function setMediaPreview(srcUrl, title, info) {
+    function setMediaPreview(srcUrl, title, info, keepUrlField = false) {
       document.getElementById('pubFinalMediaUrl').value = srcUrl;
+      document.getElementById('mediaUploadZone').style.display = 'none';
+      document.getElementById('btnMediaLink').style.display = 'none';
+      if (!keepUrlField) document.getElementById('mediaUrlZone').style.display = 'none';
       const previewWrap = document.getElementById('mediaPreviewWrap');
       const previewImg = document.getElementById('mediaPreviewImg');
       previewImg.src = srcUrl;
@@ -3998,33 +3966,14 @@
       document.getElementById('pubMediaUrl').value = '';
       document.getElementById('mediaPreviewWrap').style.display = 'none';
       document.getElementById('mediaPreviewImg').src = '';
+      document.getElementById('mediaUploadZone').style.display = '';
+      document.getElementById('mediaUrlZone').style.display = 'none';
+      document.getElementById('btnMediaLink').style.display = 'inline-block';
 
       const adj = document.getElementById('thumbAdjuster');
       const adjImg = document.getElementById('thumbAdjPreview');
       if (adj) adj.classList.remove('visible');
       if (adjImg) adjImg.src = '';
-    }
-
-    // Dynamic Bullet Row Builder
-    function addVendorBulletRow(val = '') {
-      const container = document.getElementById('pubBulletContainer');
-      const row = document.createElement('div');
-      row.className = 'bullet-row';
-      row.innerHTML = `
-        <span style="color: var(--primary); font-weight: bold;">•</span>
-        <input type="text" class="pub-bullet-item" placeholder="e.g. Includes transparent APNG, GIF & 3 color variants" value="${escapeHtml(val)}">
-        <button type="button" class="btn-row-del" onclick="this.parentElement.remove()" title="Delete">✕</button>
-      `;
-      container.appendChild(row);
-      row.querySelector('input').focus();
-    }
-
-    // Prompt to add multiple bullet points at once
-    function addMultipleBulletRowsPrompt() {
-      const input = prompt("Paste or type multiple bullet items (separated by new line or commas):", "High-res PNG files (300 DPI)\nAnimated transparent GIF\nCommercial streaming license\nIncludes project source layered files");
-      if (!input) return;
-      const items = input.split(/[\n,]+/).map(s => s.trim()).filter(Boolean);
-      items.forEach(item => addVendorBulletRow(item));
     }
 
     // Dynamic Key-Value Spec Row Builder
@@ -4033,8 +3982,8 @@
       const row = document.createElement('div');
       row.className = 'kv-row';
       row.innerHTML = `
-        <input type="text" class="kv-k" placeholder="Spec / Key (e.g. File Format)" value="${escapeHtml(k)}">
-        <input type="text" class="kv-v" placeholder="Value (e.g. Transparent GIF, PNG 4K)" value="${escapeHtml(v)}">
+        <input type="text" class="kv-k" placeholder="Name (e.g. File format)" value="${escapeHtml(k)}">
+        <input type="text" class="kv-v" placeholder="Value (e.g. PNG + GIF)" value="${escapeHtml(v)}">
         <button type="button" class="btn-row-del" onclick="this.parentElement.remove()" title="Delete">✕</button>
       `;
       container.appendChild(row);
@@ -4139,7 +4088,8 @@
       fetchAllData();
     }
 
-    async function handlePublishProduct() {
+    async function handlePublishProduct(e) {
+      if (e && e.preventDefault) e.preventDefault();
       try {
         const title = document.getElementById('pubTitle').value.trim();
         const minPrice = document.getElementById('pubMinPrice').value;
@@ -4152,9 +4102,10 @@
         // media is optional — falls back to a placeholder card
 
         // Collect structured vendor info
-        const desc = document.getElementById('pubVendorDesc').value.trim();
-        const bullets = Array.from(document.querySelectorAll('.pub-bullet-item'))
-          .map(i => i.value.trim())
+        const desc = description; // one description feeds both the card and the detail view
+        const bullets = document.getElementById('pubIncluded').value
+          .split(/\n+/)
+          .map(l => l.replace(/^\s*[-•*]\s*/, '').trim())
           .filter(Boolean);
         const kv = Array.from(document.querySelectorAll('.kv-row'))
           .map(row => ({
@@ -4185,7 +4136,7 @@
         };
 
         const btn = document.querySelector('#modalPublishProduct .btn-create');
-        if (btn) { btn.disabled = true; btn.textContent = 'Publishing...'; }
+        if (btn) { btn.disabled = true; btn.textContent = 'Publishing…'; }
 
         const res = await fetch('/api/products', {
           method: 'POST',
@@ -4193,14 +4144,14 @@
           body: JSON.stringify(payload)
         });
 
-        if (btn) { btn.disabled = false; btn.textContent = 'Publish to Market'; }
+        if (btn) { btn.disabled = false; btn.textContent = 'Publish'; }
 
         if (res.ok) {
           closeModal('modalPublishProduct');
           document.getElementById('formPublish').reset();
           clearMediaSelection();
-          document.getElementById('pubBulletContainer').innerHTML = '';
           document.getElementById('pubKvContainer').innerHTML = '';
+          document.getElementById('pubMore').open = false;
           fetchAllData();
         } else {
           const errText = await res.text();
@@ -4210,7 +4161,7 @@
         console.error('Publish error:', err);
         alert('Unexpected error publishing product: ' + err.message);
         const btn = document.querySelector('#modalPublishProduct .btn-create');
-        if (btn) { btn.disabled = false; btn.textContent = 'Publish to Market'; }
+        if (btn) { btn.disabled = false; btn.textContent = 'Publish'; }
       }
     }
 
