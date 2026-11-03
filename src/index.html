@@ -538,7 +538,192 @@
       display: block;
     }
 
-    /* Marketplace + all tabs: full-bleed wave background */
+    /* ── Hero ── */
+    .hero-tagline {
+      padding: 3.5rem 0 2rem;
+      max-width: 680px;
+    }
+    .hero-tagline h1 {
+      font-size: clamp(2rem, 4.5vw, 3.2rem);
+      font-weight: 900;
+      line-height: 1.12;
+      color: var(--text-main);
+      margin-bottom: 1rem;
+    }
+    .hero-tagline p {
+      font-size: 1.05rem;
+      color: var(--text-muted);
+      max-width: 500px;
+      line-height: 1.6;
+      margin-bottom: 1.5rem;
+    }
+    .hero-btns { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+    .hero-cta  { border-radius: 999px; padding: 0.62rem 1.4rem; font-size: 0.88rem; }
+
+    .hero-panels {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      margin-bottom: 2.4rem;
+    }
+    .hero-panel {
+      border-radius: 16px;
+      overflow: hidden;
+      background: rgba(255,255,255,0.55);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(186,135,212,0.15);
+      min-height: 140px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+    }
+    [data-theme="dark"] .hero-panel {
+      background: rgba(255,255,255,0.06);
+      border-color: rgba(186,135,212,0.18);
+    }
+    .hero-panel-body {
+      padding: 1.2rem 1.4rem;
+    }
+    .hero-panel-body h3 {
+      font-size: 1rem;
+      font-weight: 800;
+      margin-bottom: 0.35rem;
+      color: var(--text-main);
+    }
+    .hero-panel-body p {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      line-height: 1.45;
+    }
+
+    /* ── Home category pills ── */
+    .home-cats { margin-bottom: 2rem; }
+    .home-cat-label {
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: var(--text-main);
+      display: block;
+      margin-bottom: 0.75rem;
+    }
+    .home-cat-pills { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+    .home-cat-pill {
+      background: rgba(186,135,212,0.1);
+      border: 1px solid rgba(186,135,212,0.2);
+      color: var(--text-main);
+      border-radius: 999px;
+      padding: 0.42rem 0.9rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .home-cat-pill:hover { background: rgba(186,135,212,0.22); }
+
+    .home-section-hdr {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+    }
+    .home-section-hdr span {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+    .btn-text-link {
+      background: none;
+      color: var(--primary);
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      padding: 0;
+    }
+
+    /* ── Shop category filter ── */
+    .shop-cats {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.45rem;
+      margin-bottom: 1.4rem;
+    }
+    .shop-cat-btn {
+      background: rgba(186,135,212,0.08);
+      border: 1px solid rgba(186,135,212,0.18);
+      color: var(--text-muted);
+      border-radius: 999px;
+      padding: 0.4rem 0.85rem;
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.15s;
+    }
+    .shop-cat-btn:hover, .shop-cat-btn.active {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+    }
+
+    /* ── Commission browse artist grid ── */
+    .comm-artist-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 1rem;
+    }
+    .comm-artist-card {
+      background: rgba(255,255,255,0.6);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(186,135,212,0.15);
+      border-radius: 14px;
+      padding: 1.2rem;
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    [data-theme="dark"] .comm-artist-card {
+      background: rgba(255,255,255,0.05);
+    }
+    .comm-artist-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 24px rgba(186,135,212,0.18);
+    }
+    .comm-artist-avatar {
+      width: 52px; height: 52px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem; font-weight: 800;
+      margin-bottom: 0.75rem;
+    }
+    .comm-artist-name { font-weight: 800; font-size: 0.95rem; color: var(--text-main); }
+    .comm-artist-handle { font-size: 0.75rem; color: var(--primary); margin-bottom: 0.5rem; }
+    .comm-artist-cats {
+      display: flex; flex-wrap: wrap; gap: 0.3rem; margin-top: 0.5rem;
+    }
+    .comm-artist-cat {
+      background: rgba(186,135,212,0.12);
+      border-radius: 999px;
+      padding: 0.2rem 0.55rem;
+      font-size: 0.68rem;
+      font-weight: 600;
+      color: var(--primary);
+    }
+    .comm-open-badge {
+      display: inline-block;
+      background: #16a34a;
+      color: #fff;
+      font-size: 0.62rem;
+      font-weight: 700;
+      padding: 0.15rem 0.45rem;
+      border-radius: 999px;
+      margin-left: 0.35rem;
+      vertical-align: middle;
+    }
+
+    @media (max-width: 900px) {
+      .hero-panels { grid-template-columns: 1fr; }
+    }
+
+        /* Marketplace + all tabs: full-bleed wave background */
     .tab-content {
       position: relative;
       min-height: calc(100vh - 60px);
@@ -1649,12 +1834,18 @@
     <!-- Main Navigation Tabs (inside the left group) -->
     <div class="nav-tabs">
       <button class="nav-btn active" id="tabBtnMarket" data-tab="marketplace" onclick="switchTab('marketplace')">
-        Digital Market
+        Home
       </button>
-      <button class="nav-btn" id="tabBtnComms" data-tab="commissions" onclick="switchTab('commissions')">
-        Custom Requests
+      <button class="nav-btn" id="tabBtnShop" data-tab="shop" onclick="switchTab('shop')">
+        Shop
       </button>
-      <button class="nav-btn" id="tabBtnMyProfile" data-tab="my-profile" onclick="switchTab('my-profile')">
+      <button class="nav-btn" id="tabBtnBrowseComms" data-tab="browse-commissions" onclick="switchTab('browse-commissions')">
+        Commissions
+      </button>
+      <button class="nav-btn auth-only" id="tabBtnComms" data-tab="commissions" onclick="switchTab('commissions')" style="display:none;">
+        My Requests
+      </button>
+      <button class="nav-btn auth-only" id="tabBtnMyProfile" data-tab="my-profile" onclick="switchTab('my-profile')" style="display:none;">
         My Profile
       </button>
       <button class="nav-btn" id="tabBtnProfile" data-tab="profile" style="display: none;" onclick="switchTab('profile')">
@@ -1675,13 +1866,21 @@
         <span class="cart-badge" id="cartBadge">0</span>
       </button>
 
-      <div class="user-pill">
-        <div>
-          <span style="font-weight: 700; font-size: 0.85rem;" id="navUserName">User</span>
-          <span class="user-role-tag role-Client" id="navRoleTag">Client</span>
-          <span id="navPassTag" class="pass-tag" style="display: none;">ALL-DOWNLOAD PASS</span>
+      <div id="navAuthArea">
+        <!-- shown when logged out -->
+        <div id="navGuestBar" style="display:flex;align-items:center;gap:0.6rem;">
+          <button class="nav-btn" onclick="showAuthOverlay()">Sign In</button>
+          <button class="btn-buy" style="padding:0.38rem 1rem;font-size:0.82rem;border-radius:999px;" onclick="showAuthOverlay('signup')">Sign up</button>
         </div>
-        <button class="btn-logout" onclick="handleLogout()">Sign Out</button>
+        <!-- shown when logged in -->
+        <div class="user-pill" id="navUserPill" style="display:none;">
+          <div>
+            <span style="font-weight: 700; font-size: 0.85rem;" id="navUserName">User</span>
+            <span class="user-role-tag role-Client" id="navRoleTag">Client</span>
+            <span id="navPassTag" class="pass-tag" style="display: none;">ALL-DOWNLOAD PASS</span>
+          </div>
+          <button class="btn-logout" onclick="handleLogout()">Sign Out</button>
+        </div>
       </div>
     </div>
   </header>
@@ -1719,20 +1918,132 @@
       </svg>
 
       <div class="market-inner">
-        <div class="market-banner">
-          <div>
-            <h1 class="market-title">Curated Digital Assets &amp;<br>Creative Goods</h1>
-            <p class="market-desc">Explore models, animated GIFs, emote packs, overlays, and 3D rigs created by verified artists. Click any asset to inspect specs, licensing, reviews, and unlock.</p>
+        <!-- Hero tagline -->
+        <div class="hero-tagline">
+          <h1>For the love of<br>human creativity</h1>
+          <p>The platform for VTubers, streamers, and creators — curated digital goods and custom commissions from verified artists.</p>
+          <div class="hero-btns">
+            <button class="btn-buy hero-cta" onclick="switchTab('shop')">Browse Shop →</button>
+            <button class="btn-secondary hero-cta" onclick="switchTab('browse-commissions')">Find an Artist</button>
           </div>
-          <button class="btn-create" id="btnPublishProduct" style="display: none;" onclick="openPublishModal()">+ Put Out Digital Product</button>
         </div>
 
+        <!-- 3 feature panels (like VGen) -->
+        <div class="hero-panels">
+          <div class="hero-panel">
+            <div class="hero-panel-body">
+              <h3>Made for creators</h3>
+              <p>Everything you need for VTubing, streaming, music, game, and content adventures — fans welcome too!</p>
+            </div>
+          </div>
+          <div class="hero-panel">
+            <div class="hero-panel-body">
+              <h3>No Generative AI</h3>
+              <p>Every asset is hand-crafted by a verified human artist. AI-generated content is not welcome here.</p>
+            </div>
+          </div>
+          <div class="hero-panel">
+            <div class="hero-panel-body">
+              <h3>Verified but private</h3>
+              <p>Verified artists and reviews, with escrow-protected commissions. Your personal info stays between you and AtelierV.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Category pills -->
+        <div class="home-cats">
+          <span class="home-cat-label">Commission services</span>
+          <div class="home-cat-pills">
+            <button class="home-cat-pill" onclick="switchTab('browse-commissions')">🎨 Illustrations</button>
+            <button class="home-cat-pill" onclick="switchTab('browse-commissions')">🧑 2D Avatars</button>
+            <button class="home-cat-pill" onclick="switchTab('browse-commissions')">🗿 3D Models</button>
+            <button class="home-cat-pill" onclick="switchTab('browse-commissions')">😀 Emotes &amp; Badges</button>
+            <button class="home-cat-pill" onclick="switchTab('browse-commissions')">📺 Stream Assets</button>
+            <button class="home-cat-pill" onclick="switchTab('browse-commissions')">✍️ Writing</button>
+            <button class="home-cat-pill" onclick="switchTab('browse-commissions')">🎵 Music + Audio</button>
+            <button class="home-cat-pill" onclick="switchTab('browse-commissions')">📐 Branding + Graphics</button>
+          </div>
+        </div>
+
+        <!-- Featured products preview -->
+        <div class="home-section-hdr">
+          <span>Shop digital products</span>
+          <button class="btn-text-link" onclick="switchTab('shop')">Browse products →</button>
+        </div>
         <div class="products-grid" id="productsContainer">
+          <!-- Injected via JavaScript -->
+        </div>
+
+        <button class="btn-create" id="btnPublishProduct" style="display:none;margin-top:1rem;" onclick="openPublishModal()">+ Put Out Digital Product</button>
+      </div>
+    </section>
+
+
+    <!-- TAB: SHOP (public, shows all digital products) -->
+    <section id="tab-shop" class="tab-content">
+      <svg class="market-waves" viewBox="0 0 1400 780" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <defs><style>.mw{fill:none;stroke-linecap:round;animation:mwdrift linear infinite}@keyframes mwdrift{0%{transform:translateX(0)}100%{transform:translateX(calc(-1 * var(--p, 140px)))}}</style></defs>
+        <g stroke="#ba87d4" stroke-opacity="0.18" stroke-width="2.5">
+          <path class="mw" style="--p:420px;animation-duration:54s" d="M-500 520 q105 -44 210 0 t210 0 t210 0 t210 0 t210 0 t210 0 t210 0 t210 0 t210 0 t210 0 t210 0 t210 0 t210 0 t210 0 t210 0"/>
+          <path class="mw" style="--p:350px;animation-duration:55s;animation-delay:-10s" d="M-500 580 q87.5 -60 175 0 t175 0 t175 0 t175 0 t175 0 t175 0 t175 0 t175 0 t175 0 t175 0 t175 0 t175 0 t175 0 t175 0 t175 0 t175 0"/>
+        </g>
+        <g stroke="#e5c1f5" stroke-opacity="0.22" stroke-width="48" fill="none">
+          <path class="mw" style="--p:400px;animation-duration:68s;animation-delay:-28s" d="M-500 700 q100 -76 200 0 t200 0 t200 0 t200 0 t200 0 t200 0 t200 0 t200 0 t200 0 t200 0 t200 0 t200 0 t200 0 t200 0 t200 0"/>
+        </g>
+      </svg>
+      <div class="market-inner">
+        <div class="market-banner">
+          <div>
+            <h1 class="market-title">Shop Digital Products</h1>
+            <p class="market-desc">Browse emote packs, overlays, 3D rigs, Live2D models, and more from verified creators.</p>
+          </div>
+          <button class="btn-create" id="btnPublishProductShop" style="display:none;" onclick="openPublishModal()">+ Put Out Digital Product</button>
+        </div>
+
+        <!-- Category pill filters -->
+        <div class="shop-cats" id="shopCatFilter">
+          <button class="shop-cat-btn active" data-cat="">All</button>
+          <button class="shop-cat-btn" data-cat="Emotes">Emotes + Badges</button>
+          <button class="shop-cat-btn" data-cat="2D Avatars">2D Avatars</button>
+          <button class="shop-cat-btn" data-cat="3D">3D Models</button>
+          <button class="shop-cat-btn" data-cat="Overlays">Overlays &amp; UI</button>
+          <button class="shop-cat-btn" data-cat="Live2D">Live2D</button>
+          <button class="shop-cat-btn" data-cat="Animation">Animation</button>
+          <button class="shop-cat-btn" data-cat="Music">Music + Audio</button>
+        </div>
+
+        <div class="products-grid" id="shopProductsContainer">
           <!-- Injected via JavaScript -->
         </div>
       </div>
     </section>
 
+    <!-- TAB: BROWSE COMMISSIONS (public) -->
+    <section id="tab-browse-commissions" class="tab-content">
+      <svg class="market-waves" viewBox="0 0 1400 780" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <defs><style>.mw{fill:none;stroke-linecap:round;animation:mwdrift linear infinite}@keyframes mwdrift{0%{transform:translateX(0)}100%{transform:translateX(calc(-1 * var(--p, 140px)))}}</style></defs>
+        <g stroke="#ba87d4" stroke-opacity="0.18" stroke-width="2.5">
+          <path class="mw" style="--p:420px;animation-duration:54s" d="M-500 520 q105 -44 210 0 t210 0 t210 0 t210 0 t210 0 t210 0 t210 0 t210 0 t210 0 t210 0 t210 0 t210 0 t210 0 t210 0 t210 0"/>
+          <path class="mw" style="--p:350px;animation-duration:55s;animation-delay:-10s" d="M-500 580 q87.5 -60 175 0 t175 0 t175 0 t175 0 t175 0 t175 0 t175 0 t175 0 t175 0 t175 0 t175 0 t175 0 t175 0 t175 0 t175 0 t175 0"/>
+        </g>
+        <g stroke="#e5c1f5" stroke-opacity="0.22" stroke-width="48" fill="none">
+          <path class="mw" style="--p:400px;animation-duration:68s;animation-delay:-28s" d="M-500 700 q100 -76 200 0 t200 0 t200 0 t200 0 t200 0 t200 0 t200 0 t200 0 t200 0 t200 0 t200 0 t200 0 t200 0 t200 0 t200 0"/>
+        </g>
+      </svg>
+      <div class="market-inner">
+        <div class="market-banner">
+          <div>
+            <h1 class="market-title">Commission Services</h1>
+            <p class="market-desc">Browse open commission slots from verified artists. Sign in to send a brief and get started.</p>
+          </div>
+        </div>
+
+        <!-- Artist directory as commission cards -->
+        <div class="comm-artist-grid" id="browseCommArtistGrid">
+          <!-- Injected via JS -->
+        </div>
+      </div>
+    </section>
     <!-- TAB: MY OWN PROFILE (Artist & Client) -->
     <section id="tab-my-profile" class="tab-content">
       <svg class="market-waves" viewBox="0 0 1400 780" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -2510,6 +2821,92 @@
       'Writing'
     ];
 
+    function updateNavForGuest() {
+      document.getElementById('navGuestBar').style.display = 'flex';
+      document.getElementById('navUserPill').style.display = 'none';
+      document.querySelectorAll('.auth-only').forEach(el => el.style.display = 'none');
+    }
+
+    function showAuthOverlay(mode) {
+      const ov = document.getElementById('authOverlay');
+      ov.style.display = 'flex';
+      ov.classList.remove('fading-out');
+      if (mode === 'signup') switchAuthMode('signup');
+      else switchAuthMode('login');
+    }
+
+    function requireAuth(action) {
+      if (currentUser) { action(); return; }
+      showAuthOverlay();
+      // store intent to resume after login — simple one-shot
+      window._pendingAuthAction = action;
+    }
+
+    function loadPublicProducts() {
+      fetch('/api/products')
+        .then(r => r.ok ? r.json() : [])
+        .then(data => {
+          products = data;
+          renderProducts();
+        renderShopProducts();
+        if (document.getElementById('btnPublishProductShop'))
+          document.getElementById('btnPublishProductShop').style.display = currentUser?.role === 'Artist' ? 'block' : 'none';
+        renderBrowseCommArtists();
+          renderShopProducts();
+          renderBrowseCommArtists();
+        })
+        .catch(() => {});
+    }
+
+    function renderShopProducts(filterCat) {
+      const c = document.getElementById('shopProductsContainer');
+      if (!c) return;
+      let list = products;
+      if (filterCat) list = products.filter(p => {
+        try { const vi = JSON.parse(p.vendor_info); return JSON.stringify(vi).toLowerCase().includes(filterCat.toLowerCase()); } catch { return false; }
+      });
+      if (list.length === 0) {
+        c.innerHTML = `<div style="grid-column:1/-1;color:var(--text-dim);text-align:center;padding:3rem;">No products yet.</div>`;
+        return;
+      }
+      c.innerHTML = list.map(p => {
+        let imgStyle = '';
+        try { const vi = JSON.parse(p.vendor_info); if (vi.thumb_pos||vi.thumb_zoom) { imgStyle=`object-fit:cover;object-position:${vi.thumb_pos||'50% 50%'};transform:scale(${vi.thumb_zoom||1});transform-origin:${vi.thumb_pos||'50% 50%'};`; } } catch(e){}
+        return `
+          <div class="product-card" onclick="openProductDetailModal(${p.id})">
+            <div class="product-media-wrap">
+              ${p.media_url ? `<img class="product-media" src="${escapeHtml(p.media_url)}" alt="${escapeHtml(p.title)}" loading="lazy" style="${imgStyle}">` : `<div class="product-media product-media-placeholder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="40" height="40"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg></div>`}
+              <div class="product-price-tag">From $${p.min_price.toFixed(2)}</div>
+            </div>
+            <div class="product-body">
+              <div class="product-card-title">${escapeHtml(p.title)}</div>
+              <div style="font-size:0.72rem;color:var(--text-dim);margin-bottom:4px;">by ${escapeHtml(p.artist_name)}</div>
+              <div style="margin-top:4px;">${ratingBarHtml(p)}</div>
+            </div>
+          </div>`;
+      }).join('');
+    }
+
+    function renderBrowseCommArtists() {
+      const c = document.getElementById('browseCommArtistGrid');
+      if (!c) return;
+      const artists = availableArtists.length ? availableArtists : [];
+      if (artists.length === 0) {
+        c.innerHTML = `<div style="color:var(--text-dim);padding:3rem;text-align:center;">No artists listed yet.</div>`;
+        return;
+      }
+      c.innerHTML = artists.map(a => {
+        const cats = (() => { try { return JSON.parse(a.creator_categories || '[]'); } catch { return []; } })();
+        return `
+          <div class="comm-artist-card" onclick="openArtistProfile(${a.id})">
+            <div class="comm-artist-avatar">${(a.display_name||a.username||'?').charAt(0).toUpperCase()}</div>
+            <div class="comm-artist-name">${escapeHtml(a.display_name)} <span class="comm-open-badge">OPEN</span></div>
+            <div class="comm-artist-handle">@${escapeHtml(a.username)}</div>
+            <div class="comm-artist-cats">${cats.slice(0,4).map(c2=>`<span class="comm-artist-cat">${escapeHtml(c2)}</span>`).join('')}</div>
+          </div>`;
+      }).join('');
+    }
+
     function setSession(user) {
       currentUser = user;
       localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
@@ -2525,6 +2922,11 @@
         ov.addEventListener('animationend', onEnd);
       })();
 
+      document.getElementById('navGuestBar').style.display = 'none';
+      document.getElementById('navUserPill').style.display = 'flex';
+      document.querySelectorAll('.auth-only').forEach(el => el.style.display = '');
+      // fire any pending post-auth action
+      if (window._pendingAuthAction) { const fn = window._pendingAuthAction; window._pendingAuthAction = null; setTimeout(fn, 300); }
       document.getElementById('navUserName').textContent = user.display_name;
       const tag = document.getElementById('navRoleTag');
       tag.textContent = user.role;
@@ -2639,10 +3041,13 @@
       renderCart();
       document.getElementById('tabBtnProfile').style.display = 'none';
       openProfileSection('overview');
+      updateNavForGuest();
       switchTab('marketplace');
     }
 
     function switchTab(tab) {
+      const AUTH_TABS = ['commissions','my-profile','cart','escrow','ownership','vault'];
+      if (AUTH_TABS.includes(tab) && !currentUser) { showAuthOverlay(); return; }
       document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
       document.querySelectorAll('.nav-btn').forEach(el => el.classList.toggle('active', el.dataset.tab === tab));
       const cartBtn = document.getElementById('btnCart');
@@ -3941,6 +4346,14 @@
 
     // Startup Session Restoration & Theme Init
     window.addEventListener('DOMContentLoaded', () => {
+      // Shop category filter
+      document.addEventListener('click', e => {
+        const btn = e.target.closest('.shop-cat-btn');
+        if (!btn) return;
+        document.querySelectorAll('.shop-cat-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        renderShopProducts(btn.dataset.cat);
+      });
       initTheme();
       initWebSocket();
       const saved = localStorage.getItem(STORAGE_KEY);
@@ -3953,7 +4366,10 @@
             .catch(() => handleLogout());
         } catch { handleLogout(); }
       } else {
-        document.getElementById('authOverlay').style.display = 'flex';
+        // Not logged in — show page, auth overlay only on demand
+        document.getElementById('authOverlay').style.display = 'none';
+        updateNavForGuest();
+        loadPublicProducts();
       }
     });
   </script>
