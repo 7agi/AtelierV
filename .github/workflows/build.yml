@@ -29,23 +29,19 @@ jobs:
       - name: Rust Cache
         uses: Swatinem/rust-cache@v2
 
-      - name: Compile All Release Binaries
+      - name: Compile Release Binary
         run: |
-          cargo build --release --target x86_64-pc-windows-msvc --bin atelierv
-          cargo build --release --target x86_64-pc-windows-msvc --bin atelierv-admin
-          cargo build --release --target x86_64-pc-windows-msvc --bin atelierv-admin-cli
+          cargo build --release --target x86_64-pc-windows-msvc --bin atelier-v
 
       - name: Package Unified Suite
         shell: bash
         run: |
           mkdir -p dist
-          cp target/x86_64-pc-windows-msvc/release/atelierv.exe dist/
-          cp target/x86_64-pc-windows-msvc/release/atelierv-admin.exe dist/
-          cp target/x86_64-pc-windows-msvc/release/atelierv-admin-cli.exe dist/
-          cp run.bat dist/
-          cp run-admin.bat dist/
-          cp run-admin-cli.bat dist/
-          cp README.md dist/
+          cp target/x86_64-pc-windows-msvc/release/atelier-v.exe dist/
+          [ -f run.bat ] && cp run.bat dist/ || true
+          [ -f run-admin.bat ] && cp run-admin.bat dist/ || true
+          [ -f run-admin-cli.bat ] && cp run-admin-cli.bat dist/ || true
+          [ -f README.md ] && cp README.md dist/ || true
 
       - name: Upload Unified Suite Artifact
         uses: actions/upload-artifact@v4
@@ -59,8 +55,6 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            dist/atelierv.exe
-            dist/atelierv-admin.exe
-            dist/atelierv-admin-cli.exe
+            dist/atelier-v.exe
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
