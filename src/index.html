@@ -4479,23 +4479,30 @@
         const ctx  = canvas.getContext('2d');
         const W = 220, H = 220, S = 62; // canvas size, half-edge
 
-        const PRIMARY   = '#ba87d4';
-        const FACE_FILL = 'rgba(186,135,212,0.13)';
-        const LABEL_COL = '#ba87d4';
+        // 6 face base colors - light to dark shading per face, no strokes
+        // faces: front, back, right, left, top, bottom
+        const FACE_SHADES = [
+          'rgba(186,135,212,0.55)', // front  - brightest
+          'rgba(186,135,212,0.18)', // back   - darkest (usually hidden)
+          'rgba(186,135,212,0.38)', // right
+          'rgba(186,135,212,0.28)', // left
+          'rgba(186,135,212,0.65)', // top    - highlight
+          'rgba(186,135,212,0.22)', // bottom - shadow
+        ];
 
         // 8 vertices of a cube centred at origin, size S
         const verts = [
           [-S,-S,-S],[S,-S,-S],[S,S,-S],[-S,S,-S],
           [-S,-S, S],[S,-S, S],[S,S, S],[-S,S, S]
         ];
-        // 6 faces as vertex indices + label
+        // 6 faces as vertex indices — no labels except front
         const faces = [
-          { idx:[4,5,6,7], label:'aV'  },
-          { idx:[1,0,3,2], label:'aV'  },
-          { idx:[5,1,2,6], label:'✦'   },
-          { idx:[0,4,7,3], label:'✦'   },
-          { idx:[0,1,5,4], label:'◆'   },
-          { idx:[3,2,6,7], label:'◆'   },
+          { idx:[4,5,6,7], shade: FACE_SHADES[0], isFront: true  },
+          { idx:[1,0,3,2], shade: FACE_SHADES[1], isFront: false },
+          { idx:[5,1,2,6], shade: FACE_SHADES[2], isFront: false },
+          { idx:[0,4,7,3], shade: FACE_SHADES[3], isFront: false },
+          { idx:[0,1,5,4], shade: FACE_SHADES[4], isFront: false },
+          { idx:[3,2,6,7], shade: FACE_SHADES[5], isFront: false },
         ];
 
         const TOTAL = 2400; // ms total
@@ -4558,21 +4565,11 @@
             for (let i = 1; i < pts.length; i++) ctx.lineTo(pts[i][0], pts[i][1]);
             ctx.closePath();
 
-            ctx.fillStyle = FACE_FILL;
+            ctx.fillStyle = f.shade;
             ctx.fill();
-            ctx.strokeStyle = PRIMARY;
-            ctx.lineWidth = 2;
-            ctx.stroke();
+            // no stroke — clean look
 
-            // label centroid
-            const cx = pts.reduce((s,p)=>s+p[0],0)/pts.length;
-            const cy = pts.reduce((s,p)=>s+p[1],0)/pts.length;
-            const avgScale = pts.reduce((s,p)=>s+p[2],0)/pts.length;
-            ctx.fillStyle = LABEL_COL;
-            ctx.font = `700 ${Math.round(18*avgScale)}px "Plus Jakarta Sans",sans-serif`;
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText(f.label, cx, cy);
+
           });
 
           ctx.globalAlpha = 1;
