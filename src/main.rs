@@ -46,6 +46,7 @@ pub struct User {
     pub password_hash: String,
     pub all_download_access: i64, // 1 if tester account with instant download access
     pub creator_categories: Option<String>, // Comma-separated niche list (artists only)
+    pub avatar_url: Option<String>, // Small data-URL profile picture (None = show initial)
     pub created_at: String,
 }
 
@@ -57,6 +58,7 @@ pub struct SafeUser {
     pub role: String,
     pub all_download_access: bool,
     pub creator_categories: Option<String>,
+    pub avatar_url: Option<String>,
     pub created_at: String,
 }
 
@@ -69,6 +71,7 @@ impl From<User> for SafeUser {
             role: u.role,
             all_download_access: u.all_download_access == 1,
             creator_categories: u.creator_categories,
+            avatar_url: u.avatar_url,
             created_at: u.created_at,
         }
     }
@@ -86,6 +89,9 @@ pub struct SignupReq {
 pub struct UpdateProfileReq {
     pub creator_categories: Option<String>, // Comma-separated list of niches
     pub display_name: Option<String>,
+    pub username: Option<String>,
+    // Data URL for a new picture, or "" to remove the current one
+    pub avatar_url: Option<String>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -155,6 +161,7 @@ pub struct ProductReview {
 
 #[derive(Debug, Deserialize)]
 pub struct CreateReviewReq {
+    #[serde(default)] // the product id comes from the URL path; the body does not need to repeat it
     pub product_id: i64,
     pub user_id: i64,
     pub rating: i64,
@@ -448,6 +455,10 @@ pub async fn run_migrations(pool: &SqlitePool) -> Result<(), sqlx::Error> {
         .execute(pool)
         .await;
 
+    let _ = sqlx::query("ALTER TABLE users ADD COLUMN avatar_url TEXT")
+        .execute(pool)
+        .await;
+
     tracing::info!("Database schema validated.");
     Ok(())
 }
@@ -539,7 +550,7 @@ async fn login_user(
 ) -> Response {
     let clean_user = payload.username.trim().to_lowercase();
     let user_opt = sqlx::query_as::<_, User>(
-        "SELECT id, username, display_name, role, password_hash, all_download_access, creator_categories, created_at FROM users WHERE LOWER(username) = ?"
+        "SELECT id, username, display_name, role, password_hash, all_download_access, creator_categories, avatar_url, created_at FROM users WHERE LOWER(username) = ?"
     )
     .bind(&clean_user)
     .fetch_optional(&state.db)
@@ -572,7 +583,7 @@ async fn get_current_user(
     };
 
     let user_opt = sqlx::query_as::<_, User>(
-        "SELECT id, username, display_name, role, password_hash, all_download_access, creator_categories, created_at FROM users WHERE id = ?"
+        "SELECT id, username, display_name, role, password_hash, all_download_access, creator_categories, avatar_url, created_at FROM users WHERE id = ?"
     )
     .bind(user_id)
     .fetch_optional(&state.db)
@@ -587,7 +598,7 @@ async fn get_current_user(
 
 async fn list_artists(State(state): State<AppState>) -> Json<Vec<SafeUser>> {
     let artists = sqlx::query_as::<_, User>(
-        "SELECT id, username, display_name, role, password_hash, all_download_access, creator_categories, created_at FROM users WHERE role = 'Artist' ORDER BY display_name ASC"
+        "SELECT id, username, display_name, role, password_hash, all_download_access, creator_categories, avatar_url, created_at FROM users WHERE role = 'Artist' ORDER BY display_name ASC"
     )
     .fetch_all(&state.db)
     .await
@@ -602,24 +613,88 @@ async fn update_user_profile(
     Path(user_id): Path<i64>,
     Json(payload): Json<UpdateProfileReq>,
 ) -> Response {
+    use axum::http::StatusCode;
+
+    // Validate everything first so a bad field never leaves a half-applied update.
+    let display_name = match payload.display_name.as_ref().map(|d| d.trim().to_string()) {
+        Some(d) if d.is_empty() || d.chars().count() > 40 => {
+            return (StatusCode::BAD_REQUEST, "Display name must be 1 to 40 characters").into_response();
+        }
+        other => other,
+    };
+
+    let username = match payload.username.as_ref().map(|u| u.trim().to_lowercase()) {
+        Some(u) => {
+            let ok_len = (3..=24).contains(&u.chars().count());
+            let ok_chars = u.chars().all(|c| c.is_ascii_alphanumeric() || c == '_' || c == '.');
+            if !ok_len || !ok_chars {
+                return (
+                    StatusCode::BAD_REQUEST,
+                    "Username must be 3 to 24 characters: letters, numbers, underscores or dots",
+                )
+                    .into_response();
+            }
+            Some(u)
+        }
+        None => None,
+    };
+
+    // None = leave as is, Some(None) = remove picture, Some(Some(url)) = new picture
+    let avatar: Option<Option<String>> = match payload.avatar_url.as_ref() {
+        None => None,
+        Some(a) if a.is_empty() => Some(None),
+        Some(a) => {
+            if !a.starts_with("data:image/") || a.len() > 700_000 {
+                return (StatusCode::BAD_REQUEST, "Profile picture must be a small image").into_response();
+            }
+            Some(Some(a.clone()))
+        }
+    };
+
+    // Usernames are matched case-insensitively at login, so check for clashes the same way.
+    if let Some(ref un) = username {
+        let taken: Option<(i64,)> = sqlx::query_as("SELECT id FROM users WHERE LOWER(username) = ? AND id != ?")
+            .bind(un)
+            .bind(user_id)
+            .fetch_optional(&state.db)
+            .await
+            .unwrap_or(None);
+        if taken.is_some() {
+            return (StatusCode::CONFLICT, "That username is already taken").into_response();
+        }
+    }
+
     let mut sets: Vec<&str> = vec![];
     if payload.creator_categories.is_some() { sets.push("creator_categories = ?"); }
-    if payload.display_name.is_some() { sets.push("display_name = ?"); }
+    if display_name.is_some() { sets.push("display_name = ?"); }
+    if username.is_some() { sets.push("username = ?"); }
+    if avatar.is_some() { sets.push("avatar_url = ?"); }
 
     if sets.is_empty() {
-        return (axum::http::StatusCode::BAD_REQUEST, "Nothing to update").into_response();
+        return (StatusCode::BAD_REQUEST, "Nothing to update").into_response();
     }
 
     let sql = format!("UPDATE users SET {} WHERE id = ?", sets.join(", "));
     let mut q = sqlx::query(&sql);
     if let Some(ref cats) = payload.creator_categories { q = q.bind(cats); }
-    if let Some(ref dn) = payload.display_name { q = q.bind(dn); }
+    if let Some(ref dn) = display_name { q = q.bind(dn); }
+    if let Some(ref un) = username { q = q.bind(un); }
+    if let Some(ref av) = avatar { q = q.bind(av.clone()); }
     q = q.bind(user_id);
 
     match q.execute(&state.db).await {
+        Ok(r) if r.rows_affected() == 0 => (StatusCode::NOT_FOUND, "User not found").into_response(),
         Ok(_) => {
+            // Reviews keep a snapshot of the reviewer's name; keep it in step with renames.
+            if let Some(ref dn) = display_name {
+                let _ = sqlx::query("UPDATE product_reviews SET user_name = ? WHERE user_id = ?")
+                    .bind(dn)
+                    .bind(user_id)
+                    .execute(&state.db)
+                    .await;
+            }
             let user_opt = sqlx::query_as::<_, User>(
-                "SELECT id, username, display_name, role, password_hash, all_download_access, creator_categories, created_at FROM users WHERE id = ?"
+                "SELECT id, username, display_name, role, password_hash, all_download_access, creator_categories, avatar_url, created_at FROM users WHERE id = ?"
             )
             .bind(user_id)
             .fetch_optional(&state.db)
@@ -627,10 +702,17 @@ async fn update_user_profile(
             .unwrap_or(None);
             match user_opt {
                 Some(u) => Json(SafeUser::from(u)).into_response(),
-                None => (axum::http::StatusCode::NOT_FOUND, "User not found").into_response(),
+                None => (StatusCode::NOT_FOUND, "User not found").into_response(),
             }
         }
-        Err(e) => (axum::http::StatusCode::INTERNAL_SERVER_ERROR, format!("Update failed: {}", e)).into_response(),
+        Err(e) => {
+            let msg = e.to_string();
+            if msg.contains("UNIQUE") {
+                (StatusCode::CONFLICT, "That username is already taken").into_response()
+            } else {
+                (StatusCode::INTERNAL_SERVER_ERROR, format!("Update failed: {}", msg)).into_response()
+            }
+        }
     }
 }
 
@@ -982,7 +1064,7 @@ async fn list_commissions(
     };
 
     let user_opt = sqlx::query_as::<_, User>(
-        "SELECT id, username, display_name, role, password_hash, all_download_access, creator_categories, created_at FROM users WHERE id = ?"
+        "SELECT id, username, display_name, role, password_hash, all_download_access, creator_categories, avatar_url, created_at FROM users WHERE id = ?"
     )
     .bind(user_id)
     .fetch_optional(&state.db)
