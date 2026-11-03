@@ -78,6 +78,97 @@
       transition: background-color 0.2s ease, color 0.2s ease;
     }
 
+    /* ── Cube Intro Transition ── */
+    #cubeIntro {
+      position: fixed; inset: 0; z-index: 2000;
+      background: var(--bg-base);
+      display: flex; align-items: center; justify-content: center;
+      pointer-events: none;
+    }
+    #cubeIntro.done { display: none; }
+    .cube-scene {
+      perspective: 600px; width: 90px; height: 90px;
+    }
+    .cube {
+      width: 100%; height: 100%;
+      position: relative; transform-style: preserve-3d;
+      animation: cubeRoll 1.6s cubic-bezier(0.4,0,0.2,1) forwards;
+    }
+    @keyframes cubeRoll {
+      0%   { transform: rotateY(-90deg) rotateX(20deg) scale(0.6); opacity: 0; }
+      35%  { transform: rotateY(0deg)   rotateX(0deg)  scale(1);   opacity: 1; }
+      65%  { transform: rotateY(0deg)   rotateX(0deg)  scale(1);   opacity: 1; }
+      100% { transform: rotateY(90deg)  rotateX(-10deg) scale(0.5); opacity: 0; }
+    }
+    .cube-face {
+      position: absolute; width: 90px; height: 90px;
+      border: 2px solid var(--primary); border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.6rem; font-weight: 800; color: var(--primary);
+      background: var(--primary-light);
+      backdrop-filter: blur(4px);
+    }
+    .cube-face.front  { transform: translateZ(45px); }
+    .cube-face.back   { transform: rotateY(180deg) translateZ(45px); }
+    .cube-face.left   { transform: rotateY(-90deg) translateZ(45px); }
+    .cube-face.right  { transform: rotateY(90deg)  translateZ(45px); }
+    .cube-face.top    { transform: rotateX(90deg)  translateZ(45px); }
+    .cube-face.bottom { transform: rotateX(-90deg) translateZ(45px); }
+
+    /* ── Tab fade transition ── */
+    @keyframes tabFadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .tab-content.active { animation: tabFadeIn 0.22s ease both; }
+
+    /* ── Avatar Profile Button ── */
+    .avatar-btn {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: var(--primary-light); color: var(--primary);
+      font-weight: 800; font-size: 0.95rem;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; border: 2px solid var(--primary);
+      transition: background 0.15s, transform 0.15s;
+      flex-shrink: 0;
+    }
+    .avatar-btn:hover { background: var(--primary); color: #fff; transform: scale(1.08); }
+
+    /* ── Bio field ── */
+    .bio-wrap { margin-top: 1rem; }
+    .bio-wrap textarea {
+      width: 100%; resize: vertical; min-height: 72px;
+      background: var(--bg-subtle); border-radius: 8px;
+      padding: 0.6rem 0.75rem; font-size: 0.85rem;
+      font-family: inherit; color: var(--text-main);
+      transition: background 0.15s;
+    }
+    .bio-char { font-size: 0.72rem; color: var(--text-dim); text-align: right; margin-top: 3px; }
+
+    /* ── Payment connections ── */
+    .payment-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 0.75rem;
+      margin-top: 1rem;
+    }
+    .payment-card {
+      background: var(--bg-subtle); border-radius: 10px;
+      padding: 0.85rem 0.7rem; display: flex; flex-direction: column;
+      align-items: center; gap: 0.4rem; cursor: pointer;
+      transition: background 0.15s, transform 0.12s;
+      border: 1.5px solid transparent;
+    }
+    .payment-card:hover { background: var(--bg-subtle-hover); transform: translateY(-2px); }
+    .payment-card.connected { border-color: var(--accent-emerald); }
+    .payment-card svg { width: 28px; height: 28px; }
+    .payment-card-name { font-size: 0.75rem; font-weight: 700; color: var(--text-main); }
+    .payment-card-status { font-size: 0.68rem; color: var(--text-dim); }
+    .payment-card.connected .payment-card-status { color: var(--accent-emerald); font-weight: 600; }
+
+    /* ── Password strength ── */
+    .pw-strength-bar { height: 3px; border-radius: 2px; margin-top: 5px; background: var(--bg-subtle); overflow: hidden; }
+    .pw-strength-fill { height: 100%; width: 0; border-radius: 2px; transition: width 0.3s, background 0.3s; }
+    .pw-strength-label { font-size: 0.7rem; margin-top: 3px; font-weight: 600; }
+
     /* Auth Overlay - split layout from Figma "aV Website Design" */
     @keyframes authSlideIn {
       from { opacity: 0; transform: translateY(18px) scale(0.985); }
@@ -1716,6 +1807,20 @@
 <body>
 
   <!-- Auth Overlay -->
+  <!-- Cube intro transition -->
+  <div id="cubeIntro" aria-hidden="true">
+    <div class="cube-scene">
+      <div class="cube">
+        <div class="cube-face front">aV</div>
+        <div class="cube-face back">aV</div>
+        <div class="cube-face left">✦</div>
+        <div class="cube-face right">✦</div>
+        <div class="cube-face top">◆</div>
+        <div class="cube-face bottom">◆</div>
+      </div>
+    </div>
+  </div>
+
   <div id="authOverlay">
     <div class="auth-shell">
       <div class="auth-panel">
@@ -1873,12 +1978,11 @@
           <button class="btn-buy" style="padding:0.38rem 1rem;font-size:0.82rem;border-radius:999px;" onclick="showAuthOverlay('signup')">Sign up</button>
         </div>
         <!-- shown when logged in -->
-        <div class="user-pill" id="navUserPill" style="display:none;">
-          <div>
-            <span style="font-weight: 700; font-size: 0.85rem;" id="navUserName">User</span>
-            <span class="user-role-tag role-Client" id="navRoleTag">Client</span>
-            <span id="navPassTag" class="pass-tag" style="display: none;">ALL-DOWNLOAD PASS</span>
-          </div>
+        <div class="user-pill" id="navUserPill" style="display:none;align-items:center;gap:0.5rem;">
+          <span style="font-weight: 700; font-size: 0.85rem;" id="navUserName">User</span>
+          <span class="user-role-tag role-Client" id="navRoleTag">Client</span>
+          <span id="navPassTag" class="pass-tag" style="display: none;">PASS</span>
+          <button class="avatar-btn" id="navAvatarBtn" onclick="switchTab('my-profile')" title="My Profile" aria-label="My Profile">?</button>
           <button class="btn-logout" onclick="handleLogout()">Sign Out</button>
         </div>
       </div>
@@ -1974,7 +2078,7 @@
           <!-- Injected via JavaScript -->
         </div>
 
-        <button class="btn-create" id="btnPublishProduct" style="display:none;margin-top:1rem;" onclick="openPublishModal()">+ Put Out Digital Product</button>
+        <!-- Publish moved to My Profile tab -->
       </div>
     </section>
 
@@ -1997,7 +2101,7 @@
             <h1 class="market-title">Shop Digital Products</h1>
             <p class="market-desc">Browse emote packs, overlays, 3D rigs, Live2D models, and more from verified creators.</p>
           </div>
-          <button class="btn-create" id="btnPublishProductShop" style="display:none;" onclick="openPublishModal()">+ Put Out Digital Product</button>
+          <!-- Publish moved to My Profile tab -->
         </div>
 
         <!-- Category pill filters -->
@@ -2065,6 +2169,7 @@
       <div class="market-inner">
       <div class="profile-subnav" id="profileSubnav">
         <button type="button" class="active" data-psec="overview" onclick="openProfileSection('overview')">Profile</button>
+        <button type="button" data-psec="requests" onclick="openProfileSection('requests')">My Requests</button>
         <button type="button" data-psec="downloads" onclick="openProfileSection('downloads')">My Downloads</button>
         <button type="button" data-psec="escrow" onclick="openProfileSection('escrow')">Safe Escrow</button>
         <button type="button" data-psec="ownership" onclick="openProfileSection('ownership')">Copyright Registry</button>
@@ -2080,25 +2185,61 @@
           </div>
         </div>
 
-        <!-- Artist-only: Creator Categories -->
-        <div id="artistCategoriesSection" style="display: none;">
-          <div class="profile-field-label">🎨 Creator Specializations</div>
-          <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.6rem;">Select the categories that best describe your creative work. These appear on your public profile.</p>
-          <div class="category-checkbox-grid" id="categoryCheckboxGrid">
-            <!-- Injected by JS -->
-          </div>
-          <div style="margin-top: 1rem;">
-            <button class="btn-create" onclick="saveArtistCategories()" style="padding: 0.5rem 1.2rem;">Save Profile</button>
+        <!-- Bio field (everyone) -->
+        <div class="bio-wrap">
+          <div class="profile-field-label">Bio</div>
+          <textarea id="profileBioInput" maxlength="100" placeholder="Tell people a little about yourself…" oninput="document.getElementById('bioCharCount').textContent=(100-this.value.length)+' left'"></textarea>
+          <div class="bio-char" id="bioCharCount">100 left</div>
+        </div>
+
+        <!-- Artist-only: Publish button -->
+        <div id="artistPublishSection" style="display:none; margin-top:1rem;">
+          <button class="btn-create" onclick="openPublishModal()" style="width:100%;">+ Put Out Digital Product</button>
+        </div>
+
+        <div style="margin-top: 1rem;">
+          <button class="btn-create" onclick="saveProfile()" style="padding: 0.5rem 1.2rem; background: var(--primary);">Save Profile</button>
+        </div>
+
+        <!-- Payment connections (show only) -->
+        <div style="margin-top: 1.5rem;">
+          <div class="profile-field-label">💳 Payment Connections <span style="font-size:0.7rem;color:var(--text-dim);font-weight:400;">(UI preview — click to connect)</span></div>
+          <div class="payment-grid" id="paymentGrid">
+            <div class="payment-card" onclick="togglePayment(this,'PayPal')">
+              <svg viewBox="0 0 24 24" fill="none"><path d="M7.5 22H4l1.5-9h3.5c3.5 0 6-1.5 6.5-5C16.5 3.5 14 2 10.5 2H5L2 22" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 13h3c3.5 0 6-1.5 6.5-5" stroke="#003087" stroke-width="1.5" stroke-linecap="round"/></svg>
+              <div class="payment-card-name">PayPal</div>
+              <div class="payment-card-status">Not connected</div>
+            </div>
+            <div class="payment-card" onclick="togglePayment(this,'Wise')">
+              <svg viewBox="0 0 24 24" fill="none"><path d="M3 12l4-8 4 8-4 4z" fill="#37B55A" opacity=".8"/><path d="M13 12l4-8 4 8-4 4z" fill="#37B55A"/><path d="M7 16l2 4h6l2-4" stroke="#37B55A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <div class="payment-card-name">Wise</div>
+              <div class="payment-card-status">Not connected</div>
+            </div>
+            <div class="payment-card" onclick="togglePayment(this,'Mastercard')">
+              <svg viewBox="0 0 24 24" fill="none"><circle cx="9" cy="12" r="7" fill="#EB001B" opacity=".85"/><circle cx="15" cy="12" r="7" fill="#F79E1B" opacity=".85"/></svg>
+              <div class="payment-card-name">Mastercard</div>
+              <div class="payment-card-status">Not connected</div>
+            </div>
+            <div class="payment-card" onclick="togglePayment(this,'Bank')">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v1H3V9z"/><path d="M5 10v7M10 10v7M14 10v7M19 10v7"/><path d="M2 19h20"/></svg>
+              <div class="payment-card-name">Bank Transfer</div>
+              <div class="payment-card-status">Not connected</div>
+            </div>
+            <div class="payment-card" onclick="togglePayment(this,'Stripe')">
+              <svg viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="4" fill="#635BFF" opacity=".12"/><path d="M11.5 9c0-.8.7-1.1 1.8-1.1 1.6 0 3.2.5 4.2 1.1V5.3C16.4 4.5 14.8 4 12.9 4 9.7 4 7.5 5.6 7.5 9c0 5.2 7.2 4.4 7.2 6.6 0 .9-.8 1.2-1.9 1.2-1.7 0-3.5-.7-4.8-1.6v3.5c1.3.6 2.6.9 4.8.9 3.3 0 5.6-1.6 5.6-5.1C18.4 9.2 11.5 10.1 11.5 9z" fill="#635BFF"/></svg>
+              <div class="payment-card-name">Stripe</div>
+              <div class="payment-card-status">Not connected</div>
+            </div>
+            <div class="payment-card" onclick="togglePayment(this,'GCash')">
+              <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" fill="#007DFF" opacity=".15"/><path d="M12 7v5l3 3" stroke="#007DFF" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="12" r="9" stroke="#007DFF" stroke-width="1.5"/></svg>
+              <div class="payment-card-name">GCash</div>
+              <div class="payment-card-status">Not connected</div>
+            </div>
           </div>
         </div>
 
         <!-- Client section (no posting) -->
         <div id="clientProfileInfo" style="display: none;">
-          <div class="profile-field-label">Your Account</div>
-          <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5;">
-            As a <strong>Client</strong>, you can browse the marketplace, purchase digital assets, and commission artists for custom work.
-            To create and sell content, register as an <strong>Artist</strong> account.
-          </p>
         </div>
       </div>
 
@@ -2110,6 +2251,16 @@
         </div>
       </div>
       </div><!-- end psec-overview -->
+
+      <div class="profile-panel" id="psec-requests">
+        <div style="margin-bottom: 1.5rem;">
+          <h2 style="font-size: 1.4rem; font-weight: 800;">My Requests</h2>
+          <p style="color: var(--text-muted); font-size: 0.85rem;">Custom commission briefs you've sent or received.</p>
+        </div>
+        <div class="commissions-grid" id="profileCommissionsContainer">
+          <div style="grid-column:1/-1;color:var(--text-dim);text-align:center;padding:2rem;">Loading…</div>
+        </div>
+      </div>
 
       <div class="profile-panel" id="psec-downloads">
       <div style="margin-bottom: 1.5rem;">
@@ -2849,8 +3000,7 @@
           products = data;
           renderProducts();
         renderShopProducts();
-        if (document.getElementById('btnPublishProductShop'))
-          document.getElementById('btnPublishProductShop').style.display = currentUser?.role === 'Artist' ? 'block' : 'none';
+        // publish button now lives in My Profile tab only
         renderBrowseCommArtists();
           renderShopProducts();
           renderBrowseCommArtists();
@@ -2940,22 +3090,22 @@
       }
 
       if (user.role === 'Artist') {
-        document.getElementById('btnPublishProduct').style.display = 'block';
         document.getElementById('artistDirectorySection').style.display = 'none';
         document.getElementById('commHeading').textContent = 'Commissions Put Out to You';
-        document.getElementById('artistCategoriesSection').style.display = 'block';
-        document.getElementById('clientProfileInfo').style.display = 'none';
-        buildCategoryCheckboxes(user.creator_categories);
+        document.getElementById('artistPublishSection').style.display = 'block';
+        document.getElementById('myListingsSection').style.display = 'block';
       } else {
-        document.getElementById('btnPublishProduct').style.display = 'none';
         document.getElementById('artistDirectorySection').style.display = 'block';
         document.getElementById('commHeading').textContent = 'Your Commission Briefs';
-        document.getElementById('artistCategoriesSection').style.display = 'none';
-        document.getElementById('clientProfileInfo').style.display = 'block';
+        document.getElementById('artistPublishSection').style.display = 'none';
+        document.getElementById('myListingsSection').style.display = 'none';
       }
 
       // Populate My Profile tab
-      document.getElementById('myProfAvatar').textContent = (user.display_name || user.username || '?').charAt(0).toUpperCase();
+      const avatarChar = (user.display_name || user.username || '?').charAt(0).toUpperCase();
+      document.getElementById('myProfAvatar').textContent = avatarChar;
+      const navAvatar = document.getElementById('navAvatarBtn');
+      if (navAvatar) navAvatar.textContent = avatarChar;
       document.getElementById('myProfDisplayName').textContent = user.display_name;
       document.getElementById('myProfUsername').textContent = `@${user.username}`;
       const myTag = document.getElementById('myProfRoleTag');
@@ -2987,34 +3137,42 @@
       }).join('');
     }
 
-    async function saveArtistCategories() {
-      if (!currentUser || currentUser.role !== 'Artist') return;
-      const checkedBoxes = Array.from(document.querySelectorAll('#categoryCheckboxGrid input[type="checkbox"]:checked'));
-      const chosen = checkedBoxes.map(cb => cb.value.trim());
-      const categoriesStr = chosen.join(',');
-
+    async function saveProfile() {
+      if (!currentUser) return;
+      const bio = (document.getElementById('profileBioInput')?.value || '').trim().slice(0, 100);
       try {
         const res = await fetch(`/api/users/${currentUser.id}/profile`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            creator_categories: categoriesStr
-          })
+          body: JSON.stringify({ display_name: currentUser.display_name, bio })
         });
-
         if (res.ok) {
           const updatedUser = await res.json();
           currentUser = updatedUser;
           localStorage.setItem(STORAGE_KEY, JSON.stringify(currentUser));
-          alert('✓ Creator profile specializations saved successfully!');
-          fetchAllData();
+          const btn = document.querySelector('[onclick="saveProfile()"]');
+          if (btn) { btn.textContent = '✓ Saved'; setTimeout(() => btn.textContent = 'Save Profile', 1800); }
         } else {
-          alert(await res.text() || 'Failed to update profile');
+          alert(await res.text() || 'Failed to save');
         }
-      } catch (err) {
-        console.error('Error saving profile:', err);
-        alert('Could not save profile at this time.');
+      } catch (e) { alert('Could not save profile.'); }
+    }
+
+    // Payment toggle (UI only)
+    function togglePayment(card, name) {
+      const connected = card.classList.toggle('connected');
+      card.querySelector('.payment-card-status').textContent = connected ? '✓ Connected' : 'Not connected';
+    }
+
+    // Render commissions inside My Profile → My Requests panel
+    function renderProfileCommissions() {
+      const c = document.getElementById('profileCommissionsContainer');
+      if (!c) return;
+      if (commissions.length === 0) {
+        c.innerHTML = `<div style="grid-column:1/-1;color:var(--text-dim);text-align:center;padding:2rem;">No commission requests yet.</div>`;
+        return;
       }
+      c.innerHTML = document.getElementById('commissionsContainer')?.innerHTML || '';
     }
 
     function handleLogout() {
@@ -3269,6 +3427,7 @@
           renderArtistProfileProducts();
         }
         renderCommissions();
+        renderProfileCommissions();
         renderPurchases();
         renderLedger();
         renderOwnership();
@@ -4346,6 +4505,10 @@
 
     // Startup Session Restoration & Theme Init
     window.addEventListener('DOMContentLoaded', () => {
+      // Cube intro: dismiss after animation (1.6s) + small buffer
+      const cubeEl = document.getElementById('cubeIntro');
+      if (cubeEl) setTimeout(() => cubeEl.classList.add('done'), 1900);
+
       // Shop category filter
       document.addEventListener('click', e => {
         const btn = e.target.closest('.shop-cat-btn');
