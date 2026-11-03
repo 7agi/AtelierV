@@ -60,13 +60,20 @@
     }
 
 
-    /* Smooth light/dark switch: applied only while toggling so normal hover/animation behaviour is untouched */
-    html.theme-transition, html.theme-transition *, html.theme-transition *::before, html.theme-transition *::after {
-      transition: background-color .45s ease, color .45s ease, border-color .45s ease,
-                  fill .45s ease, stroke .45s ease, box-shadow .45s ease, opacity .45s ease !important;
+    /* Smooth light/dark switch.
+       Preferred path: View Transitions API crossfades one snapshot of the whole page, so every element changes in sync.
+       While it runs, per-element transitions are disabled so nothing lags behind the crossfade. */
+    ::view-transition-old(root), ::view-transition-new(root) {
+      animation-duration: .45s; animation-timing-function: ease; mix-blend-mode: normal;
+    }
+    html.theme-switching *, html.theme-switching *::before, html.theme-switching *::after { transition: none !important; }
+    /* Fallback for browsers without View Transitions */
+    html.theme-fade, html.theme-fade *, html.theme-fade *::before, html.theme-fade *::after {
+      transition: background-color .4s ease, color .4s ease, border-color .4s ease, fill .4s ease, stroke .4s ease, box-shadow .4s ease !important;
     }
     @media (prefers-reduced-motion: reduce) {
-      html.theme-transition, html.theme-transition *, html.theme-transition *::before, html.theme-transition *::after { transition: none !important; }
+      ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; }
+      html.theme-fade, html.theme-fade * { transition: none !important; }
     }
 
     * {
@@ -2867,10 +2874,18 @@
       const current = document.documentElement.getAttribute('data-theme') || 'light';
       const next = current === 'dark' ? 'light' : 'dark';
       const root = document.documentElement;
-      root.classList.add('theme-transition');
-      applyTheme(next);
-      clearTimeout(window._themeTransitionTimer);
-      window._themeTransitionTimer = setTimeout(() => root.classList.remove('theme-transition'), 500);
+      const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (reduce) { applyTheme(next); return; }
+      if (document.startViewTransition) {
+        root.classList.add('theme-switching');
+        const vt = document.startViewTransition(() => applyTheme(next));
+        vt.finished.finally(() => root.classList.remove('theme-switching'));
+      } else {
+        root.classList.add('theme-fade');
+        applyTheme(next);
+        clearTimeout(window._themeFadeTimer);
+        window._themeFadeTimer = setTimeout(() => root.classList.remove('theme-fade'), 450);
+      }
     }
 
     // Auth shader: animated brand-purple gradient blobs in #authShader.
@@ -4804,24 +4819,21 @@
         const TOTAL = 2400; // ms total
         const start = performance.now();
 
-        function project(v, rx, ry) {
-          // rotate X then Y
-          let [x,y,z] = v;
-          let y2 = y*Math.cos(rx) - z*Math.sin(rx);
-          let z2 = y*Math.sin(rx) + z*Math.cos(rx);
-          let x3 = x*Math.cos(ry) + z2*Math.sin(ry);
-          let z3 =-x*Math.sin(ry) + z2*Math.cos(ry);
-          // perspective
-          const fov = 420;
-          const scale = fov / (fov + z3 + S*1.5);
-          return [W/2 + x3*scale, H/2 + y2*scale, scale, z3];
+        const CAM_Z = -(420 + S * 1.5); // camera position implied by project()
+
+        function rotate(v, rx, ry) {
+          const [x,y,z] = v;
+          const y2 = y*Math.cos(rx) - z*Math.sin(rx);
+          const z2 = y*Math.sin(rx) + z*Math.cos(rx);
+          const x3 = x*Math.cos(ry) + z2*Math.sin(ry);
+          const z3 = -x*Math.sin(ry) + z2*Math.cos(ry);
+          return [x3, y2, z3];
         }
 
-        function faceNormal(pts2d) {
-          // cross product z for back-face culling
-          const ax = pts2d[1][0]-pts2d[0][0], ay = pts2d[1][1]-pts2d[0][1];
-          const bx = pts2d[2][0]-pts2d[0][0], by = pts2d[2][1]-pts2d[0][1];
-          return ax*by - ay*bx;
+        function project(r) {
+          const fov = 420;
+          const scale = fov / (fov + r[2] + S*1.5);
+          return [W/2 + r[0]*scale, H/2 + r[1]*scale, scale, r[2]];
         }
 
         function drawFrame(now) {
@@ -4842,30 +4854,29 @@
           ctx.clearRect(0, 0, W, H);
           ctx.globalAlpha = alpha;
 
-          // project all verts
-          const pv = verts.map(v => project(v, rx, ry));
+          // rotate all verts once, then project
+          const rv = verts.map(v => rotate(v, rx, ry));
+          const pv = rv.map(project);
 
-          // sort faces by avg depth (painter's algorithm)
-          const sorted = faces.map(f => {
+          // A face is visible when its outward normal points toward the camera.
+          // The cube is centred at the origin, so a face's centre doubles as its outward normal.
+          // This doesn't depend on vertex winding order, so no face is wrongly culled.
+          const visible = faces.map(f => {
+            const c = [0,1,2].map(k => f.idx.reduce((sum,i) => sum + rv[i][k], 0) / 4);
+            const toFace = [c[0], c[1], c[2] - CAM_Z];
+            const facing = c[0]*toFace[0] + c[1]*toFace[1] + c[2]*toFace[2] < 0;
             const pts = f.idx.map(i => pv[i]);
-            const avgZ = pts.reduce((s,p) => s+p[3], 0) / pts.length;
-            return { ...f, pts, avgZ };
-          }).sort((a,b) => b.avgZ - a.avgZ);
+            return { ...f, pts, facing, avgZ: pts.reduce((sum,p) => sum + p[3], 0) / 4 };
+          }).filter(f => f.facing).sort((a,b) => b.avgZ - a.avgZ); // far to near
 
-          sorted.forEach(f => {
+          visible.forEach(f => {
             const pts = f.pts;
-            if (faceNormal(pts) > 0) return; // back-face cull
-
             ctx.beginPath();
             ctx.moveTo(pts[0][0], pts[0][1]);
             for (let i = 1; i < pts.length; i++) ctx.lineTo(pts[i][0], pts[i][1]);
             ctx.closePath();
-
             ctx.fillStyle = f.shade;
             ctx.fill();
-            // no stroke — clean look
-
-
           });
 
           ctx.globalAlpha = 1;
