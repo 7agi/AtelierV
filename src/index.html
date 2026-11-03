@@ -84,45 +84,11 @@
       background: var(--bg-base);
       display: flex; align-items: center; justify-content: center;
       pointer-events: none;
+      transition: opacity 0.4s ease;
     }
-    #cubeIntro.done { display: none; }
-
-    .cube-scene {
-      width: 100px; height: 100px;
-      perspective: 520px;
-      perspective-origin: 50% 50%;
-    }
-    .cube {
-      width: 100px; height: 100px;
-      position: relative;
-      transform-style: preserve-3d;
-      animation: cubeRoll 2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-    }
-    @keyframes cubeRoll {
-      0%   { transform: rotateX(-30deg) rotateY(-120deg) scale(0.55); opacity: 0; }
-      18%  { opacity: 1; }
-      45%  { transform: rotateX(-15deg) rotateY(-30deg)  scale(1.05); opacity: 1; }
-      70%  { transform: rotateX(10deg)  rotateY(60deg)   scale(1);    opacity: 1; }
-      88%  { opacity: 1; }
-      100% { transform: rotateX(25deg)  rotateY(160deg)  scale(0.5);  opacity: 0; }
-    }
-    .cube-face {
-      position: absolute;
-      width: 100px; height: 100px;
-      border: 2px solid rgba(186,135,212,0.7);
-      border-radius: 12px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.5rem; font-weight: 800; color: var(--primary);
-      background: rgba(186,135,212,0.10);
-      backface-visibility: visible;
-    }
-    /* half-size = 50px */
-    .cube-face.front  { transform: translateZ(50px); }
-    .cube-face.back   { transform: rotateY(180deg)  translateZ(50px); }
-    .cube-face.left   { transform: rotateY(-90deg)  translateZ(50px); }
-    .cube-face.right  { transform: rotateY( 90deg)  translateZ(50px); }
-    .cube-face.top    { transform: rotateX( 90deg)  translateZ(50px); }
-    .cube-face.bottom { transform: rotateX(-90deg)  translateZ(50px); }
+    #cubeIntro.done { opacity: 0; pointer-events: none; }
+    #cubeIntro.gone { display: none; }
+    #cubeCanvas { display: block; }
 
     /* ── Tab fade transition ── */
     @keyframes tabFadeIn {
@@ -1818,16 +1784,7 @@
   <!-- Auth Overlay -->
   <!-- Cube intro transition -->
   <div id="cubeIntro" aria-hidden="true">
-    <div class="cube-scene">
-      <div class="cube">
-        <div class="cube-face front">aV</div>
-        <div class="cube-face back">aV</div>
-        <div class="cube-face left">✦</div>
-        <div class="cube-face right">✦</div>
-        <div class="cube-face top">◆</div>
-        <div class="cube-face bottom">◆</div>
-      </div>
-    </div>
+    <canvas id="cubeCanvas" width="220" height="220"></canvas>
   </div>
 
   <div id="authOverlay">
@@ -4514,9 +4471,122 @@
 
     // Startup Session Restoration & Theme Init
     window.addEventListener('DOMContentLoaded', () => {
-      // Cube intro: dismiss after animation (1.6s) + small buffer
-      const cubeEl = document.getElementById('cubeIntro');
-      if (cubeEl) setTimeout(() => cubeEl.classList.add('done'), 1900);
+      // ── Canvas cube intro ──
+      (function startCubeIntro() {
+        const el   = document.getElementById('cubeIntro');
+        const canvas = document.getElementById('cubeCanvas');
+        if (!el || !canvas) return;
+        const ctx  = canvas.getContext('2d');
+        const W = 220, H = 220, S = 62; // canvas size, half-edge
+
+        const PRIMARY   = '#ba87d4';
+        const FACE_FILL = 'rgba(186,135,212,0.13)';
+        const LABEL_COL = '#ba87d4';
+
+        // 8 vertices of a cube centred at origin, size S
+        const verts = [
+          [-S,-S,-S],[S,-S,-S],[S,S,-S],[-S,S,-S],
+          [-S,-S, S],[S,-S, S],[S,S, S],[-S,S, S]
+        ];
+        // 6 faces as vertex indices + label
+        const faces = [
+          { idx:[4,5,6,7], label:'aV'  },
+          { idx:[1,0,3,2], label:'aV'  },
+          { idx:[5,1,2,6], label:'✦'   },
+          { idx:[0,4,7,3], label:'✦'   },
+          { idx:[0,1,5,4], label:'◆'   },
+          { idx:[3,2,6,7], label:'◆'   },
+        ];
+
+        const TOTAL = 2400; // ms total
+        const start = performance.now();
+
+        function project(v, rx, ry) {
+          // rotate X then Y
+          let [x,y,z] = v;
+          let y2 = y*Math.cos(rx) - z*Math.sin(rx);
+          let z2 = y*Math.sin(rx) + z*Math.cos(rx);
+          let x3 = x*Math.cos(ry) + z2*Math.sin(ry);
+          let z3 =-x*Math.sin(ry) + z2*Math.cos(ry);
+          // perspective
+          const fov = 420;
+          const scale = fov / (fov + z3 + S*1.5);
+          return [W/2 + x3*scale, H/2 + y2*scale, scale, z3];
+        }
+
+        function faceNormal(pts2d) {
+          // cross product z for back-face culling
+          const ax = pts2d[1][0]-pts2d[0][0], ay = pts2d[1][1]-pts2d[0][1];
+          const bx = pts2d[2][0]-pts2d[0][0], by = pts2d[2][1]-pts2d[0][1];
+          return ax*by - ay*bx;
+        }
+
+        function drawFrame(now) {
+          const t = Math.min((now - start) / TOTAL, 1);
+
+          // ease in-out cubic
+          const ease = t < 0.5 ? 4*t*t*t : 1 - Math.pow(-2*t+2,3)/2;
+
+          // opacity: fade in 0→0.15, full 0.15→0.8, fade out 0.8→1
+          let alpha = 1;
+          if (t < 0.15) alpha = t / 0.15;
+          else if (t > 0.80) alpha = 1 - (t - 0.80) / 0.20;
+
+          // rotation: sweep from (-0.5,-1.2) to (0.5, 2.0)
+          const rx = -0.5 + ease * 1.0;
+          const ry = -1.2 + ease * 3.2;
+
+          ctx.clearRect(0, 0, W, H);
+          ctx.globalAlpha = alpha;
+
+          // project all verts
+          const pv = verts.map(v => project(v, rx, ry));
+
+          // sort faces by avg depth (painter's algorithm)
+          const sorted = faces.map(f => {
+            const pts = f.idx.map(i => pv[i]);
+            const avgZ = pts.reduce((s,p) => s+p[3], 0) / pts.length;
+            return { ...f, pts, avgZ };
+          }).sort((a,b) => b.avgZ - a.avgZ);
+
+          sorted.forEach(f => {
+            const pts = f.pts;
+            if (faceNormal(pts) > 0) return; // back-face cull
+
+            ctx.beginPath();
+            ctx.moveTo(pts[0][0], pts[0][1]);
+            for (let i = 1; i < pts.length; i++) ctx.lineTo(pts[i][0], pts[i][1]);
+            ctx.closePath();
+
+            ctx.fillStyle = FACE_FILL;
+            ctx.fill();
+            ctx.strokeStyle = PRIMARY;
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // label centroid
+            const cx = pts.reduce((s,p)=>s+p[0],0)/pts.length;
+            const cy = pts.reduce((s,p)=>s+p[1],0)/pts.length;
+            const avgScale = pts.reduce((s,p)=>s+p[2],0)/pts.length;
+            ctx.fillStyle = LABEL_COL;
+            ctx.font = `700 ${Math.round(18*avgScale)}px "Plus Jakarta Sans",sans-serif`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(f.label, cx, cy);
+          });
+
+          ctx.globalAlpha = 1;
+
+          if (t < 1) {
+            requestAnimationFrame(drawFrame);
+          } else {
+            el.classList.add('done');
+            setTimeout(() => el.classList.add('gone'), 450);
+          }
+        }
+
+        requestAnimationFrame(drawFrame);
+      })();
 
       // Shop category filter
       document.addEventListener('click', e => {
